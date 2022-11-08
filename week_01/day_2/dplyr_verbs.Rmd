@@ -267,3 +267,129 @@ all_deaths %>%
   arrange(desc(year_of_death))
 ```
 
+mutate() up next! Use this to create or modify columns
+
+```{r}
+all_deaths %>% 
+  mutate(years_survived = year_of_death - 298, .after = year_of_death) %>% 
+  arrange(desc(years_survived))
+```
+
+this will make a new column years_survived which is a subtraction of years_of_death and 298. .after dictates where the column goes. .before also works!
+
+Mutate can be used with conversion functions. Stuff like
+
+as.integer()
+as.double()
+as.numeric()
+as.character()
+as.factor()
+as.logical()
+
+```{r}
+all_deaths %>% 
+  mutate(book_of_death = as.character(book_of_death))
+```
+
+BE CAREFUL. Converting in ways that don't make sense will blow up your stuff.
+
+```{r}
+all_deaths %>% 
+  mutate(name = as.numeric(name))
+```
+
+Telling it to convert characters to numerics will N/A out data!
+
+```{r}
+all_deaths %>% 
+  mutate(year_of_death = mean(year_of_death, na.rm = TRUE))
+```
+
+the na.rm in the above is a flag to tell the calculation to exclue N/As.
+
+Quick task --
+
+1 Add a new column which is a logical vector, which has TRUE if book_intro_chapter is empty, and FALSE if it isn’t. Hint: you’ll need to use the is.na function.
+2 Change the nobility column to a logical vector.
+3 Find the number of male characters by taking the sum of the gender column (as gender = 1 is male).
+
+```{r}
+all_deaths %>% 
+  mutate(no_intro = as.logical(is.na(book_intro_chapter)))
+```
+
+```{r}
+all_deaths %>% 
+  mutate(as.logical(nobility))
+```
+
+```{r}
+all_deaths %>% 
+  mutate(men = sum(gender))
+```
+
+last one not very useful!
+
+NEXT! summarise()
+
+This is a better way to do question 3 from above. Few other options though!
+
+```{r}
+all_deaths %>% 
+  summarise(n_males = sum(gender))
+```
+
+AND groupby()
+
+```{r}
+all_deaths %>% 
+  group_by(allegiances) %>% 
+  summarise(character_count = n())
+```
+
+```{r}
+all_deaths %>% 
+  group_by(allegiances) %>% 
+  summarise(character_count = n())
+```
+
+n() function simply reports the size of a group, so it's taking those groups, counting their members and then summarising the result.
+
+```{r}
+all_deaths %>% 
+  group_by(nobility, gender) %>% 
+  summarise(character_count = n())
+```
+
+New task!
+
+If a character doesn’t have a missing value for book_of_death, this means that they have died at some point. Use this to find the allegiances with the highest number of people dead.
+Hint You will need to:
+Filter the data so we just have characters who have died.
+Use group by and summarise to find the number of characters who belonged to each allegiance.
+Arrange so the highest values come first. 
+Try to use a single pipe sequence for this solution.
+
+```{r}
+all_deaths %>% 
+  filter(!is.na(book_of_death)) %>% #
+  group_by(allegiances) %>% 
+  summarise(character_count = n()) %>% 
+  arrange(desc(character_count))
+```
+
+```{r}
+all_deaths %>% 
+  filter(is.na(book_of_death))
+```
+
+NEXT! pull()
+
+```{r}
+average_year_of_death <- all_deaths %>% 
+  summarise(avg_value = mean(year_of_death, na.rm = TRUE)) %>% 
+  pull()
+all_deaths %>% 
+  mutate(death_later_than_average = year_of_death > average_year_of_death)
+```
+
