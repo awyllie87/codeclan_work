@@ -1,0 +1,7 @@
+---
+title: "dplyr verbs"
+output: html_notebook
+---
+
+Goal today is to figure out what all the dplyr verbs do and how to use them
+
