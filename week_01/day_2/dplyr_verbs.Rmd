@@ -5,3 +5,265 @@ output: html_notebook
 
 Goal today is to figure out what all the dplyr verbs do and how to use them
 
+On the block today --
+
+select()
+filter()
+arrange()
+mutate()
+group_by()
+summarise()
+
+First up, load libraries. CodeClanData is where all the class data is kept.
+
+```{r}
+library(tidyverse)
+library(CodeClanData)
+library(skimr)
+```
+
+Brief R lesson -- two ways to call functions from libraries. Either load the entitre library with the library() call and then use the function, or via calling the function explicitly via libraryname::function_name eg praise::praise()
+
+CodeClanData has a whole bunch of datasets inside it, so we're going to use those.
+
+```{r}
+all_deaths
+```
+
+This is a very daft dataset. Game of Thrones!
+
+How big is this dataset?
+```{r}
+nrow(all_deaths)
+```
+
+will let us know how many rows.
+
+```{r}
+ncol(all_deaths)
+```
+
+for columns.
+
+Want the dimensions?
+
+```{r}
+dim(all_deaths)
+```
+
+will do that.
+
+```{r}
+names(all_deaths)
+```
+
+gives us the names of all the columns (and give us column numbers!)
+
+```{r}
+head(all_deaths)
+```
+
+will give us the top of the data. You can customise how many rows you see --
+
+```{r}
+head(all_deaths, 10)
+```
+
+you can use tail() to see the bottom instead
+
+```{r}
+tail(all_deaths)
+```
+
+Cool summary function -
+
+```{r}
+glimpse(all_deaths)
+```
+
+Want a little sanity? Have a look at the dataset as an actual table! Probably don't want this in code, but it might be useful in console!
+
+```{r}
+View(all_deaths)
+```
+
+Useful function in skimr:
+
+```{r}
+skim(all_deaths)
+```
+Gives you a pretty simple summation of the data.
+
+Time for dplyr! select() will let you pull just the columns you want
+
+```{r}
+select(all_deaths, name, allegiances, gender, nobility, year_of_death)
+```
+
+You can also do the reverse and just nominate columns to not view.
+
+```{r}
+select(all_deaths, -name)
+```
+
+Reminder that without assigning these to an object, you're not actually doing anything besides view it.
+
+```{r}
+all_deaths_no_names <- select(all_deaths, -name)
+```
+
+will throw it into an object. If you want it to be a little more interactive, wrap the whole line in parentheses and RStudio will pop a view of the new object for you
+
+```{r}
+(all_deaths_no_names <- select(all_deaths, -name))
+```
+
+Cool shit you can do -- 
+
+select() has a whole bunch of helper functions. Check the man page with ?
+
+```{r}
+?select
+```
+
+What if you wanted just the columns related to a book?
+
+```{r}
+select(all_deaths, contains("Book"))
+```
+
+how about related to a death?
+
+```{r}
+select(all_deaths, contains("Death"))
+```
+
+You can combine things to get useful stuff like this --
+
+```{r}
+select(all_deaths, name, contains("Death"))
+```
+
+Now for filter(). Same as select(), but for rows! Let's you return all rows that meet a condition.
+
+Makes big use of the logical operators.
+
+Useful one you might not know --
+
+%in% checks for equality against *more than one* value.
+
+Time for some examples -
+
+```{r}
+filter(all_deaths, allegiances == "Lannister")
+```
+
+```{r}
+filter(all_deaths, allegiances != "Lannister")
+```
+
+Shows everyone who is or isn't a Lannister
+
+```{r}
+filter(all_deaths, allegiances %in% c("House Lannister", "Lannister"))
+```
+
+Note that this pulls more results than the initial filter! The filter is doing exact matches, so all the ones with the "House" prefix *were not included*
+
+```{r}
+filter(all_deaths, year_of_death >= 299)
+```
+
+Sidebar into a handy bonus function --
+
+```{r}
+distinct(all_deaths, allegiances)
+```
+
+will show you all the distinct values from a column. So if you're trying to glance at all the House names or something, this is a handy way to give it a glance.
+
+Might be helpful to manipulate it a bit, so
+
+```{r}
+distinct_alleg <- distinct(all_deaths, allegiances)
+
+arrange(distinct_alleg, allegiances)
+```
+
+Will put them all in distinct_alleg and then sort them alphabetically
+
+```{r}
+filter(all_deaths, allegiances == "Lannister" 
+       & nobility == 1)
+```
+
+```{r}
+filter(all_deaths, book_intro_chapter >= 5 &
+         book_intro_chapter <= 10)
+```
+
+Quick note -- AND takes precedence over OR
+
+```{r}
+filter(all_deaths, year_of_death <= 299)
+```
+
+
+```{r}
+filter(all_deaths, name %in% c("Jon Snow", "Samwell Tarly", "Daenerys Targaryen"))
+```
+
+```{r}
+got_characters <- filter(all_deaths, allegiances != "Lannister" & gender == 0)
+select(got_characters, name)
+```
+OR NEST THIS
+
+```{r}
+select(filter(all_deaths, allegiances != "Lannister" & gender == 0), name)
+```
+
+```{r}
+all_deaths %>% 
+  filter(allegiances != "Lannister" & gender == 0) %>%
+  select(name)
+```
+
+PIPES OWN. CTRL+SHIFT+M %>% %>% %>% %>% %>% %>% %>% 
+
+Time for arrange(). By default this is in ascending order
+
+```{r}
+all_deaths %>% 
+  arrange(gender)
+```
+
+Wanna do it descending?
+
+```{r}
+all_deaths %>% 
+  arrange(desc(gender))
+```
+
+You can sort my multiple columns. Sorts in priority from left to right.
+
+```{r}
+all_deaths %>% 
+  arrange(book_of_death, death_chapter)
+```
+
+```{r}
+all_deaths %>% 
+  arrange(allegiances)
+```
+
+```{r}
+all_deaths %>% 
+  arrange(allegiances, book_intro_chapter)
+```
+
+```{r}
+all_deaths %>% 
+  arrange(desc(year_of_death))
+```
+

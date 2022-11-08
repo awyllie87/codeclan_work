@@ -1763,9 +1763,356 @@ pre code {
 <!-- rnb-text-begin -->
 <p>Goal today is to figure out what all the dplyr verbs do and how to
 use them</p>
+<p>On the block today –</p>
+<p>select() filter() arrange() mutate() group_by() summarise()</p>
+<p>First up, load libraries. CodeClanData is where all the class data is
+kept.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShza2ltcilcblxuYGBgIn0= -->
+<pre class="r"><code>library(skimr)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogcGFja2FnZSDigJhza2ltcuKAmSB3YXMgYnVpbHQgdW5kZXIgUiB2ZXJzaW9uIDQuMi4yXG4ifQ== -->
+<pre><code>Warning: package ‘skimr’ was built under R version 4.2.2</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Brief R lesson – two ways to call functions from libraries. Either
+load the entitre library with the library() call and then use the
+function, or via calling the function explicitly via
+libraryname::function_name eg praise::praise()</p>
+<p>CodeClanData has a whole bunch of datasets inside it, so we’re going
+to use those.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2RlYXRoc1xuYGBgIn0= -->
+<pre class="r"><code>all_deaths</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>This is a very daft dataset. Game of Thrones!</p>
+<p>How big is this dataset?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubnJvdyhhbGxfZGVhdGhzKVxuYGBgIn0= -->
+<pre class="r"><code>nrow(all_deaths)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>will let us know how many rows.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmNvbChhbGxfZGVhdGhzKVxuYGBgIn0= -->
+<pre class="r"><code>ncol(all_deaths)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>for columns.</p>
+<p>Want the dimensions?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGltKGFsbF9kZWF0aHMpXG5gYGAifQ== -->
+<pre class="r"><code>dim(all_deaths)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>will do that.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmFtZXMoYWxsX2RlYXRocylcbmBgYCJ9 -->
+<pre class="r"><code>names(all_deaths)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>gives us the names of all the columns (and give us column
+numbers!)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChhbGxfZGVhdGhzKVxuYGBgIn0= -->
+<pre class="r"><code>head(all_deaths)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>will give us the top of the data. You can customise how many rows you
+see –</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChhbGxfZGVhdGhzLCAxMClcbmBgYCJ9 -->
+<pre class="r"><code>head(all_deaths, 10)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>you can use tail() to see the bottom instead</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFpbChhbGxfZGVhdGhzKVxuYGBgIn0= -->
+<pre class="r"><code>tail(all_deaths)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Cool summary function -</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2xpbXBzZShhbGxfZGVhdGhzKVxuYGBgIn0= -->
+<pre class="r"><code>glimpse(all_deaths)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Want a little sanity? Have a look at the dataset as an actual table!
+Probably don’t want this in code, but it might be useful in console!</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Useful function in skimr:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2tpbShhbGxfZGVhdGhzKVxuYGBgIn0= -->
+<pre class="r"><code>skim(all_deaths)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Gives you a pretty simple summation of the data.</p>
+<p>Time for dplyr! select() will let you pull just the columns you
+want</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VsZWN0KGFsbF9kZWF0aHMsIG5hbWUsIGFsbGVnaWFuY2VzLCBnZW5kZXIsIG5vYmlsaXR5LCB5ZWFyX29mX2RlYXRoKVxuYGBgIn0= -->
+<pre class="r"><code>select(all_deaths, name, allegiances, gender, nobility, year_of_death)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>You can also do the reverse and just nominate columns to not
+view.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VsZWN0KGFsbF9kZWF0aHMsIC1uYW1lKVxuYGBgIn0= -->
+<pre class="r"><code>select(all_deaths, -name)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Reminder that without assigning these to an object, you’re not
+actually doing anything besides view it.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>will throw it into an object. If you want it to be a little more
+interactive, wrap the whole line in parentheses and RStudio will pop a
+view of the new object for you</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuKGFsbF9kZWF0aHNfbm9fbmFtZXMgPC0gc2VsZWN0KGFsbF9kZWF0aHMsIC1uYW1lKSlcbmBgYCJ9 -->
+<pre class="r"><code>(all_deaths_no_names &lt;- select(all_deaths, -name))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Cool shit you can do –</p>
+<p>select() has a whole bunch of helper functions. Check the man page
+with ?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>What if you wanted just the columns related to a book?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VsZWN0KGFsbF9kZWF0aHMsIGNvbnRhaW5zKFwiQm9va1wiKSlcbmBgYCJ9 -->
+<pre class="r"><code>select(all_deaths, contains(&quot;Book&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>how about related to a death?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VsZWN0KGFsbF9kZWF0aHMsIGNvbnRhaW5zKFwiRGVhdGhcIikpXG5gYGAifQ== -->
+<pre class="r"><code>select(all_deaths, contains(&quot;Death&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>You can combine things to get useful stuff like this –</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VsZWN0KGFsbF9kZWF0aHMsIG5hbWUsIGNvbnRhaW5zKFwiRGVhdGhcIikpXG5gYGAifQ== -->
+<pre class="r"><code>select(all_deaths, name, contains(&quot;Death&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Now for filter(). Same as select(), but for rows! Let’s you return
+all rows that meet a condition.</p>
+<p>Makes big use of the logical operators.</p>
+<p>Useful one you might not know –</p>
+<p>%in% checks for equality against <em>more than one</em> value.</p>
+<p>Time for some examples -</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGFsbF9kZWF0aHMsIGFsbGVnaWFuY2VzID09IFwiTGFubmlzdGVyXCIpXG5gYGAifQ== -->
+<pre class="r"><code>filter(all_deaths, allegiances == &quot;Lannister&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGFsbF9kZWF0aHMsIGFsbGVnaWFuY2VzICE9IFwiTGFubmlzdGVyXCIpXG5gYGAifQ== -->
+<pre class="r"><code>filter(all_deaths, allegiances != &quot;Lannister&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Shows everyone who is or isn’t a Lannister</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGFsbF9kZWF0aHMsIGFsbGVnaWFuY2VzICVpbiUgYyhcIkhvdXNlIExhbm5pc3RlclwiLCBcIkxhbm5pc3RlclwiKSlcbmBgYCJ9 -->
+<pre class="r"><code>filter(all_deaths, allegiances %in% c(&quot;House Lannister&quot;, &quot;Lannister&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Note that this pulls more results than the initial filter! The filter
+is doing exact matches, so all the ones with the “House” prefix <em>were
+not included</em></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGFsbF9kZWF0aHMsIHllYXJfb2ZfZGVhdGggPj0gMjk5KVxuYGBgIn0= -->
+<pre class="r"><code>filter(all_deaths, year_of_death &gt;= 299)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Sidebar into a handy bonus function –</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlzdGluY3QoYWxsX2RlYXRocywgYWxsZWdpYW5jZXMpXG5gYGAifQ== -->
+<pre class="r"><code>distinct(all_deaths, allegiances)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>will show you all the distinct values from a column. So if you’re
+trying to glance at all the House names or something, this is a handy
+way to give it a glance.</p>
+<p>Might be helpful to manipulate it a bit, so</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGlzdGluY3RfYWxsZWcgPC0gZGlzdGluY3QoYWxsX2RlYXRocywgYWxsZWdpYW5jZXMpXG5cbmFycmFuZ2UoZGlzdGluY3RfYWxsZWcsIGFsbGVnaWFuY2VzKVxuYGBgIn0= -->
+<pre class="r"><code>distinct_alleg &lt;- distinct(all_deaths, allegiances)
+
+arrange(distinct_alleg, allegiances)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Will put them all in distinct_alleg and then sort them
+alphabetically</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGFsbF9kZWF0aHMsIGFsbGVnaWFuY2VzID09IFwiTGFubmlzdGVyXCIgXG4gICAgICAgJiBub2JpbGl0eSA9PSAxKVxuYGBgIn0= -->
+<pre class="r"><code>filter(all_deaths, allegiances == &quot;Lannister&quot; 
+       &amp; nobility == 1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGFsbF9kZWF0aHMsIGJvb2tfaW50cm9fY2hhcHRlciA+PSA1ICZcbiAgICAgICAgIGJvb2tfaW50cm9fY2hhcHRlciA8PSAxMClcbmBgYCJ9 -->
+<pre class="r"><code>filter(all_deaths, book_intro_chapter &gt;= 5 &amp;
+         book_intro_chapter &lt;= 10)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Quick note – AND takes precedence over OR</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGFsbF9kZWF0aHMsIHllYXJfb2ZfZGVhdGggPD0gMjk5KVxuYGBgIn0= -->
+<pre class="r"><code>filter(all_deaths, year_of_death &lt;= 299)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsdGVyKGFsbF9kZWF0aHMsIG5hbWUgJWluJSBjKFwiSm9uIFNub3dcIiwgXCJTYW13ZWxsIFRhcmx5XCIsIFwiRGFlbmVyeXMgVGFyZ2FyeWVuXCIpKVxuYGBgIn0= -->
+<pre class="r"><code>filter(all_deaths, name %in% c(&quot;Jon Snow&quot;, &quot;Samwell Tarly&quot;, &quot;Daenerys Targaryen&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ290X2NoYXJhY3RlcnMgPC0gZmlsdGVyKGFsbF9kZWF0aHMsIGFsbGVnaWFuY2VzICE9IFwiTGFubmlzdGVyXCIgJiBnZW5kZXIgPT0gMClcbnNlbGVjdChnb3RfY2hhcmFjdGVycywgbmFtZSlcbmBgYCJ9 -->
+<pre class="r"><code>got_characters &lt;- filter(all_deaths, allegiances != &quot;Lannister&quot; &amp; gender == 0)
+select(got_characters, name)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>OR NEST THIS</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VsZWN0KGZpbHRlcihhbGxfZGVhdGhzLCBhbGxlZ2lhbmNlcyAhPSBcIkxhbm5pc3RlclwiICYgZ2VuZGVyID09IDApLCBuYW1lKVxuYGBgIn0= -->
+<pre class="r"><code>select(filter(all_deaths, allegiances != &quot;Lannister&quot; &amp; gender == 0), name)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2RlYXRocyAlPiUgXG4gIGZpbHRlcihhbGxlZ2lhbmNlcyAhPSBcIkxhbm5pc3RlclwiICYgZ2VuZGVyID09IDApICU+JVxuICBzZWxlY3QobmFtZSlcbmBgYCJ9 -->
+<pre class="r"><code>all_deaths %&gt;% 
+  filter(allegiances != &quot;Lannister&quot; &amp; gender == 0) %&gt;%
+  select(name)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>PIPES OWN. CTRL+SHIFT+M %&gt;% %&gt;% %&gt;% %&gt;% %&gt;% %&gt;%
+%&gt;%</p>
+<p>Time for arrange(). By default this is in ascending order</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2RlYXRocyAlPiUgXG4gIGFycmFuZ2UoZ2VuZGVyKVxuYGBgIn0= -->
+<pre class="r"><code>all_deaths %&gt;% 
+  arrange(gender)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Wanna do it descending?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2RlYXRocyAlPiUgXG4gIGFycmFuZ2UoZGVzYyhnZW5kZXIpKVxuYGBgIn0= -->
+<pre class="r"><code>all_deaths %&gt;% 
+  arrange(desc(gender))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>You can sort my multiple columns. Sorts in priority from left to
+right.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2RlYXRocyAlPiUgXG4gIGFycmFuZ2UoYm9va19vZl9kZWF0aCwgZGVhdGhfY2hhcHRlcilcbmBgYCJ9 -->
+<pre class="r"><code>all_deaths %&gt;% 
+  arrange(book_of_death, death_chapter)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2RlYXRocyAlPiUgXG4gIGFycmFuZ2UoYWxsZWdpYW5jZXMpXG5gYGAifQ== -->
+<pre class="r"><code>all_deaths %&gt;% 
+  arrange(allegiances)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2RlYXRocyAlPiUgXG4gIGFycmFuZ2UoYWxsZWdpYW5jZXMsIGJvb2tfaW50cm9fY2hhcHRlcilcbmBgYCJ9 -->
+<pre class="r"><code>all_deaths %&gt;% 
+  arrange(allegiances, book_intro_chapter)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2RlYXRocyAlPiUgXG4gIGFycmFuZ2UoZGVzYyh5ZWFyX29mX2RlYXRoKSlcbmBgYCJ9 -->
+<pre class="r"><code>all_deaths %&gt;% 
+  arrange(desc(year_of_death))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogImRwbHlyIHZlcmJzIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KR29hbCB0b2RheSBpcyB0byBmaWd1cmUgb3V0IHdoYXQgYWxsIHRoZSBkcGx5ciB2ZXJicyBkbyBhbmQgaG93IHRvIHVzZSB0aGVtDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogImRwbHlyIHZlcmJzIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KR29hbCB0b2RheSBpcyB0byBmaWd1cmUgb3V0IHdoYXQgYWxsIHRoZSBkcGx5ciB2ZXJicyBkbyBhbmQgaG93IHRvIHVzZSB0aGVtDQoNCk9uIHRoZSBibG9jayB0b2RheSAtLQ0KDQpzZWxlY3QoKQ0KZmlsdGVyKCkNCmFycmFuZ2UoKQ0KbXV0YXRlKCkNCmdyb3VwX2J5KCkNCnN1bW1hcmlzZSgpDQoNCkZpcnN0IHVwLCBsb2FkIGxpYnJhcmllcy4gQ29kZUNsYW5EYXRhIGlzIHdoZXJlIGFsbCB0aGUgY2xhc3MgZGF0YSBpcyBrZXB0Lg0KDQpgYGB7cn0NCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShDb2RlQ2xhbkRhdGEpDQpsaWJyYXJ5KHNraW1yKQ0KYGBgDQoNCkJyaWVmIFIgbGVzc29uIC0tIHR3byB3YXlzIHRvIGNhbGwgZnVuY3Rpb25zIGZyb20gbGlicmFyaWVzLiBFaXRoZXIgbG9hZCB0aGUgZW50aXRyZSBsaWJyYXJ5IHdpdGggdGhlIGxpYnJhcnkoKSBjYWxsIGFuZCB0aGVuIHVzZSB0aGUgZnVuY3Rpb24sIG9yIHZpYSBjYWxsaW5nIHRoZSBmdW5jdGlvbiBleHBsaWNpdGx5IHZpYSBsaWJyYXJ5bmFtZTo6ZnVuY3Rpb25fbmFtZSBlZyBwcmFpc2U6OnByYWlzZSgpDQoNCkNvZGVDbGFuRGF0YSBoYXMgYSB3aG9sZSBidW5jaCBvZiBkYXRhc2V0cyBpbnNpZGUgaXQsIHNvIHdlJ3JlIGdvaW5nIHRvIHVzZSB0aG9zZS4NCg0KYGBge3J9DQphbGxfZGVhdGhzDQpgYGANCg0KVGhpcyBpcyBhIHZlcnkgZGFmdCBkYXRhc2V0LiBHYW1lIG9mIFRocm9uZXMhDQoNCkhvdyBiaWcgaXMgdGhpcyBkYXRhc2V0Pw0KYGBge3J9DQpucm93KGFsbF9kZWF0aHMpDQpgYGANCg0Kd2lsbCBsZXQgdXMga25vdyBob3cgbWFueSByb3dzLg0KDQpgYGB7cn0NCm5jb2woYWxsX2RlYXRocykNCmBgYA0KDQpmb3IgY29sdW1ucy4NCg0KV2FudCB0aGUgZGltZW5zaW9ucz8NCg0KYGBge3J9DQpkaW0oYWxsX2RlYXRocykNCmBgYA0KDQp3aWxsIGRvIHRoYXQuDQoNCmBgYHtyfQ0KbmFtZXMoYWxsX2RlYXRocykNCmBgYA0KDQpnaXZlcyB1cyB0aGUgbmFtZXMgb2YgYWxsIHRoZSBjb2x1bW5zIChhbmQgZ2l2ZSB1cyBjb2x1bW4gbnVtYmVycyEpDQoNCmBgYHtyfQ0KaGVhZChhbGxfZGVhdGhzKQ0KYGBgDQoNCndpbGwgZ2l2ZSB1cyB0aGUgdG9wIG9mIHRoZSBkYXRhLiBZb3UgY2FuIGN1c3RvbWlzZSBob3cgbWFueSByb3dzIHlvdSBzZWUgLS0NCg0KYGBge3J9DQpoZWFkKGFsbF9kZWF0aHMsIDEwKQ0KYGBgDQoNCnlvdSBjYW4gdXNlIHRhaWwoKSB0byBzZWUgdGhlIGJvdHRvbSBpbnN0ZWFkDQoNCmBgYHtyfQ0KdGFpbChhbGxfZGVhdGhzKQ0KYGBgDQoNCkNvb2wgc3VtbWFyeSBmdW5jdGlvbiAtDQoNCmBgYHtyfQ0KZ2xpbXBzZShhbGxfZGVhdGhzKQ0KYGBgDQoNCldhbnQgYSBsaXR0bGUgc2FuaXR5PyBIYXZlIGEgbG9vayBhdCB0aGUgZGF0YXNldCBhcyBhbiBhY3R1YWwgdGFibGUhIFByb2JhYmx5IGRvbid0IHdhbnQgdGhpcyBpbiBjb2RlLCBidXQgaXQgbWlnaHQgYmUgdXNlZnVsIGluIGNvbnNvbGUhDQoNCmBgYHtyfQ0KVmlldyhhbGxfZGVhdGhzKQ0KYGBgDQoNClVzZWZ1bCBmdW5jdGlvbiBpbiBza2ltcjoNCg0KYGBge3J9DQpza2ltKGFsbF9kZWF0aHMpDQpgYGANCkdpdmVzIHlvdSBhIHByZXR0eSBzaW1wbGUgc3VtbWF0aW9uIG9mIHRoZSBkYXRhLg0KDQpUaW1lIGZvciBkcGx5ciEgc2VsZWN0KCkgd2lsbCBsZXQgeW91IHB1bGwganVzdCB0aGUgY29sdW1ucyB5b3Ugd2FudA0KDQpgYGB7cn0NCnNlbGVjdChhbGxfZGVhdGhzLCBuYW1lLCBhbGxlZ2lhbmNlcywgZ2VuZGVyLCBub2JpbGl0eSwgeWVhcl9vZl9kZWF0aCkNCmBgYA0KDQpZb3UgY2FuIGFsc28gZG8gdGhlIHJldmVyc2UgYW5kIGp1c3Qgbm9taW5hdGUgY29sdW1ucyB0byBub3Qgdmlldy4NCg0KYGBge3J9DQpzZWxlY3QoYWxsX2RlYXRocywgLW5hbWUpDQpgYGANCg0KUmVtaW5kZXIgdGhhdCB3aXRob3V0IGFzc2lnbmluZyB0aGVzZSB0byBhbiBvYmplY3QsIHlvdSdyZSBub3QgYWN0dWFsbHkgZG9pbmcgYW55dGhpbmcgYmVzaWRlcyB2aWV3IGl0Lg0KDQpgYGB7cn0NCmFsbF9kZWF0aHNfbm9fbmFtZXMgPC0gc2VsZWN0KGFsbF9kZWF0aHMsIC1uYW1lKQ0KYGBgDQoNCndpbGwgdGhyb3cgaXQgaW50byBhbiBvYmplY3QuIElmIHlvdSB3YW50IGl0IHRvIGJlIGEgbGl0dGxlIG1vcmUgaW50ZXJhY3RpdmUsIHdyYXAgdGhlIHdob2xlIGxpbmUgaW4gcGFyZW50aGVzZXMgYW5kIFJTdHVkaW8gd2lsbCBwb3AgYSB2aWV3IG9mIHRoZSBuZXcgb2JqZWN0IGZvciB5b3UNCg0KYGBge3J9DQooYWxsX2RlYXRoc19ub19uYW1lcyA8LSBzZWxlY3QoYWxsX2RlYXRocywgLW5hbWUpKQ0KYGBgDQoNCkNvb2wgc2hpdCB5b3UgY2FuIGRvIC0tIA0KDQpzZWxlY3QoKSBoYXMgYSB3aG9sZSBidW5jaCBvZiBoZWxwZXIgZnVuY3Rpb25zLiBDaGVjayB0aGUgbWFuIHBhZ2Ugd2l0aCA/DQoNCmBgYHtyfQ0KP3NlbGVjdA0KYGBgDQoNCldoYXQgaWYgeW91IHdhbnRlZCBqdXN0IHRoZSBjb2x1bW5zIHJlbGF0ZWQgdG8gYSBib29rPw0KDQpgYGB7cn0NCnNlbGVjdChhbGxfZGVhdGhzLCBjb250YWlucygiQm9vayIpKQ0KYGBgDQoNCmhvdyBhYm91dCByZWxhdGVkIHRvIGEgZGVhdGg/DQoNCmBgYHtyfQ0Kc2VsZWN0KGFsbF9kZWF0aHMsIGNvbnRhaW5zKCJEZWF0aCIpKQ0KYGBgDQoNCllvdSBjYW4gY29tYmluZSB0aGluZ3MgdG8gZ2V0IHVzZWZ1bCBzdHVmZiBsaWtlIHRoaXMgLS0NCg0KYGBge3J9DQpzZWxlY3QoYWxsX2RlYXRocywgbmFtZSwgY29udGFpbnMoIkRlYXRoIikpDQpgYGANCg0KTm93IGZvciBmaWx0ZXIoKS4gU2FtZSBhcyBzZWxlY3QoKSwgYnV0IGZvciByb3dzISBMZXQncyB5b3UgcmV0dXJuIGFsbCByb3dzIHRoYXQgbWVldCBhIGNvbmRpdGlvbi4NCg0KTWFrZXMgYmlnIHVzZSBvZiB0aGUgbG9naWNhbCBvcGVyYXRvcnMuDQoNClVzZWZ1bCBvbmUgeW91IG1pZ2h0IG5vdCBrbm93IC0tDQoNCiVpbiUgY2hlY2tzIGZvciBlcXVhbGl0eSBhZ2FpbnN0ICptb3JlIHRoYW4gb25lKiB2YWx1ZS4NCg0KVGltZSBmb3Igc29tZSBleGFtcGxlcyAtDQoNCmBgYHtyfQ0KZmlsdGVyKGFsbF9kZWF0aHMsIGFsbGVnaWFuY2VzID09ICJMYW5uaXN0ZXIiKQ0KYGBgDQoNCmBgYHtyfQ0KZmlsdGVyKGFsbF9kZWF0aHMsIGFsbGVnaWFuY2VzICE9ICJMYW5uaXN0ZXIiKQ0KYGBgDQoNClNob3dzIGV2ZXJ5b25lIHdobyBpcyBvciBpc24ndCBhIExhbm5pc3Rlcg0KDQpgYGB7cn0NCmZpbHRlcihhbGxfZGVhdGhzLCBhbGxlZ2lhbmNlcyAlaW4lIGMoIkhvdXNlIExhbm5pc3RlciIsICJMYW5uaXN0ZXIiKSkNCmBgYA0KDQpOb3RlIHRoYXQgdGhpcyBwdWxscyBtb3JlIHJlc3VsdHMgdGhhbiB0aGUgaW5pdGlhbCBmaWx0ZXIhIFRoZSBmaWx0ZXIgaXMgZG9pbmcgZXhhY3QgbWF0Y2hlcywgc28gYWxsIHRoZSBvbmVzIHdpdGggdGhlICJIb3VzZSIgcHJlZml4ICp3ZXJlIG5vdCBpbmNsdWRlZCoNCg0KYGBge3J9DQpmaWx0ZXIoYWxsX2RlYXRocywgeWVhcl9vZl9kZWF0aCA+PSAyOTkpDQpgYGANCg0KU2lkZWJhciBpbnRvIGEgaGFuZHkgYm9udXMgZnVuY3Rpb24gLS0NCg0KYGBge3J9DQpkaXN0aW5jdChhbGxfZGVhdGhzLCBhbGxlZ2lhbmNlcykNCmBgYA0KDQp3aWxsIHNob3cgeW91IGFsbCB0aGUgZGlzdGluY3QgdmFsdWVzIGZyb20gYSBjb2x1bW4uIFNvIGlmIHlvdSdyZSB0cnlpbmcgdG8gZ2xhbmNlIGF0IGFsbCB0aGUgSG91c2UgbmFtZXMgb3Igc29tZXRoaW5nLCB0aGlzIGlzIGEgaGFuZHkgd2F5IHRvIGdpdmUgaXQgYSBnbGFuY2UuDQoNCk1pZ2h0IGJlIGhlbHBmdWwgdG8gbWFuaXB1bGF0ZSBpdCBhIGJpdCwgc28NCg0KYGBge3J9DQpkaXN0aW5jdF9hbGxlZyA8LSBkaXN0aW5jdChhbGxfZGVhdGhzLCBhbGxlZ2lhbmNlcykNCg0KYXJyYW5nZShkaXN0aW5jdF9hbGxlZywgYWxsZWdpYW5jZXMpDQpgYGANCg0KV2lsbCBwdXQgdGhlbSBhbGwgaW4gZGlzdGluY3RfYWxsZWcgYW5kIHRoZW4gc29ydCB0aGVtIGFscGhhYmV0aWNhbGx5DQoNCmBgYHtyfQ0KZmlsdGVyKGFsbF9kZWF0aHMsIGFsbGVnaWFuY2VzID09ICJMYW5uaXN0ZXIiIA0KICAgICAgICYgbm9iaWxpdHkgPT0gMSkNCmBgYA0KDQpgYGB7cn0NCmZpbHRlcihhbGxfZGVhdGhzLCBib29rX2ludHJvX2NoYXB0ZXIgPj0gNSAmDQogICAgICAgICBib29rX2ludHJvX2NoYXB0ZXIgPD0gMTApDQpgYGANCg0KUXVpY2sgbm90ZSAtLSBBTkQgdGFrZXMgcHJlY2VkZW5jZSBvdmVyIE9SDQoNCmBgYHtyfQ0KZmlsdGVyKGFsbF9kZWF0aHMsIHllYXJfb2ZfZGVhdGggPD0gMjk5KQ0KYGBgDQoNCg0KYGBge3J9DQpmaWx0ZXIoYWxsX2RlYXRocywgbmFtZSAlaW4lIGMoIkpvbiBTbm93IiwgIlNhbXdlbGwgVGFybHkiLCAiRGFlbmVyeXMgVGFyZ2FyeWVuIikpDQpgYGANCg0KYGBge3J9DQpnb3RfY2hhcmFjdGVycyA8LSBmaWx0ZXIoYWxsX2RlYXRocywgYWxsZWdpYW5jZXMgIT0gIkxhbm5pc3RlciIgJiBnZW5kZXIgPT0gMCkNCnNlbGVjdChnb3RfY2hhcmFjdGVycywgbmFtZSkNCmBgYA0KT1IgTkVTVCBUSElTDQoNCmBgYHtyfQ0Kc2VsZWN0KGZpbHRlcihhbGxfZGVhdGhzLCBhbGxlZ2lhbmNlcyAhPSAiTGFubmlzdGVyIiAmIGdlbmRlciA9PSAwKSwgbmFtZSkNCmBgYA0KDQpgYGB7cn0NCmFsbF9kZWF0aHMgJT4lIA0KICBmaWx0ZXIoYWxsZWdpYW5jZXMgIT0gIkxhbm5pc3RlciIgJiBnZW5kZXIgPT0gMCkgJT4lDQogIHNlbGVjdChuYW1lKQ0KYGBgDQoNClBJUEVTIE9XTi4gQ1RSTCtTSElGVCtNICU+JSAlPiUgJT4lICU+JSAlPiUgJT4lICU+JSANCg0KVGltZSBmb3IgYXJyYW5nZSgpLiBCeSBkZWZhdWx0IHRoaXMgaXMgaW4gYXNjZW5kaW5nIG9yZGVyDQoNCmBgYHtyfQ0KYWxsX2RlYXRocyAlPiUgDQogIGFycmFuZ2UoZ2VuZGVyKQ0KYGBgDQoNCldhbm5hIGRvIGl0IGRlc2NlbmRpbmc/DQoNCmBgYHtyfQ0KYWxsX2RlYXRocyAlPiUgDQogIGFycmFuZ2UoZGVzYyhnZW5kZXIpKQ0KYGBgDQoNCllvdSBjYW4gc29ydCBteSBtdWx0aXBsZSBjb2x1bW5zLiBTb3J0cyBpbiBwcmlvcml0eSBmcm9tIGxlZnQgdG8gcmlnaHQuDQoNCmBgYHtyfQ0KYWxsX2RlYXRocyAlPiUgDQogIGFycmFuZ2UoYm9va19vZl9kZWF0aCwgZGVhdGhfY2hhcHRlcikNCmBgYA0KDQpgYGB7cn0NCmFsbF9kZWF0aHMgJT4lIA0KICBhcnJhbmdlKGFsbGVnaWFuY2VzKQ0KYGBgDQoNCmBgYHtyfQ0KYWxsX2RlYXRocyAlPiUgDQogIGFycmFuZ2UoYWxsZWdpYW5jZXMsIGJvb2tfaW50cm9fY2hhcHRlcikNCmBgYA0KDQpgYGB7cn0NCmFsbF9kZWF0aHMgJT4lIA0KICBhcnJhbmdlKGRlc2MoeWVhcl9vZl9kZWF0aCkpDQpgYGANCg0K</div>
 
 
 
