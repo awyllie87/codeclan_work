@@ -1,0 +1,60 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Ctrl + Alt + I to make a code chunk
+
+Alt + - to do <- quick 
+THIS ONLY WORKS INSIDE A CODE CHUNK
+
+Make sure tidyverse is installed
+
+## ```{r}
+## install.packages("tidyverse")
+## ```
+
+Will need to import tidyverse for most stuff. 
+```{r}
+library(tidyverse)
+```
+
+```{r}
+dog_bites <- read_csv("data/dog_bites.csv")
+```
+
+```{r}
+dog_bites
+```
+
+##```{r}
+##install.packages("readxl")
+##```
+
+```{r}
+library(readxl)
+```
+
+```{r}
+seedmix <- read_excel("data/edinburgh_seedmix.xlsx")
+```
+
+```{r}
+seedmix_north <- read_excel("data/edinburgh_seedmix.xlsx", sheet = 3)
+```
+
+```{r}
+seedmix_north <- read_excel("data/edinburgh_seedmix.xlsx", sheet = "North Neighbourhood")
+```
+
+Command to tell you what the worksheets are called (and their numbers)
+```{r}
+excel_sheets("data/edinburgh_seedmix.xlsx")
+```
+
+##```{r}
+##install.packages("devtools")
+##library(devtools)
+##devtools::install_github("codeclan/CodeClanData")
+##```
+
