@@ -1,0 +1,79 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+comms_data <- read_csv("data/telecom_data.csv")
+```
+
+```{r}
+comms_data %>% 
+  filter(is.na(monthly_charges))
+```
+
+```{r}
+comms_data %>% 
+  summarise(count = sum(is.na(monthly_charges)))
+```
+
+Removing N/As - can be done globally using *drop_na()*, or by single column by specifying inside the parentheses
+
+```{r}
+comms_data %>% 
+  drop_na()
+```
+
+```{r}
+comms_data %>% 
+  drop_na(monthly_charges)
+```
+
+Impute data -- use *coalesce()* to replace NA values directly. Can apply whatever calculation you like. *median* being used in this case
+
+```{r}
+comms_data_imputed_median <- comms_data %>% 
+  mutate(monthly_charges = coalesce(monthly_charges, median(monthly_charges, na.rm = TRUE)))
+comms_data_imputed_median
+```
+
+```{r}
+comms_data_imputed_mean <- comms_data %>% 
+  mutate(monthly_charges = coalesce(monthly_charges, mean(monthly_charges, na.rm = TRUE)))
+comms_data_imputed_mean
+```
+
+```{r}
+ggplot(comms_data_imputed_median, aes(customerID, monthly_charges)) + geom_point()
+```
+
+```{r}
+ggplot(comms_data_imputed_mean, aes(customerID, monthly_charges)) + geom_point()
+```
+
+You need to watch for manually inputted values referring to some form of N/A. R *will not* understand this or identify them with *is.na()*. For instance this is not actually identifying all the rows we want --
+
+```{r}
+comms_data_imputed_median %>% 
+  filter(is.na(total_charges))
+```
+
+You'll need to fix this manually.
+
+```{r}
+total_charges_replaced <- comms_data_imputed_median %>% 
+  mutate(total_charges = na_if(total_charges, "na")) %>% 
+  mutate(total_charges = na_if(total_charges, "N/A"))
+```
+
+6 more rows!
+
+```{r}
+total_charges_replaced %>% 
+  filter(is.na(total_charges))
+```
+
