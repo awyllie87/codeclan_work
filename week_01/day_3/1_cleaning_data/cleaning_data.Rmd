@@ -1,0 +1,50 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+*skip* in read.csv instructs it to skip *n* number of lines before loading. You'll have to check the file manually tofigure out waht you want using read.csv or eyeballing the file.
+
+*col_types* is how to adjust the data type of a column during import. In this case bought online is a dbl but should really be logical, so we can just convert it here
+
+```{r}
+read_csv("data/steam-200k-sample.csv",
+         skip = 4,
+         col_types = cols('bought online' = col_logical()))
+```
+
+Can do it with *mutate* instead
+
+```{r}
+video_games <- read_csv("data/steam-200k-sample.csv", skip = 4) %>% 
+  mutate(`bought online` = as.logical(`bought online`))
+```
+
+```{r}
+video_games %>% 
+  names()
+```
+
+```{r}
+video_games_clean <- video_games %>% clean_names()
+```
+
+```{r}
+video_games_clean %>% 
+  names()
+```
+
+```{r}
+video_games_renamed <- video_games %>% 
+  rename("customer_id" = "customer id",
+         "game_name" = "game name",
+         "activity" = "what",
+         "playing_hours" = "value",
+         "bought_online" = "bought online")
+```
+
