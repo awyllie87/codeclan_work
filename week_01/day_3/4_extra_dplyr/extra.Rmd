@@ -1,0 +1,80 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(CodeClanData)
+```
+
+# Extra dplyr
+
+ - `groupby()` with `mutate()`
+ - using `across` to perform operations across multiple columns
+ 
+ When group_by -> mutating the grouping level remains. In summarise the default
+ is to remove the last layer of grouping
+
+```{r}
+chinesemeal %>% 
+  group_by(Year) %>% 
+  mutate(total_calories = sum(CaloriesPerDay)) %>% 
+  ungroup() %>% # remove any persistent groups
+  mutate(proportion_total_cals = ((CaloriesPerDay / total_calories))*100) %>% 
+  arrange(Year)
+```
+
+# window functions
+
+`lag()` and `lead()`
+
+`lag()` accessess a value in a previous row.
+Use it to get differences over time.
+
+For Food Type = Carbohydrates, add a column showing the difference in CaloriesPerDay 
+compared with the previous year. Note! You can give lag a value if you want to look more than one back
+
+```{r}
+chinesemeal %>% 
+  filter(FoodType == "Carbohydrates") %>% 
+  mutate(prev_cals = lag(CaloriesPerDay, 1)) %>% 
+  mutate(calorie_diff = CaloriesPerDay - prev_cals)
+```
+
+# Grouping on multiple columns
+
+Get a count of how many people in each allegiance are of each gender.
+Note this example replicates `count()`
+
+```{r}
+all_deaths %>% 
+  group_by(allegiances, gender) %>% 
+  summarise(n_characters = n())
+```
+
+# Operations across multiple columns
+
+Change column types of the book columns to be logical rather than double.
+When running a function, `across()` is looking for the NAME of a function, not a function! no parenthese!
+
+```{r}
+all_deaths %>% 
+  mutate(
+    across(.cols = book1_GoT:book5_DwD,
+           .fns = as.logical)
+  )
+```
+
+Get the mean value of each numerical column
+```{r}
+all_deaths %>% 
+  summarise(
+    across(
+      .cols = where(is.numeric),
+      .fns = mean, #can apply additional arguments to the function  
+      na.rm = TRUE
+    )
+  )
+```
+

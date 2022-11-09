@@ -77,3 +77,48 @@ total_charges_replaced %>%
   filter(is.na(total_charges))
 ```
 
+Another way to adjust total_charges here is to change the column to a numeric, since that's what it is.
+This introduces NAs by "coercion", because it forces the strings out and has no choice but to replace them with NA.
+
+```{r}
+charges_numeric <- comms_data_imputed_median %>% 
+  mutate(total_charges = as.numeric(total_charges))
+```
+
+```{r}
+charges_numeric <- charges_numeric %>% 
+  filter(!is.na(total_charges))
+charges_numeric
+```
+
+Task - 5 minutes
+
+Take a look at the payment_method column and find the different type of missing value identifiers we have, and how many we have.
+
+Replace these with NA, and then check if you have the right amount
+
+```{r}
+charges_numeric %>% 
+  group_by(payment_method) %>% 
+  summarise()
+```
+
+```{r}
+payment_method_replaced <- charges_numeric %>% 
+  mutate(payment_method = na_if(payment_method, "--"))
+payment_method_replaced %>% 
+  group_by(payment_method) %>% 
+  summarise()
+```
+
+If you want to clean up the NAs and actually add something
+
+```{r}
+payment_method_replaced <- charges_numeric %>% 
+  mutate(payment_method = na_if(payment_method, "--")) %>% 
+  mutate(payment_method = coalesce(payment_method, "unavailable"))
+payment_method_replaced %>% 
+  group_by(payment_method) %>% 
+  summarise()
+```
+

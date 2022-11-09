@@ -1,0 +1,179 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(CodeClanData)
+```
+
+Recoding! dplyr functions!
+
+`distinct()` is a dplyr function that takes in a dataset and a list of columns, and 
+returns the unique values in that column
+
+```{r}
+students_big %>% 
+  distinct(region)
+```
+
+`count()` works similarly, but returns the number of occurences of each distinct
+value
+
+```{r}
+students_big %>% 
+  count(region)
+```
+
+`count()` is cool, because you can also apply it to multiple columns to get more
+distinct breakdowns of the data.
+
+`distinct()` also does this!
+
+```{r}
+students_big %>% 
+  count(region, gender)
+```
+
+Recoding! Involves changing ("recoding") the values in column. Primarily to make data uniform
+for easier interpretation.
+
+Methods:
+`if_else()`
+`recode()`
+`case_when()`
+
+## `if_else()`
+
+```{r}
+letters <- c("a","B","c")
+
+if_else(letters == "B", "b", "e")
+```
+
+if_else requires an else! if want it to do nothing, feed the vector in
+
+```{r}
+letters <- c("a","B","c")
+
+if_else(letters == "B", "b", letters)
+```
+
+```{r}
+students_big %>% 
+  mutate(gender = if_else(gender == "M", "Male", "Female")) %>% 
+  count(gender)
+```
+
+Task - 5 minutes
+
+1. Change the column handed to to "Right" and "Left" instead or "R" and "L".
+2. In favourite_physical_activity change "Football/Soccer" into "Football" and leave all other activities the same.
+
+```{r}
+students_big %>% 
+  mutate(handed = if_else(handed == "R", "Right", handed)) %>% 
+  mutate(handed = if_else(handed == "L", "Left", handed)) %>% 
+  count(handed)
+```
+
+```{r}
+students_big %>% 
+  mutate(favourite_physical_activity = 
+           if_else(favourite_physical_activity == "Football/Soccer", "Football",
+                   favourite_physical_activity)) %>% 
+  count(favourite_physical_activity)
+```
+
+## `recode`
+
+how it works -
+
+recode(column/vector, "old_value" = "new_value", 
+        "another_old_value" = "another_new_value", ...,
+        .default = NULL, .missing = NULL)
+        
+```{r}
+students_big %>% 
+  mutate(handed = recode(handed, "L" = "Left", "R" = "Right", "B" = "Both")) %>% 
+  count(handed)
+```
+
+```{r}
+students_big %>% 
+  mutate(travel_to_school = recode(travel_to_school,
+                                   "Car" = "car",
+                                   "Bus" = "bus",
+                                   "Walk" = "walk",
+                                   .default = "other"))
+```
+
+
+```{r}
+data <- read.table(header = TRUE, text="
+ subject sex control cond1 cond2 compl
+       1   M     7.9  12.3  10.7  T
+       2   F     6.3  10.6  11.1  T
+       3   F     9.5  13.1  13.8  N
+       4   M    11.5  13.4  12.9  F
+")
+```
+
+Using the data below, do the following:
+Recode the sex column to be “Male” and “Female”
+Recode the compl column to be T = “True”, F = “False”, and NA otherwise
+
+```{r}
+data_recode <- data %>% 
+  mutate(sex = recode(sex,
+                      "M" = "Male",
+                      "F" = "Female")) %>% 
+  mutate(compl = recode(compl,
+                        "T" = "True",
+                        "F" = "False",
+                        .default = NA_character_))
+
+data_recode
+```
+
+# `case_when()`
+
+Oh boy. `~` used for conditional tests. NOTE `case_when` stops running through
+the conditions when it finds the first one. *TRUE* simply enforces a case at the
+end of the conditionals, effectively acting as a default replacement if no condition met.
+
+```{r}
+case_when(
+  letters == "a" ~ "A"
+  letters == "b" ~ "B"
+  letters == "c" ~ "C",
+  TRUE ~ letters)
+```
+
+```{r}
+students_big %>% 
+  mutate(education_level = case_when(
+    ageyears > 16 ~ "sixth form",
+    ageyears > 12 ~ "high school",
+    ageyears <= 12 ~ "primary school")) %>% 
+  count(education_level)
+```
+
+Task - 5 minutes
+Using case_when, make a new column estimated_travel_time which is:
+Equal to 60 when your region is London.
+If you aren’t from London, then:
+10 when your travel_to_school is “Walk”.
+20 when your travel_to_school is “Car”.
+For everyone one else then it should equal to 30.
+
+```{r}
+students_big %>% 
+  mutate(estimated_travel_time = case_when(
+    region == "London" ~ 60,
+    travel_to_school == "Walk" ~ 10,
+    travel_to_school == "Car" ~ 20,
+    TRUE ~ 30)) %>% 
+```
+
