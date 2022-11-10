@@ -3,3 +3,28 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+Doing some examples of error messaging today to try and help interpret what's going on!
+
+```{r}
+the_name_of_my_variable <- c(3, 4, 5)
+
+the_name_of_my_varaible == 4
+```
+Typo! Reference the object the error is upset about to see what's going on.
+
+```{r}
+the_name_of_my_variable <- c(3, 4, 5)
+
+filter(the_name_of_my_variable, variable == 4)
+```
+This doesn't work for a bunch of reasons --
+`filter()` doesn't work with vectors.
+`variable` doesn't exist. What's it trying to reference? vectors don't have headers like columns do.
+
+```{r}
+the_name_of_my_variable <- c(3, 4, 5)
+the_name_of_your_variable <- c(6, 7, 8)
+
+both_variables <- tibble(the_name_of_my_variable the_name_of_your_variable)
+```
+There's a missing comma in the `tibble` function. Unexpected symbol is often going to be because something is missing rather than something extra being there. It's probably better consider it "there's symbols in an order that doesn't make sense"
