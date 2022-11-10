@@ -27,4 +27,4 @@ the_name_of_your_variable <- c(6, 7, 8)
 
 both_variables <- tibble(the_name_of_my_variable the_name_of_your_variable)
 ```
-There's a missing comma in the `tibble` function. Unexpected symbol is often going to be because something is missing rather than something extra being there. It's probably better consider it "there's symbols in an order that doesn't make sense"
+There's a missing comma in the `tibble` function. Unexpected symbol is often going to be because something is missing rather than something extra being there. It's probably better to consider it "there's symbols in an order that doesn't make sense"
