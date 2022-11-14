@@ -1,0 +1,196 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+New Week, new topic! Joins is up first.
+
+Database relationships and keys, briefly:
+
+### Relationships
+
+one-to-one
+many-to-many
+one-to-many
+
+*Keys* are identifiers that are used to make rows uniquely identifiable.
+
+Primary keys are the unique ID for a table, foreign keys are primary keys from a different table referenced somewhere else.
+
+Joins are done using `dplyr`
+
+### Mutating joins
+
+`mutating-joins`
+
+`inner_join()`
+  Will return all rows from table x that have a **match** in table B
+  
+`left_join()`
+  Includes all rows in table x
+  Will also **add** columns from table y
+  
+`right_join()`
+  Includes all rows in table x
+  Will also **add** columns from table y
+
+`full_join()`
+  Includes all rows in table x and table y
+
+### Filtering joins
+
+`filter-joins`
+
+Filtering joins **filter rows** from table x based on the presence or absence of matches in table y
+
+`semi_join()` returns **only** rows from table x where there are at least one match in table y
+
+`anti_join()` returns only rows from table X where there are **no** matches in table Y
+
+### Binding functions
+
+No concept of "matching" 
+
+`bind_rows()`
+  Adds rows to a table
+  
+`bind_cols()`
+  Adds columns to a table
+
+```{r}
+count()
+```
+
+```{r}
+customers <- tibble(
+  customer_ID = c(001, 002, 004, 005, 008, 010), 
+  name = c("John Smith", "Jane Adams", "Robert Landry", "Jane Tow", "Raul Tann", "Hilary Joyal"),
+  email_address = c("johnsmith@gmail.com", "janea@gmail.com", "rlabdry@hotmail.com", "janet89@aol.com", "paul.tann1@gmail.com", NA),
+  shipping_address = c("32 Station Road, Edinburgh", "42 Park Drive, Edinburgh", NA, "10 Gardiner Rd, Edinburgh", "12 Main St, Edinburgh", " 234 Queensferry Rd, Edinburgh,")
+)
+
+
+orders <- tibble(
+  customer_ID = c(001, 002, 005, 010, 012, 001), 
+  order_number = c("KU65781", "SU98201", "JS76821", "YR28212", "JS91221","YR21873"),
+  order_total = c("£32.50", "£56.00", "£100.02", "£20.25", "£39.50", "£45.00"),
+  product_code = c("XZY780", "XYZ123", "XYZ256", "XYZ262", "XYZ345", "XYZ127")
+)
+
+
+customers
+orders
+```
+
+Customers --
+Primary key = customer_ID
+
+Orders --
+Primary key = order_number
+Foreign key = customer_ID
+
+### `inner_join()`
+
+Consider    `customers` as Table X
+            `orders` as Table y
+            
+```{r}
+customers %>% 
+  inner_join(orders, by = "customer_ID")
+```
+
+### `left_join()`
+
+Includes all rows in x
+
+```{r}
+left_join(customers, orders)
+left_join(orders, customers)
+```
+
+It appends the columns required from table y into table x.
+
+`right_join` works the same way, but does it the other way round. Functionally the difference is about column layout in the new output -> they're creating same dataframe otherwise.
+
+```{r}
+right_join(customers, orders)
+right_join(orders, customers)
+```
+### `full_join`
+
+```{r}
+full_join(customers, orders, by = "customer_ID")
+```
+
+Both combined adds everything, including rows where no relationship can be found. 
+
+### More on the "by ="
+
+Often you'll need to identify which columns are the common relationship, for example primary key to foreign key
+
+```{r}
+customers %>% 
+  inner_join(orders, by = "customer_ID")
+
+customers %>% 
+  rename(this_is_the_primary_key = customer_ID) %>% 
+  inner_join(orders, c("this_is_the_primary_key" = "customer_ID"))
+```
+
+```{r}
+customers2 <- customers %>% 
+  mutate(payment_type = c("card", "cash", "cash", "card", "card", "card"))
+
+orders2 <- orders %>%
+  mutate(payment_type = c("card", "cash", "cash", "card", "card", "cash"))
+
+customers2
+orders2
+
+# join by two columns
+inner_join(customers2, orders2, by = c("customer_ID", "payment_type"))
+```
+
+Note that because `customers2` has a payment_type column, the join matches across that and eliminates John Smith's payment that doesn't match up
+
+### filtering joins
+
+```{r}
+semi_join(customers, orders, "customer_ID")
+```
+
+Returns all rows from `customers` when their customer_ID occurs at least once in `orders`.
+Basically it's an `inner_join` with no dupes?
+
+```{r}
+anti_join(customers, orders, "customer_ID")
+```
+
+```{r}
+statuses <- tibble(
+  status = c("active", "active", "inactive", "inactive", "active", "inactive")
+) 
+```
+
+If you run bind_cols() on your customers and statuses tables, how many rows will be returned?
+Use the bind_cols() function to merge customers and statuses.
+
+```{r}
+bind_cols(customers, statuses)
+```
+
+```{r}
+past_customers <- tibble(
+  customer_ID = c(020, 021), 
+  name = c("Dave Brown", "Jess Bishop"),
+  email_address = c("dbrown@hotmail.com", "jessb@gmail.com"),
+  shipping_address = c("57 Park View, Leith", "12 Reid Way, Broxburn")
+)
+
+bind_rows(customers, past_customers)
+```
+
