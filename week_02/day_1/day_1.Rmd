@@ -194,3 +194,99 @@ past_customers <- tibble(
 bind_rows(customers, past_customers)
 ```
 
+### Tidy Data
+
+Fundamentals of tidy data -
+
+1. Each variable should have its own column
+2. Each observation should have its own row
+3. Each value should have its own cell
+
+Four main functions in `tidyr`
+
+`pivot_longer()`
+    makes data into a "longer" format
+
+`pivot_wider()`
+    makes data into a "wider" format
+    
+`separate()` 
+    splits column data
+  
+`unite()`
+    to join columns
+    
+```{r}
+subject_hr <- tibble( name = c("SUBJ01","SUBJ02","SUBJ03"), 
+  hr_am = c(68,72,68), 
+  hr_pm = c(58,89,52))
+
+subject_hr
+
+subject_hr %>% 
+  pivot_longer(cols = c(hr_am, hr_pm), 
+               names_to = "measurement_time",
+               values_to = "heartrate")
+```
+```{r}
+income <- tibble(religion = c("Agnostic","Atheist","Buddhist", "Catholic"), 
+  X10k = c(12,25,3,75), 
+  X10k_to_20k = c(34,14,6,60),
+  X20k_to_30k = c(45,22,10,110))
+
+income
+
+tidy_income <- income %>% 
+  pivot_longer(-religion, 
+               names_to = "income",
+               values_to = "count")
+
+tidy_income
+```
+
+```{r}
+messy_orders <- tibble( name = c("Joe Bloggs","Jane Smith","Penny Jones"), 
+  order_info = c("XY7282/29-06-19","LO0182/15-03-19","AS6812/04-06-19"), 
+  order_amount = c(58.00,125.00,75.25))
+
+messy_orders
+
+tidy_orders <- messy_orders %>% 
+  separate(order_info, c("order_number", "date"),
+           sep = "/")
+tidy_orders
+```
+
+```{r}
+hospital_visit <- read_csv("data/hospitals93to98.csv")
+```
+
+```{r}
+hospital_visit
+
+hospital_visits_longer <- hospital_visit %>% 
+  pivot_longer(cols = starts_with("FY"),
+               names_to = "year",
+               values_to = "count")
+hospital_visits_longer
+
+hospital_visits_wider <- hospital_visits_longer %>% 
+  pivot_wider(names_from = Field,
+              values_from = count)
+hospital_visits_wider
+
+hospital_coded <- hospital_visits_wider %>% 
+  separate(IcdChapter, c("code", "description"),
+           sep="\\.")
+hospital_coded
+```
+
+Wouldn't normally use `unite` on this data, but included for completeness!
+
+```{r}
+hospital_unite <- hospital_coded %>% 
+  unite(disease, c("code", "description"), sep = ":")
+
+head(hospital_unite)
+```
+
