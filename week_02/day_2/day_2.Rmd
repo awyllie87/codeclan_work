@@ -1,0 +1,84 @@
+---
+title: "Strings"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+# Basics
+
+Strings - R understands both single and double quotes for strings.
+
+BE VERY CAREFUL if you decide to use single quotes. It'll fuck up in a lot of strings
+
+'this is Dave's dog', for instance, will fall over. Stick to double quotes in most instances!
+
+```{r}
+employees <- tibble(
+  first_name = c("Sally", "steven", "Mary", "John"),
+  last_name = c("Smith", "hasTings", "Milne", "Davidson"),
+  postcode = c("EH10 6GH", "EH3 7HL", "G1 7FR", NA), 
+  location = c(" ", "Edinburgh", "", "Stirling")
+)
+
+employees
+```
+
+Strings can contain any sort of character. Different numbers of spaces are all unique strings, and one space is not the same as an empty string!
+
+```{r}
+employees %>% 
+  group_by(location) %>% 
+  summarise(count = n())
+```
+
+```{r}
+mary_location <- employees %>% 
+  filter(first_name == "Mary") %>% 
+  select(location) %>% 
+  pull()
+
+sally_location <- employees %>% 
+  filter(first_name == "Sally") %>% 
+  select(location) %>% 
+  pull()
+
+mary_location == sally_location
+```
+
+Time for `stringr`
+
+concatenate strings with two functions:
+`str_c`
+`str_join`
+
+```{r}
+str_c("This","is","some","text","that","I","wanttojoin")
+```
+```{r}
+employees %>% 
+  mutate(full_name = str_c(first_name, last_name, sep=' '))
+```
+
+```{r}
+employees %>% 
+  mutate(full_name = str_c(first_name, location, sep=' '))
+```
+
+# Casings
+
+```{r}
+pangram <- " Todays class is about basics of string"
+
+pangram %>% 
+  str_to_sentence()
+```
+```{r}
+employees %>% 
+  select(first_name, last_name) %>% 
+  mutate(first_name_fixed = str_to_title(first_name)) %>% 
+  mutate(last_name_fixed = str_to_title(last_name))
+```
+
