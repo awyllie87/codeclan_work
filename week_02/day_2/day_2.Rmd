@@ -82,3 +82,350 @@ employees %>%
   mutate(last_name_fixed = str_to_title(last_name))
 ```
 
+# Splitting
+
+```{r}
+unbroken_string <- "Al is going to help me with this part"
+```
+
+```{r}
+unbroken_string %>% 
+  str_split(" ") %>% 
+  flatten_chr()
+```
+
+```{r}
+employees %>% 
+  mutate(postcode_new = str_split(postcode, " ")) %>% 
+  unnest(postcode_new)
+```
+Better to use `separate()` for something like this
+
+```{r}
+employees %>% 
+  separate(postcode, c("postcode_outer", "postcode_inner"), sep = " ")
+```
+
+**Task - 10 mins**
+Concatenate the strings "Manipulating" "strings" "is" "fun!"
+Capitalise the result and save it in a new variable
+Split the formatted string into individual characters
+
+```{r}
+string_sentence <- str_c("Manipulating", "strings","is","fun!", sep = " ") %>% 
+  str_to_sentence()
+
+string_sentence
+
+str_split(string_sentence, "")
+```
+You can pull out pieces of strings with `str_sub()`
+
+```{r}
+full_string <-  "let's find us a substring for this activity"
+full_string
+```
+```{r}
+full_string %>% 
+  str_sub(start = 1, end = 5)
+```
+
+```{r}
+full_string %>% 
+  str_sub(start = 5)
+```
+
+You can use a negative on start to count backwards, if you wanted the last characters instead. Useful for stuff like postcodes which start with either 3 or 4 characters but always end with 3.
+
+```{r}
+full_string %>% 
+  str_sub(start = -5)
+```
+
+```{r}
+employees %>% 
+  mutate(postcode_outer = str_sub(postcode, 1, -4)) %>% 
+  mutate(postcode_inner = str_sub(postcode, -3))
+```
+
+```{r}
+original_string <- "lets have some words that we will be replacing now"
+```
+
+```{r}
+str_sub(original_string, 1, 22) <- "I have some"
+original_string
+```
+
+```{r}
+number <- 123456.8
+number
+number2 <- 1234567.8
+number2
+```
+
+**Task - 10 mins**
+Here are some more questions for you to practice with. Remember, the point of these questions is not to do something that makes sense for this dataset, but rather to allow you to practice using the techniques we’ve learnt today on a real dataset. When it comes to your projects, you will be in charge of deciding how to work with the strings in your dataset.
+We are going to use some Spotify data for this task:
+spotify_songs <- read_csv("data/spotify_sample.csv")
+Upcase the text in the playlist_name column. Overwrite the existing column to store the result.
+Lowcase the text in the track_artist column. Store the result in a new column called track_artist_lowcase.
+Take the first 5 characters of the playlist_id column, and save it in a new column called playlist_start.
+Take the first 4 characters of the track_album_release_date column and save it in a new column called year.
+What else can you do to this dataset to practice? Can you work with the numbers? This is open ended - have fun!
+
+```{r}
+spotify_songs <- read_csv("data/spotify_sample.csv")
+```
+```{r}
+spotify_songs %>% 
+  mutate(playlist_name = str_to_upper(playlist_name),
+         track_artist_lowcase = str_to_lower(track_artist),
+         playlist_start = str_sub(playlist_id, end = 5),
+         year = str_sub(track_album_release_date, end = 4))
+```
+
+# Regular Expressions
+
+```{r}
+single_string <- "string a"
+strings <- c("string a", "string b", "string c", "string d", "striiiiiiing e")
+```
+
+Is this pattern present in a string?
+Use `str_detect()`
+
+```{r}
+pattern <- "word"
+
+single_string %>% 
+  str_detect(pattern)
+```
+```{r}
+pattern <- "a"
+
+strings %>% 
+  str_detect(pattern)
+```
+```{r}
+pattern <- "str"
+
+strings %>% 
+  str_detect(pattern)
+```
+
+```{r}
+pattern <- "string"
+
+strings %>% 
+  str_detect(pattern)
+```
+
+You can use square brackets to denote a range of individual characters
+
+```{r}
+pattern <- "[abc]"
+
+strings %>% 
+  str_detect(pattern)
+```
+
+You can use a hyphen to donate real ranges like a to c
+
+```{r}
+pattern <- "[a-c]"
+
+strings %>% 
+  str_detect(pattern)
+```
+
+It's worth nothing here that with regard to expressions, the letters of the alphabet are store Upper Case and then Lower Case, so you can do stuff like [A-z] to match every character, but [a-Z] doesn't work.
+
+You can also use `(?i)` as a mode modifier to ignore case.
+
+```{r}
+pattern <- "(?i)[A-Z]"
+pattern2 <- "(?i)[a-z]"
+
+strings %>% 
+  str_detect(pattern)
+
+strings %>% 
+  str_detect(pattern2)
+```
+
+Another one is `i{n}` for number of repeated occurences
+
+```{r}
+pattern <- "i{3}"
+
+strings %>% 
+  str_detect(pattern)
+```
+
+***Task - 15 mins***
+
+Make a vector containing the following strings:
+- "We're having great fun learning about data analysis at CodeClan!"
+- "CodeClan is at 37 Castle Terrace in Edinburgh and ClockWise in Glasgow"
+- "Our cohort code starts with DE or DR"
+- "You get a great view of the castle or the national conservatoire from just outside CodeClan's door"
+
+Write and test regular expressions which will match:
+- Any string mentioning CodeClan
+- Any string containing two consecutive capital letters
+- Any string not including the word "castle" or "Castle"
+
+Hint
+Remember, str_detect() can take an optional third argument called negate
+
+Hint
+The techniques we looked at above can be combined.
+
+```{r}
+task_vector <-  c("We're having great fun learning about data analysis at CodeClan!",
+                "CodeClan is at 37 Castle Terrace in Edinburgh and Clockwise in Glasgow",
+                "Our cohort code starts with DE or DR",
+                "You get a great view of the castle or the national conservatoire from just outside CodeClan's door")
+```
+
+```{r}
+str_test_codeclan <- "CodeClan"
+str_test_cons_caps <- "[:upper:][:upper:]"
+str_test_castle <- "(?i)castle"
+
+task_vector %>% 
+  str_detect(str_test_codeclan)
+task_vector %>% 
+  str_detect(str_test_cons_caps)
+task_vector %>% 
+  str_detect(str_test_castle, negate = TRUE)
+```
+
+**Extracting matching sub-strings**
+
+Uses `str_extract()`
+
+```{r}
+strings <- c(
+  "This string has an_address@email.com in it", 
+  "This one has user.name@company.co.uk", 
+  "Now we've got other_person_123@server.net and my.name@runningoutofideas.com"
+)
+```
+
+By default just extracts the first match that returns TRUE
+
+```{r}
+pattern <- "[a-z]"
+
+strings %>% 
+  str_extract(pattern)
+```
+
+```{r}
+string <- "@emailprovider.com"
+pattern <- "[a-z]*@emailprovider.com"
+
+string %>% 
+  str_detect(pattern)
+```
+This uses the * quantifier.
+
+**Quantifiers**
+
+* = any number of
++ = one or more
+{x} = specific number of
+
+```{r}
+pattern <- "[A-z]+@"
+
+strings %>% 
+  str_extract(pattern)
+```
+[:alnum:] is a POSIX for all alphanumerics
+
+```{r}
+pattern <- "[:alnum:]+@"
+
+strings %>% 
+  str_extract(pattern)
+```
+
+```{r}
+pattern <- "[:alnum:]+@[:alnum:]+"
+
+strings %>%
+  str_extract(pattern)
+```
+You can use `str_extract_all` to pull all occurrences.
+
+```{r}
+pattern <- "[a-z0-9_\\.]+@[a-z0-9_\\.]+"
+
+strings %>%
+  str_extract_all(pattern)
+```
+**str_replace**
+
+```{r}
+pattern <- "[a-z0-9_\\.]+@[a-z0-9_\\.]+"
+
+strings %>% 
+  str_replace_all(pattern, "REDACTED")
+```
+
+**Anchors**
+
+`^` start
+`$` end
+
+```{r}
+test_strings <- c(
+  "abc", 
+  "Abc",
+  "abC",
+  "s"
+)
+```
+
+```{r}
+# extract all lowercase letters
+test_strings %>% 
+  str_extract_all("[a-z]")
+
+#extract the lowercase letter if it is the last letter in the string
+test_strings %>% 
+  str_extract_all("[a-z]$")
+
+#extract the lowercase letter if it is the first letter in the string
+test_strings %>% 
+  str_extract_all("^[a-z]")
+
+#extract the lowercase letters if they are the first AND last letters in the string
+test_strings %>% 
+  str_extract_all("^[a-z]$")
+```
+
+**Strings within a tibble**
+
+```{r}
+student <- c("Abigail", "Bjorn", "Caitlin")
+age <- c(25, 56, 40)
+emails <- c("abigal12@company.co.uk", "bsmith@gmail.co.uk", "caitlin_1980")
+
+student_info <- tibble(student, age, emails)
+
+student_info 
+```
+
+```{r}
+student_info %>%
+  mutate(email_detect = (str_detect(emails, "[a-z]+@")))
+```
+
+
+
+
+
