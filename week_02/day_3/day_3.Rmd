@@ -1,0 +1,193 @@
+---
+title: "Week 2 Day 3"
+output: html_notebook
+---
+
+# Lists
+
+```{r}
+grocery_list <- list("Bread","Butter","Milk","Chicken","Cat Food")
+```
+
+```{r}
+x <-  list(1,"a",TRUE,c(1,2,3))
+
+x[[2]]
+```
+
+Name your lists
+
+```{r}
+named_list <- list(a = "I like programming in R", b = 1:10)
+
+named_list$a
+named_list$b
+
+names(named_list)
+
+named_list
+```
+
+Nested lists
+
+```{r}
+student_info <- list(
+                "Agnes" = list(height = 1.8, shoe_size = 8L),
+                "Bobby" = list(height = 2.1, gender = "Male"),
+                "Charlie" = list(gender = "Female", likes_beets = TRUE)
+)
+
+student_info[[1]]
+
+
+
+
+```
+
+```{r}
+student_info$Agnes
+```
+
+```{r}
+student_info$Agnes$height
+```
+
+```{r}
+student_info[[1]][[1]]
+```
+
+```{r}
+demo_list <- list(1,"uzair","codeclan",c(1,2,3,4))
+
+demo_list[2] <- "UZAIR"
+
+demo_list[4] <- NULL
+demo_list
+```
+
+**Task - 5 minutes**
+Make a named list that contains a numeric vector and a character vector.
+Access the second element of your list using double square brackets [[]]. What is its class?
+Access the second element of your list using single square brackets []. What is its class?
+Access the second element of your list by name. What is its class?
+
+```{r}
+task_list <- list(nums = c(1:26), alphas = c(letters))
+
+class(task_list[[2]])
+class(task_list[2])
+
+class(task_list$alphas)
+```
+
+# Matrices
+
+```{r}
+matrix(1:4,nrow=2,ncol=2)
+```
+
+```{r}
+matrix(1:4,nrow=2,ncol=2,byrow=TRUE)
+```
+
+```{r}
+m <- matrix(1:6, nrow=2, ncol=3)
+m
+```
+
+```{r}
+m[1,]
+m[,1]
+m[1,1]
+m[2,3]
+m[,c(1,3)]
+```
+```{r}
+m * 3
+
+m - 2 
+```
+
+```{r}
+rowSums(m)
+colSums(m)
+rowMeans(m)
+colMeans(m)
+```
+
+**Task - 5 minutes**
+Make a matrix with 3 rows and 4 columns. Each column should contain the numbers 1 to 3.
+Find the element in the 2nd row, 3rd column.
+Check that all the columns are identical by checking that their sums are the same.
+
+```{r}
+task_matrix <- matrix(1:3, nrow=3, ncol=4)
+
+task_matrix[2,3]
+colSums(task_matrix)
+```
+
+# Control Flow
+
+```{r}
+if ( 1 %in% c(1,4,6)){
+  print("yes")
+}
+```
+```{r}
+if (5 != 3){
+  print("Yes")}
+```
+
+```{r}
+x <- 4
+y <- 7
+
+if (x > y){
+  print("Yes")
+}
+```
+
+**Task - 5 minutes**
+
+Write an if statement that prints ‘Yes that divides by 2’ if a number x is divisible by 2 (hint: use %% 2 == 0 as your expression), try it out for different values of x.
+
+```{r}
+x <- 4
+
+if (x %% 2 == 0){
+  print("Yes that divides by 2")
+}
+```
+
+```{r}
+z <- 33
+
+if (z %% 2 != 0){
+  print("No this is not a prime number")
+}
+if (z %% 2 == 0){
+  print("Yes this is a prime number")
+}
+```
+
+```{r}
+if ( 10 != 5){
+  if (3 > 1){
+    print("Hello World!")
+  }
+  print("Goodbye!")
+}
+```
+
+```{r}
+if (10 != 5){
+  if (2 <= 0){
+    print("Hello World!")
+  }
+  print("Goodbye!")
+}
+```
+
+
+
