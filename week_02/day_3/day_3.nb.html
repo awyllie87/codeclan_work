@@ -2062,6 +2062,8 @@ task_matrix[2,3]</code></pre>
 </div>
 <div id="control-flow" class="section level1">
 <h1>Control Flow</h1>
+<div id="if" class="section level2">
+<h2>if</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaWYgKCAxICVpbiUgYygxLDQsNikpe1xuICBwcmludChcInllc1wiKVxufVxuYGBgIn0= -->
@@ -2163,10 +2165,460 @@ if (z %% 2 != 0){
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p><strong>Task - 10 minutes</strong> Here’s an example of a nested if
+statement. Predict what the code is going to print out for the following
+combinations: x is 10 and y is 3. x is 10 and y is 2. x is 2 and y is
+10.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5pZiAoeCA+IHkpIHtcbiAgcHJpbnQoXCJTdGFydCBvZiBvdXRlciBpZiBibG9ja1wiKVxuXG4gIGlmICh4ICUlIHkgPT0gMCkge1xuICAgIHByaW50KFwiSW5uZXIgaWYgYmxvY2sgMVwiKVxuICB9XG5cbiAgaWYgKHkgJWluJSBjKDE6NSkpIHtcbiAgICBwcmludChcIklubmVyIGlmIGJsb2NrIDJcIilcbiAgfVxuXG4gIHByaW50KFwiRW5kIG9mIG91dGVyIGlmIGJsb2NrXCIpXG59XG5cbnByaW50KFwiQWZ0ZXIgaWYgc3RhdGVtZW50XCIpXG5gYGAifQ== -->
+<pre class="r"><code>
+if (x &gt; y) {
+  print(&quot;Start of outer if block&quot;)
+
+  if (x %% y == 0) {
+    print(&quot;Inner if block 1&quot;)
+  }
+
+  if (y %in% c(1:5)) {
+    print(&quot;Inner if block 2&quot;)
+  }
+
+  print(&quot;End of outer if block&quot;)
+}
+
+print(&quot;After if statement&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQWZ0ZXIgaWYgc3RhdGVtZW50XCJcbiJ9 -->
+<pre><code>[1] &quot;After if statement&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol style="list-style-type: decimal">
+<li>“Start of outer if block”, “Inner if block 1”, “End of outer if
+block”, “After if statement”</li>
+<li>“Start of outer if block”, “Inner if block 1”, “Inner if block 2”,
+“End of outer if block”, “After if statement”</li>
+<li>“After if statement”</li>
+</ol>
+</div>
+<div id="if-else" class="section level2">
+<h2>if else</h2>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2VhdGhlciA9IFwiV2luZHlcIlxuaWYgKHdlYXRoZXIgPT0gXCJXaW5keVwiKXtcbiAgcHJpbnQoXCJ3ZWF0aGVyIGlzIHdpbmR5XCIpXG59IGVsc2V7XG4gIHByaW50KFwid2VhdGhlciBpcyBub3Qgd2luZHkgdG9kYXkgbGV0cyBnbyBzaG9wcGluZ1wiKVxufVxuYGBgIn0= -->
+<pre class="r"><code>weather = &quot;Windy&quot;
+if (weather == &quot;Windy&quot;){
+  print(&quot;weather is windy&quot;)
+} else{
+  print(&quot;weather is not windy today lets go shopping&quot;)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwid2VhdGhlciBpcyB3aW5keVwiXG4ifQ== -->
+<pre><code>[1] &quot;weather is windy&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaWYgKDQ+NSl7XG4gIHByaW50KFwiWWVzXCIpXG59IGVsc2V7XG4gIHByaW50KFwiTm9cIilcbn1cbmBgYCJ9 -->
+<pre class="r"><code>if (4&gt;5){
+  print(&quot;Yes&quot;)
+} else{
+  print(&quot;No&quot;)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiTm9cIlxuIn0= -->
+<pre><code>[1] &quot;No&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaWYgKDMgJWluJSA0OjYpe1xuICBwcmludChcIjMgaXMgaW4gcmFuZ2VcIilcbn0gZWxzZSB7XG4gIHByaW50KFwiaXRzIG5vdCBpbiByYW5nZVwiKVxufVxuYGBgIn0= -->
+<pre class="r"><code>if (3 %in% 4:6){
+  print(&quot;3 is in range&quot;)
+} else {
+  print(&quot;its not in range&quot;)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiaXRzIG5vdCBpbiByYW5nZVwiXG4ifQ== -->
+<pre><code>[1] &quot;its not in range&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>Task - 5 minutes</strong></p>
+<p>Edit your code from the first exercise so that it prints ‘Yes that
+divides’ when x is divisible by 2, and prints ‘No that does not divide’
+otherwise.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA8LSA0XG5cbmlmICh4ICUlIDIgPT0gMCl7XG4gIHByaW50KFwiWWVzIHRoYXQgZGl2aWRlcyBieSAyXCIpXG4gIH1lbHNlIHtwcmludChcIk5vIHRoYXQgZG9lcyBub3QgZGl2aWRlXCIpfVxuYGBgIn0= -->
+<pre class="r"><code>x &lt;- 4
+
+if (x %% 2 == 0){
+  print(&quot;Yes that divides by 2&quot;)
+  }else {print(&quot;No that does not divide&quot;)}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiWWVzIHRoYXQgZGl2aWRlcyBieSAyXCJcbiJ9 -->
+<pre><code>[1] &quot;Yes that divides by 2&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>Task - 10 minutes</strong> Here’s an example of a nested
+if-else statement. Predict what it’s going to print out for the
+following conditions:. 1. When x is 5 and y is 10 2. When x is 6 and y
+is 12 3. When x is 6 and y is 13</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA8LSA2XG55IDwtIDEzXG5cbmlmICh4ICVpbiUgYygzLCA0LCA1KSl7XG4gIFxuICBwcmludChcInggaXMgaW4gb3VyIGxpc3RcIilcbiAgXG4gIGlmICh4ID09IDUpe1xuICAgIFxuICAgIHByaW50KFwieCBpcyBleGFjdGx5IDVcIilcbiAgICBcbiAgfVxuICBcbn0gZWxzZSB7XG4gIFxuICBwcmludChcIlN0YXJ0IG9mIGVsc2Ugc3RhdGVtZW50XCIpXG4gIFxuICBpZiAoeSAlJSB4ID09IDApe1xuICAgIFxuICAgIHByaW50KFwieCBkaXZpZGVzIHlcIilcbiAgXG4gIH0gZWxzZXtcbiAgICBcbiAgICBwcmludChcInggZG9lcyBub3QgZGl2aWRlIFlcIilcbiAgfVxuICBcbiAgcHJpbnQgKFwiRW5kIG9mIGVsc2Ugc3RhdGVtZW50XCIpXG4gIFxufVxuYGBgIn0= -->
+<pre class="r"><code>x &lt;- 6
+y &lt;- 13
+
+if (x %in% c(3, 4, 5)){
+  
+  print(&quot;x is in our list&quot;)
+  
+  if (x == 5){
+    
+    print(&quot;x is exactly 5&quot;)
+    
+  }
+  
+} else {
+  
+  print(&quot;Start of else statement&quot;)
+  
+  if (y %% x == 0){
+    
+    print(&quot;x divides y&quot;)
+  
+  } else{
+    
+    print(&quot;x does not divide Y&quot;)
+  }
+  
+  print (&quot;End of else statement&quot;)
+  
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiU3RhcnQgb2YgZWxzZSBzdGF0ZW1lbnRcIlxuWzFdIFwieCBkb2VzIG5vdCBkaXZpZGUgWVwiXG5bMV0gXCJFbmQgb2YgZWxzZSBzdGF0ZW1lbnRcIlxuIn0= -->
+<pre><code>[1] &quot;Start of else statement&quot;
+[1] &quot;x does not divide Y&quot;
+[1] &quot;End of else statement&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol style="list-style-type: decimal">
+<li>“x is in our list”, “x is exactly 5”</li>
+<li>“Start of else statement”, “x divides y”, “End of else
+statement”</li>
+<li>“Start of else statement”, “x does not divide y”, “End of else
+statement”</li>
+</ol>
+</div>
+<div id="for" class="section level2">
+<h2>for</h2>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2Vla2RheXMgPC0gYyhcIk1vbmRheVwiLCBcIlR1ZXNkYXlcIiwgXCJXZWRuZXNkYXlcIiwgXCJUaHVyc2RheVwiLCBcIkZyaWRheVwiKVxuXG5mb3IgKGRheSBpbiB3ZWVrZGF5cykge1xuICAgIHBocmFzZSA8LSBwYXN0ZShcIlRoZSBkYXkgaXNcIiwgZGF5KVxuICAgIHByaW50KHBocmFzZSlcbiAgICAjIG9yIGNvdWxkIGRvIGluIG9uZSBsaW5lIGFzXG4gICAgIyBwcmludChwYXN0ZShcIlRoZSBkYXkgaXNcIiwgZGF5KSlcbn0gXG5gYGAifQ== -->
+<pre class="r"><code>weekdays &lt;- c(&quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;)
+
+for (day in weekdays) {
+    phrase &lt;- paste(&quot;The day is&quot;, day)
+    print(phrase)
+    # or could do in one line as
+    # print(paste(&quot;The day is&quot;, day))
+} </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIGRheSBpcyBNb25kYXlcIlxuWzFdIFwiVGhlIGRheSBpcyBUdWVzZGF5XCJcblsxXSBcIlRoZSBkYXkgaXMgV2VkbmVzZGF5XCJcblsxXSBcIlRoZSBkYXkgaXMgVGh1cnNkYXlcIlxuWzFdIFwiVGhlIGRheSBpcyBGcmlkYXlcIlxuIn0= -->
+<pre><code>[1] &quot;The day is Monday&quot;
+[1] &quot;The day is Tuesday&quot;
+[1] &quot;The day is Wednesday&quot;
+[1] &quot;The day is Thursday&quot;
+[1] &quot;The day is Friday&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>Task - 10 mins</strong></p>
+<p>Change the code below to use a for loop:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoMSlcbmBgYCJ9 -->
+<pre class="r"><code>print(1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDFcbiJ9 -->
+<pre><code>[1] 1</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoMilcbmBgYCJ9 -->
+<pre class="r"><code>print(2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDJcbiJ9 -->
+<pre><code>[1] 2</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoMylcbmBgYCJ9 -->
+<pre class="r"><code>print(3)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDNcbiJ9 -->
+<pre><code>[1] 3</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoNClcbmBgYCJ9 -->
+<pre class="r"><code>print(4)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDRcbiJ9 -->
+<pre><code>[1] 4</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoNSlcbmBgYCJ9 -->
+<pre class="r"><code>print(5)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDVcbiJ9 -->
+<pre><code>[1] 5</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9yKGkgaW4gMTo1KXtcbiAgcHJpbnQoaSlcbn1cbmBgYCJ9 -->
+<pre class="r"><code>for(i in 1:5){
+  print(i)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDFcblsxXSAyXG5bMV0gM1xuWzFdIDRcblsxXSA1XG4ifQ== -->
+<pre><code>[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="while" class="section level2">
+<h2>while</h2>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhcnRfdmFsdWUgPC0gMVxuc3RvcF92YWx1ZSA8LSAxMFxuXG53aGlsZSAoc3RhcnRfdmFsdWUgPCBzdG9wX3ZhbHVlKXtcbiAgc3RhcnRfdmFsdWUgPC0gc3RhcnRfdmFsdWUgKyAxXG4gIHBocmFzZSA9IHBhc3RlKFwic3RhcnQgdmFsdWUgaXNcIiwgc3RhcnRfdmFsdWUpXG4gIHByaW50KHBocmFzZSlcbn1cbmBgYCJ9 -->
+<pre class="r"><code>start_value &lt;- 1
+stop_value &lt;- 10
+
+while (start_value &lt; stop_value){
+  start_value &lt;- start_value + 1
+  phrase = paste(&quot;start value is&quot;, start_value)
+  print(phrase)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwic3RhcnQgdmFsdWUgaXMgMlwiXG5bMV0gXCJzdGFydCB2YWx1ZSBpcyAzXCJcblsxXSBcInN0YXJ0IHZhbHVlIGlzIDRcIlxuWzFdIFwic3RhcnQgdmFsdWUgaXMgNVwiXG5bMV0gXCJzdGFydCB2YWx1ZSBpcyA2XCJcblsxXSBcInN0YXJ0IHZhbHVlIGlzIDdcIlxuWzFdIFwic3RhcnQgdmFsdWUgaXMgOFwiXG5bMV0gXCJzdGFydCB2YWx1ZSBpcyA5XCJcblsxXSBcInN0YXJ0IHZhbHVlIGlzIDEwXCJcbiJ9 -->
+<pre><code>[1] &quot;start value is 2&quot;
+[1] &quot;start value is 3&quot;
+[1] &quot;start value is 4&quot;
+[1] &quot;start value is 5&quot;
+[1] &quot;start value is 6&quot;
+[1] &quot;start value is 7&quot;
+[1] &quot;start value is 8&quot;
+[1] &quot;start value is 9&quot;
+[1] &quot;start value is 10&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="alternative-indexing" class="section level1">
+<h1>Alternative indexing</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2Vla2RheXMgPC0gYyhcIk1vbmRheVwiLCBcIlR1ZXNkYXlcIiwgXCJXZWRuZXNkYXlcIiwgXCJUaHVyc2RheVwiLCBcIkZyaWRheVwiKVxuXG5mb3IgKGkgaW4gMTpsZW5ndGgod2Vla2RheXMpKXtcbiAgcGhyYXNlIDwtIHBhc3RlKFwiVGhlIGRheSBpc1wiLCB3ZWVrZGF5c1tpXSlcbiAgcHJpbnQocGhyYXNlKVxufVxuYGBgIn0= -->
+<pre class="r"><code>weekdays &lt;- c(&quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;)
+
+for (i in 1:length(weekdays)){
+  phrase &lt;- paste(&quot;The day is&quot;, weekdays[i])
+  print(phrase)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIGRheSBpcyBNb25kYXlcIlxuWzFdIFwiVGhlIGRheSBpcyBUdWVzZGF5XCJcblsxXSBcIlRoZSBkYXkgaXMgV2VkbmVzZGF5XCJcblsxXSBcIlRoZSBkYXkgaXMgVGh1cnNkYXlcIlxuWzFdIFwiVGhlIGRheSBpcyBGcmlkYXlcIlxuIn0= -->
+<pre><code>[1] &quot;The day is Monday&quot;
+[1] &quot;The day is Tuesday&quot;
+[1] &quot;The day is Wednesday&quot;
+[1] &quot;The day is Thursday&quot;
+[1] &quot;The day is Friday&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9yIChpIGluIDE6bGVuZ3RoKHdlZWtkYXlzKSl7XG4gIHdlZWtkYXlzW2ldIDwtIHBhc3RlMCh3ZWVrZGF5c1tpXSwgXCJzXCIpXG59XG5gYGAifQ== -->
+<pre class="r"><code>for (i in 1:length(weekdays)){
+  weekdays[i] &lt;- paste0(weekdays[i], &quot;s&quot;)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="nested-loops" class="section level1">
+<h1>Nested loops</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXlfbWF0cml4IDwtIHJlcGxpY2F0ZSg1LCBybm9ybSg1KSlcbmBgYCJ9 -->
+<pre class="r"><code>my_matrix &lt;- replicate(5, rnorm(5))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9yIChyb3dfaW5kZXggaW4gMTpkaW0obXlfbWF0cml4KVsxXSl7XG4gIGZvcihjb2xfaW5kZXggaW4gMTpkaW0obXlfbWF0cml4KVsyXSl7XG4gICAgcHJpbnQobXlfbWF0cml4W3Jvd19pbmRleCwgY29sX2luZGV4XSlcbiAgfVxufVxuYGBgIn0= -->
+<pre class="r"><code>for (row_index in 1:dim(my_matrix)[1]){
+  for(col_index in 1:dim(my_matrix)[2]){
+    print(my_matrix[row_index, col_index])
+  }
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMTIyOTMyMlxuWzFdIC0xLjE1NDY4OFxuWzFdIC0wLjg1MjA1NVxuWzFdIDEuNjY4MTg0XG5bMV0gMC4wOTU1ODk0MVxuWzFdIC0wLjE5ODM5NjlcblsxXSAtMC4wMTQxMjIxNlxuWzFdIC0wLjI0NDM1MDFcblsxXSAtMC4wOTIzNjcxMVxuWzFdIC0wLjE3NTY2NjlcblsxXSAtMC4xNTE2MTY0XG5bMV0gMS4zNjQ3OThcblsxXSAtMS40Nzc0ODRcblsxXSAtMy4xMjg0NTVcblsxXSAtMC40OTU1NzNcblsxXSAwLjQwNDU0OFxuWzFdIDIuMjAwMDc2XG5bMV0gLTAuNDgxOTA5MlxuWzFdIC0wLjc0NDEyMDhcblsxXSAwLjYzNzY4XG5bMV0gMC41ODYzNjYxXG5bMV0gMC41NTQwNzU3XG5bMV0gMS4zOTIxNjZcblsxXSAwLjE4OTg1MDJcblsxXSAwLjM2OTQ5NDZcbiJ9 -->
+<pre><code>[1] 0.1229322
+[1] -1.154688
+[1] -0.852055
+[1] 1.668184
+[1] 0.09558941
+[1] -0.1983969
+[1] -0.01412216
+[1] -0.2443501
+[1] -0.09236711
+[1] -0.1756669
+[1] -0.1516164
+[1] 1.364798
+[1] -1.477484
+[1] -3.128455
+[1] -0.495573
+[1] 0.404548
+[1] 2.200076
+[1] -0.4819092
+[1] -0.7441208
+[1] 0.63768
+[1] 0.5863661
+[1] 0.5540757
+[1] 1.392166
+[1] 0.1898502
+[1] 0.3694946</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>Task</strong></p>
+<p>Create a nested for loop and if statement combination which loops
+through the weekdays and prints out the phrase ‘Last weekday!’ once it
+gets to Friday.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2Vla2RheXMgPC0gYyhcIk1vbmRheVwiLCBcIlR1ZXNkYXlcIiwgXCJXZWRuZXNkYXlcIiwgXCJUaHVyc2RheVwiLCBcIkZyaWRheVwiKVxuZm9yIChpIGluIHNlcV9hbG9uZyh3ZWVrZGF5cykpe1xuICBpZih3ZWVrZGF5c1tpXSA9PSBcIkZyaWRheVwiKXtcbiAgICBwaHJhc2UgPC0gcGFzdGUwKFwiSXQncyBcIix3ZWVrZGF5c1tpXSxcIiEgTGFzdCB3ZWVrZGF5ISBGcmVlZG9tIVwiKVxuICAgIHByaW50KHBocmFzZSlcbiAgfVxufVxuXG5gYGAifQ== -->
+<pre class="r"><code>weekdays &lt;- c(&quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;)
+for (i in seq_along(weekdays)){
+  if(weekdays[i] == &quot;Friday&quot;){
+    phrase &lt;- paste0(&quot;It&#39;s &quot;,weekdays[i],&quot;! Last weekday! Freedom!&quot;)
+    print(phrase)
+  }
+}
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiSXQncyBGcmlkYXkhIExhc3Qgd2Vla2RheSEgRnJlZWRvbSFcIlxuIn0= -->
+<pre><code>[1] &quot;It&#39;s Friday! Last weekday! Freedom!&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="functions" class="section level1">
+<h1>Functions</h1>
+<p>In R, functions return the last output by default. The CodeClan style
+guide suggests to not use <code>return()</code> unless you’re doing
+something like if statements and have multiple different possible return
+values.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZnVuY3Rpb25fbmFtZSA8LSBmdW5jdGlvbihhcmd1bWVudF8xLCBhcmd1bWVudF8yID0gdmFsdWUpe1xuXG4gICAgICMgRG8gc3R1ZmZcbiAgICAgIFxuICAgICAgcmV0dXJuKG91dHB1dCl9XG5gYGAifQ== -->
+<pre class="r"><code>function_name &lt;- function(argument_1, argument_2 = value){
+
+     # Do stuff
+      
+      return(output)}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVsdGlwbHlfYnlfNSA8LSBmdW5jdGlvbih4KXtcbiAgeCo1XG59XG5cbm11bHRpcGx5X2J5XzUoMTQpXG5gYGAifQ== -->
+<pre class="r"><code>multiply_by_5 &lt;- function(x){
+  x*5
+}
+
+multiply_by_5(14)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDcwXG4ifQ== -->
+<pre><code>[1] 70</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVsdGlwbHlfYnkgPC0gZnVuY3Rpb24oeCwgeSl7XG4gIHggKiB5XG59XG5cbm11bHRpcGx5X2J5KDMsIDEyKVxuYGBgIn0= -->
+<pre class="r"><code>multiply_by &lt;- function(x, y){
+  x * y
+}
+
+multiply_by(3, 12)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM2XG4ifQ== -->
+<pre><code>[1] 36</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVsdGlwbHlfYnlfNV9kZWYgPC0gZnVuY3Rpb24oeCwgeSA9IDUpe1xuICB4ICogeVxufVxuXG5tdWx0aXBseV9ieV81X2RlZig0LCAyKVxuYGBgIn0= -->
+<pre class="r"><code>multiply_by_5_def &lt;- function(x, y = 5){
+  x * y
+}
+
+multiply_by_5_def(4, 2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDhcbiJ9 -->
+<pre><code>[1] 8</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJpYW5nbGVfZiA8LSBmdW5jdGlvbih4KXtcbiAgKHgqKHggKyAxKSkvMlxufVxuXG50cmlhbmdsZV9mKDUpXG5gYGAifQ== -->
+<pre class="r"><code>triangle_f &lt;- function(x){
+  (x*(x + 1))/2
+}
+
+triangle_f(5)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE1XG4ifQ== -->
+<pre><code>[1] 15</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>Task - 5 minutes</strong> Write a function make_price() that
+takes as input any whole number, and returns it written as a price
+(i.e. with a ‘£’ in front of the number). For example 5 would become £5,
+and 123 would become £123. Try out your function a few times to test
+that it works. Hint Use the str_c() function</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWFrZV9wcmljZSA8LSBmdW5jdGlvbih4KXtcbiAgaWYoaXMubnVtZXJpYyh4KSA9PSBUUlVFKXsgIFxuICAgIHN0cl9jKFwiwqNcIiwgeCl9ZWxzZXtcbiAgICAgIHByaW50KFwidGhhdCBpc24ndCBhIG51bWJlclwiKVxuICAgIH1cbn1cblxubWFrZV9wcmljZShcIndvcmRcIilcbmBgYCJ9 -->
+<pre class="r"><code>make_price &lt;- function(x){
+  if(is.numeric(x) == TRUE){  
+    str_c(&quot;£&quot;, x)}else{
+      print(&quot;that isn&#39;t a number&quot;)
+    }
+}
+
+make_price(&quot;word&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwidGhhdCBpc24ndCBhIG51bWJlclwiXG4ifQ== -->
+<pre><code>[1] &quot;that isn&#39;t a number&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIldlZWsgMiBEYXkgMyINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCiMgTGlzdHMNCg0KYGBge3J9DQpncm9jZXJ5X2xpc3QgPC0gbGlzdCgiQnJlYWQiLCJCdXR0ZXIiLCJNaWxrIiwiQ2hpY2tlbiIsIkNhdCBGb29kIikNCmBgYA0KDQpgYGB7cn0NCnggPC0gIGxpc3QoMSwiYSIsVFJVRSxjKDEsMiwzKSkNCg0KeFtbMl1dDQpgYGANCg0KTmFtZSB5b3VyIGxpc3RzDQoNCmBgYHtyfQ0KbmFtZWRfbGlzdCA8LSBsaXN0KGEgPSAiSSBsaWtlIHByb2dyYW1taW5nIGluIFIiLCBiID0gMToxMCkNCg0KbmFtZWRfbGlzdCRhDQpuYW1lZF9saXN0JGINCg0KbmFtZXMobmFtZWRfbGlzdCkNCg0KbmFtZWRfbGlzdA0KYGBgDQoNCk5lc3RlZCBsaXN0cw0KDQpgYGB7cn0NCnN0dWRlbnRfaW5mbyA8LSBsaXN0KA0KICAgICAgICAgICAgICAgICJBZ25lcyIgPSBsaXN0KGhlaWdodCA9IDEuOCwgc2hvZV9zaXplID0gOEwpLA0KICAgICAgICAgICAgICAgICJCb2JieSIgPSBsaXN0KGhlaWdodCA9IDIuMSwgZ2VuZGVyID0gIk1hbGUiKSwNCiAgICAgICAgICAgICAgICAiQ2hhcmxpZSIgPSBsaXN0KGdlbmRlciA9ICJGZW1hbGUiLCBsaWtlc19iZWV0cyA9IFRSVUUpDQopDQoNCnN0dWRlbnRfaW5mb1tbMV1dDQoNCg0KDQoNCmBgYA0KDQpgYGB7cn0NCnN0dWRlbnRfaW5mbyRBZ25lcw0KYGBgDQoNCmBgYHtyfQ0Kc3R1ZGVudF9pbmZvJEFnbmVzJGhlaWdodA0KYGBgDQoNCmBgYHtyfQ0Kc3R1ZGVudF9pbmZvW1sxXV1bWzFdXQ0KYGBgDQoNCmBgYHtyfQ0KZGVtb19saXN0IDwtIGxpc3QoMSwidXphaXIiLCJjb2RlY2xhbiIsYygxLDIsMyw0KSkNCg0KZGVtb19saXN0WzJdIDwtICJVWkFJUiINCg0KZGVtb19saXN0WzRdIDwtIE5VTEwNCmRlbW9fbGlzdA0KYGBgDQoNCioqVGFzayAtIDUgbWludXRlcyoqDQpNYWtlIGEgbmFtZWQgbGlzdCB0aGF0IGNvbnRhaW5zIGEgbnVtZXJpYyB2ZWN0b3IgYW5kIGEgY2hhcmFjdGVyIHZlY3Rvci4NCkFjY2VzcyB0aGUgc2Vjb25kIGVsZW1lbnQgb2YgeW91ciBsaXN0IHVzaW5nIGRvdWJsZSBzcXVhcmUgYnJhY2tldHMgW1tdXS4gV2hhdCBpcyBpdHMgY2xhc3M/DQpBY2Nlc3MgdGhlIHNlY29uZCBlbGVtZW50IG9mIHlvdXIgbGlzdCB1c2luZyBzaW5nbGUgc3F1YXJlIGJyYWNrZXRzIFtdLiBXaGF0IGlzIGl0cyBjbGFzcz8NCkFjY2VzcyB0aGUgc2Vjb25kIGVsZW1lbnQgb2YgeW91ciBsaXN0IGJ5IG5hbWUuIFdoYXQgaXMgaXRzIGNsYXNzPw0KDQpgYGB7cn0NCnRhc2tfbGlzdCA8LSBsaXN0KG51bXMgPSBjKDE6MjYpLCBhbHBoYXMgPSBjKGxldHRlcnMpKQ0KDQpjbGFzcyh0YXNrX2xpc3RbWzJdXSkNCmNsYXNzKHRhc2tfbGlzdFsyXSkNCg0KY2xhc3ModGFza19saXN0JGFscGhhcykNCmBgYA0KDQojIE1hdHJpY2VzDQoNCmBgYHtyfQ0KbWF0cml4KDE6NCxucm93PTIsbmNvbD0yKQ0KYGBgDQoNCmBgYHtyfQ0KbWF0cml4KDE6NCxucm93PTIsbmNvbD0yLGJ5cm93PVRSVUUpDQpgYGANCg0KYGBge3J9DQptIDwtIG1hdHJpeCgxOjYsIG5yb3c9MiwgbmNvbD0zKQ0KbQ0KYGBgDQoNCmBgYHtyfQ0KbVsxLF0NCm1bLDFdDQptWzEsMV0NCm1bMiwzXQ0KbVssYygxLDMpXQ0KYGBgDQpgYGB7cn0NCm0gKiAzDQoNCm0gLSAyIA0KYGBgDQoNCmBgYHtyfQ0Kcm93U3VtcyhtKQ0KY29sU3VtcyhtKQ0Kcm93TWVhbnMobSkNCmNvbE1lYW5zKG0pDQpgYGANCg0KKipUYXNrIC0gNSBtaW51dGVzKioNCk1ha2UgYSBtYXRyaXggd2l0aCAzIHJvd3MgYW5kIDQgY29sdW1ucy4gRWFjaCBjb2x1bW4gc2hvdWxkIGNvbnRhaW4gdGhlIG51bWJlcnMgMSB0byAzLg0KRmluZCB0aGUgZWxlbWVudCBpbiB0aGUgMm5kIHJvdywgM3JkIGNvbHVtbi4NCkNoZWNrIHRoYXQgYWxsIHRoZSBjb2x1bW5zIGFyZSBpZGVudGljYWwgYnkgY2hlY2tpbmcgdGhhdCB0aGVpciBzdW1zIGFyZSB0aGUgc2FtZS4NCg0KYGBge3J9DQp0YXNrX21hdHJpeCA8LSBtYXRyaXgoMTozLCBucm93PTMsIG5jb2w9NCkNCg0KdGFza19tYXRyaXhbMiwzXQ0KY29sU3Vtcyh0YXNrX21hdHJpeCkNCmBgYA0KDQojIENvbnRyb2wgRmxvdw0KDQpgYGB7cn0NCmlmICggMSAlaW4lIGMoMSw0LDYpKXsNCiAgcHJpbnQoInllcyIpDQp9DQpgYGANCmBgYHtyfQ0KaWYgKDUgIT0gMyl7DQogIHByaW50KCJZZXMiKX0NCmBgYA0KDQpgYGB7cn0NCnggPC0gNA0KeSA8LSA3DQoNCmlmICh4ID4geSl7DQogIHByaW50KCJZZXMiKQ0KfQ0KYGBgDQoNCioqVGFzayAtIDUgbWludXRlcyoqDQoNCldyaXRlIGFuIGlmIHN0YXRlbWVudCB0aGF0IHByaW50cyDigJhZZXMgdGhhdCBkaXZpZGVzIGJ5IDLigJkgaWYgYSBudW1iZXIgeCBpcyBkaXZpc2libGUgYnkgMiAoaGludDogdXNlICUlIDIgPT0gMCBhcyB5b3VyIGV4cHJlc3Npb24pLCB0cnkgaXQgb3V0IGZvciBkaWZmZXJlbnQgdmFsdWVzIG9mIHguDQoNCmBgYHtyfQ0KeCA8LSA0DQoNCmlmICh4ICUlIDIgPT0gMCl7DQogIHByaW50KCJZZXMgdGhhdCBkaXZpZGVzIGJ5IDIiKQ0KfQ0KYGBgDQoNCmBgYHtyfQ0KeiA8LSAzMw0KDQppZiAoeiAlJSAyICE9IDApew0KICBwcmludCgiTm8gdGhpcyBpcyBub3QgYSBwcmltZSBudW1iZXIiKQ0KfQ0KaWYgKHogJSUgMiA9PSAwKXsNCiAgcHJpbnQoIlllcyB0aGlzIGlzIGEgcHJpbWUgbnVtYmVyIikNCn0NCmBgYA0KDQpgYGB7cn0NCmlmICggMTAgIT0gNSl7DQogIGlmICgzID4gMSl7DQogICAgcHJpbnQoIkhlbGxvIFdvcmxkISIpDQogIH0NCiAgcHJpbnQoIkdvb2RieWUhIikNCn0NCmBgYA0KDQpgYGB7cn0NCmlmICgxMCAhPSA1KXsNCiAgaWYgKDIgPD0gMCl7DQogICAgcHJpbnQoIkhlbGxvIFdvcmxkISIpDQogIH0NCiAgcHJpbnQoIkdvb2RieWUhIikNCn0NCmBgYA0KDQoNCg0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIldlZWsgMiBEYXkgMyINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCiMgTGlzdHMNCg0KYGBge3J9DQpncm9jZXJ5X2xpc3QgPC0gbGlzdCgiQnJlYWQiLCJCdXR0ZXIiLCJNaWxrIiwiQ2hpY2tlbiIsIkNhdCBGb29kIikNCmBgYA0KDQpgYGB7cn0NCnggPC0gIGxpc3QoMSwiYSIsVFJVRSxjKDEsMiwzKSkNCg0KeFtbMl1dDQpgYGANCg0KTmFtZSB5b3VyIGxpc3RzDQoNCmBgYHtyfQ0KbmFtZWRfbGlzdCA8LSBsaXN0KGEgPSAiSSBsaWtlIHByb2dyYW1taW5nIGluIFIiLCBiID0gMToxMCkNCg0KbmFtZWRfbGlzdCRhDQpuYW1lZF9saXN0JGINCg0KbmFtZXMobmFtZWRfbGlzdCkNCg0KbmFtZWRfbGlzdA0KYGBgDQoNCk5lc3RlZCBsaXN0cw0KDQpgYGB7cn0NCnN0dWRlbnRfaW5mbyA8LSBsaXN0KA0KICAgICAgICAgICAgICAgICJBZ25lcyIgPSBsaXN0KGhlaWdodCA9IDEuOCwgc2hvZV9zaXplID0gOEwpLA0KICAgICAgICAgICAgICAgICJCb2JieSIgPSBsaXN0KGhlaWdodCA9IDIuMSwgZ2VuZGVyID0gIk1hbGUiKSwNCiAgICAgICAgICAgICAgICAiQ2hhcmxpZSIgPSBsaXN0KGdlbmRlciA9ICJGZW1hbGUiLCBsaWtlc19iZWV0cyA9IFRSVUUpDQopDQoNCnN0dWRlbnRfaW5mb1tbMV1dDQoNCg0KDQoNCmBgYA0KDQpgYGB7cn0NCnN0dWRlbnRfaW5mbyRBZ25lcw0KYGBgDQoNCmBgYHtyfQ0Kc3R1ZGVudF9pbmZvJEFnbmVzJGhlaWdodA0KYGBgDQoNCmBgYHtyfQ0Kc3R1ZGVudF9pbmZvW1sxXV1bWzFdXQ0KYGBgDQoNCmBgYHtyfQ0KZGVtb19saXN0IDwtIGxpc3QoMSwidXphaXIiLCJjb2RlY2xhbiIsYygxLDIsMyw0KSkNCg0KZGVtb19saXN0WzJdIDwtICJVWkFJUiINCg0KZGVtb19saXN0WzRdIDwtIE5VTEwNCmRlbW9fbGlzdA0KYGBgDQoNCioqVGFzayAtIDUgbWludXRlcyoqDQpNYWtlIGEgbmFtZWQgbGlzdCB0aGF0IGNvbnRhaW5zIGEgbnVtZXJpYyB2ZWN0b3IgYW5kIGEgY2hhcmFjdGVyIHZlY3Rvci4NCkFjY2VzcyB0aGUgc2Vjb25kIGVsZW1lbnQgb2YgeW91ciBsaXN0IHVzaW5nIGRvdWJsZSBzcXVhcmUgYnJhY2tldHMgW1tdXS4gV2hhdCBpcyBpdHMgY2xhc3M/DQpBY2Nlc3MgdGhlIHNlY29uZCBlbGVtZW50IG9mIHlvdXIgbGlzdCB1c2luZyBzaW5nbGUgc3F1YXJlIGJyYWNrZXRzIFtdLiBXaGF0IGlzIGl0cyBjbGFzcz8NCkFjY2VzcyB0aGUgc2Vjb25kIGVsZW1lbnQgb2YgeW91ciBsaXN0IGJ5IG5hbWUuIFdoYXQgaXMgaXRzIGNsYXNzPw0KDQpgYGB7cn0NCnRhc2tfbGlzdCA8LSBsaXN0KG51bXMgPSBjKDE6MjYpLCBhbHBoYXMgPSBjKGxldHRlcnMpKQ0KDQpjbGFzcyh0YXNrX2xpc3RbWzJdXSkNCmNsYXNzKHRhc2tfbGlzdFsyXSkNCg0KY2xhc3ModGFza19saXN0JGFscGhhcykNCmBgYA0KDQojIE1hdHJpY2VzDQoNCmBgYHtyfQ0KbWF0cml4KDE6NCxucm93PTIsbmNvbD0yKQ0KYGBgDQoNCmBgYHtyfQ0KbWF0cml4KDE6NCxucm93PTIsbmNvbD0yLGJ5cm93PVRSVUUpDQpgYGANCg0KYGBge3J9DQptIDwtIG1hdHJpeCgxOjYsIG5yb3c9MiwgbmNvbD0zKQ0KbQ0KYGBgDQoNCmBgYHtyfQ0KbVsxLF0NCm1bLDFdDQptWzEsMV0NCm1bMiwzXQ0KbVssYygxLDMpXQ0KYGBgDQpgYGB7cn0NCm0gKiAzDQoNCm0gLSAyIA0KYGBgDQoNCmBgYHtyfQ0Kcm93U3VtcyhtKQ0KY29sU3VtcyhtKQ0Kcm93TWVhbnMobSkNCmNvbE1lYW5zKG0pDQpgYGANCg0KKipUYXNrIC0gNSBtaW51dGVzKioNCk1ha2UgYSBtYXRyaXggd2l0aCAzIHJvd3MgYW5kIDQgY29sdW1ucy4gRWFjaCBjb2x1bW4gc2hvdWxkIGNvbnRhaW4gdGhlIG51bWJlcnMgMSB0byAzLg0KRmluZCB0aGUgZWxlbWVudCBpbiB0aGUgMm5kIHJvdywgM3JkIGNvbHVtbi4NCkNoZWNrIHRoYXQgYWxsIHRoZSBjb2x1bW5zIGFyZSBpZGVudGljYWwgYnkgY2hlY2tpbmcgdGhhdCB0aGVpciBzdW1zIGFyZSB0aGUgc2FtZS4NCg0KYGBge3J9DQp0YXNrX21hdHJpeCA8LSBtYXRyaXgoMTozLCBucm93PTMsIG5jb2w9NCkNCg0KdGFza19tYXRyaXhbMiwzXQ0KY29sU3Vtcyh0YXNrX21hdHJpeCkNCmBgYA0KDQojIENvbnRyb2wgRmxvdw0KDQojIyBpZg0KDQpgYGB7cn0NCmlmICggMSAlaW4lIGMoMSw0LDYpKXsNCiAgcHJpbnQoInllcyIpDQp9DQpgYGANCmBgYHtyfQ0KaWYgKDUgIT0gMyl7DQogIHByaW50KCJZZXMiKX0NCmBgYA0KDQpgYGB7cn0NCnggPC0gNA0KeSA8LSA3DQoNCmlmICh4ID4geSl7DQogIHByaW50KCJZZXMiKQ0KfQ0KYGBgDQoNCioqVGFzayAtIDUgbWludXRlcyoqDQoNCldyaXRlIGFuIGlmIHN0YXRlbWVudCB0aGF0IHByaW50cyDigJhZZXMgdGhhdCBkaXZpZGVzIGJ5IDLigJkgaWYgYSBudW1iZXIgeCBpcyBkaXZpc2libGUgYnkgMiAoaGludDogdXNlICUlIDIgPT0gMCBhcyB5b3VyIGV4cHJlc3Npb24pLCB0cnkgaXQgb3V0IGZvciBkaWZmZXJlbnQgdmFsdWVzIG9mIHguDQoNCmBgYHtyfQ0KeCA8LSA0DQoNCmlmICh4ICUlIDIgPT0gMCl7DQogIHByaW50KCJZZXMgdGhhdCBkaXZpZGVzIGJ5IDIiKQ0KfQ0KYGBgDQoNCmBgYHtyfQ0KeiA8LSAzMw0KDQppZiAoeiAlJSAyICE9IDApew0KICBwcmludCgiTm8gdGhpcyBpcyBub3QgYSBwcmltZSBudW1iZXIiKQ0KfQ0KaWYgKHogJSUgMiA9PSAwKXsNCiAgcHJpbnQoIlllcyB0aGlzIGlzIGEgcHJpbWUgbnVtYmVyIikNCn0NCmBgYA0KDQpgYGB7cn0NCmlmICggMTAgIT0gNSl7DQogIGlmICgzID4gMSl7DQogICAgcHJpbnQoIkhlbGxvIFdvcmxkISIpDQogIH0NCiAgcHJpbnQoIkdvb2RieWUhIikNCn0NCmBgYA0KDQpgYGB7cn0NCmlmICgxMCAhPSA1KXsNCiAgaWYgKDIgPD0gMCl7DQogICAgcHJpbnQoIkhlbGxvIFdvcmxkISIpDQogIH0NCiAgcHJpbnQoIkdvb2RieWUhIikNCn0NCmBgYA0KKipUYXNrIC0gMTAgbWludXRlcyoqDQpIZXJl4oCZcyBhbiBleGFtcGxlIG9mIGEgbmVzdGVkIGlmIHN0YXRlbWVudC4gUHJlZGljdCB3aGF0IHRoZSBjb2RlIGlzIGdvaW5nIHRvIHByaW50IG91dCBmb3IgdGhlIGZvbGxvd2luZyBjb21iaW5hdGlvbnM6DQp4IGlzIDEwIGFuZCB5IGlzIDMuDQp4IGlzIDEwIGFuZCB5IGlzIDIuDQp4IGlzIDIgYW5kIHkgaXMgMTAuDQoNCmBgYHtyfQ0KDQppZiAoeCA+IHkpIHsNCiAgcHJpbnQoIlN0YXJ0IG9mIG91dGVyIGlmIGJsb2NrIikNCg0KICBpZiAoeCAlJSB5ID09IDApIHsNCiAgICBwcmludCgiSW5uZXIgaWYgYmxvY2sgMSIpDQogIH0NCg0KICBpZiAoeSAlaW4lIGMoMTo1KSkgew0KICAgIHByaW50KCJJbm5lciBpZiBibG9jayAyIikNCiAgfQ0KDQogIHByaW50KCJFbmQgb2Ygb3V0ZXIgaWYgYmxvY2siKQ0KfQ0KDQpwcmludCgiQWZ0ZXIgaWYgc3RhdGVtZW50IikNCmBgYA0KDQoxLiAiU3RhcnQgb2Ygb3V0ZXIgaWYgYmxvY2siLCAiSW5uZXIgaWYgYmxvY2sgMSIsICJFbmQgb2Ygb3V0ZXIgaWYgYmxvY2siLCAiQWZ0ZXIgaWYgc3RhdGVtZW50Ig0KMi4gIlN0YXJ0IG9mIG91dGVyIGlmIGJsb2NrIiwgIklubmVyIGlmIGJsb2NrIDEiLCAiSW5uZXIgaWYgYmxvY2sgMiIsICJFbmQgb2Ygb3V0ZXIgaWYgYmxvY2siLCAiQWZ0ZXIgaWYgc3RhdGVtZW50Ig0KMy4gIkFmdGVyIGlmIHN0YXRlbWVudCINCg0KIyMgaWYgZWxzZQ0KDQpgYGB7cn0NCndlYXRoZXIgPSAiV2luZHkiDQppZiAod2VhdGhlciA9PSAiV2luZHkiKXsNCiAgcHJpbnQoIndlYXRoZXIgaXMgd2luZHkiKQ0KfSBlbHNlew0KICBwcmludCgid2VhdGhlciBpcyBub3Qgd2luZHkgdG9kYXkgbGV0cyBnbyBzaG9wcGluZyIpDQp9DQpgYGANCmBgYHtyfQ0KaWYgKDQ+NSl7DQogIHByaW50KCJZZXMiKQ0KfSBlbHNlew0KICBwcmludCgiTm8iKQ0KfQ0KYGBgDQoNCmBgYHtyfQ0KaWYgKDMgJWluJSA0OjYpew0KICBwcmludCgiMyBpcyBpbiByYW5nZSIpDQp9IGVsc2Ugew0KICBwcmludCgiaXRzIG5vdCBpbiByYW5nZSIpDQp9DQpgYGANCg0KKipUYXNrIC0gNSBtaW51dGVzKioNCg0KRWRpdCB5b3VyIGNvZGUgZnJvbSB0aGUgZmlyc3QgZXhlcmNpc2Ugc28gdGhhdCBpdCBwcmludHMg4oCYWWVzIHRoYXQgZGl2aWRlc+KAmSB3aGVuIHggaXMgZGl2aXNpYmxlIGJ5IDIsIGFuZCBwcmludHMg4oCYTm8gdGhhdCBkb2VzIG5vdCBkaXZpZGXigJkgb3RoZXJ3aXNlLg0KDQpgYGB7cn0NCnggPC0gNA0KDQppZiAoeCAlJSAyID09IDApew0KICBwcmludCgiWWVzIHRoYXQgZGl2aWRlcyBieSAyIikNCn1lbHNlIHtwcmludCgiTm8gdGhhdCBkb2VzIG5vdCBkaXZpZGUiKQ0KICAgIH0NCmBgYA0KDQoqKlRhc2sgLSAxMCBtaW51dGVzKioNCkhlcmXigJlzIGFuIGV4YW1wbGUgb2YgYSBuZXN0ZWQgaWYtZWxzZSBzdGF0ZW1lbnQuIFByZWRpY3Qgd2hhdCBpdOKAmXMgZ29pbmcgdG8gcHJpbnQgb3V0IGZvciB0aGUgZm9sbG93aW5nIGNvbmRpdGlvbnM6Lg0KMS4gV2hlbiB4IGlzIDUgYW5kIHkgaXMgMTANCjIuIFdoZW4geCBpcyA2IGFuZCB5IGlzIDEyDQozLiBXaGVuIHggaXMgNiBhbmQgeSBpcyAxMw0KDQpgYGB7cn0NCnggPC0gNg0KeSA8LSAxMw0KDQppZiAoeCAlaW4lIGMoMywgNCwgNSkpew0KICANCiAgcHJpbnQoInggaXMgaW4gb3VyIGxpc3QiKQ0KICANCiAgaWYgKHggPT0gNSl7DQogICAgDQogICAgcHJpbnQoInggaXMgZXhhY3RseSA1IikNCiAgICANCiAgfQ0KICANCn0gZWxzZSB7DQogIA0KICBwcmludCgiU3RhcnQgb2YgZWxzZSBzdGF0ZW1lbnQiKQ0KICANCiAgaWYgKHkgJSUgeCA9PSAwKXsNCiAgICANCiAgICBwcmludCgieCBkaXZpZGVzIHkiKQ0KICANCiAgfSBlbHNlew0KICAgIA0KICAgIHByaW50KCJ4IGRvZXMgbm90IGRpdmlkZSBZIikNCiAgfQ0KICANCiAgcHJpbnQgKCJFbmQgb2YgZWxzZSBzdGF0ZW1lbnQiKQ0KICANCn0NCmBgYA0KDQoxLiAieCBpcyBpbiBvdXIgbGlzdCIsICJ4IGlzIGV4YWN0bHkgNSINCjIuICJTdGFydCBvZiBlbHNlIHN0YXRlbWVudCIsICJ4IGRpdmlkZXMgeSIsICJFbmQgb2YgZWxzZSBzdGF0ZW1lbnQiDQozLiAiU3RhcnQgb2YgZWxzZSBzdGF0ZW1lbnQiLCAieCBkb2VzIG5vdCBkaXZpZGUgeSIsICJFbmQgb2YgZWxzZSBzdGF0ZW1lbnQiDQoNCiMjIGZvcg0KDQpgYGB7cn0NCndlZWtkYXlzIDwtIGMoIk1vbmRheSIsICJUdWVzZGF5IiwgIldlZG5lc2RheSIsICJUaHVyc2RheSIsICJGcmlkYXkiKQ0KDQpmb3IgKGRheSBpbiB3ZWVrZGF5cykgew0KICAgIHBocmFzZSA8LSBwYXN0ZSgiVGhlIGRheSBpcyIsIGRheSkNCiAgICBwcmludChwaHJhc2UpDQogICAgIyBvciBjb3VsZCBkbyBpbiBvbmUgbGluZSBhcw0KICAgICMgcHJpbnQocGFzdGUoIlRoZSBkYXkgaXMiLCBkYXkpKQ0KfSANCmBgYA0KDQoqKlRhc2sgLSAxMCBtaW5zKioNCg0KQ2hhbmdlIHRoZSBjb2RlIGJlbG93IHRvIHVzZSBhIGZvciBsb29wOg0KYGBge3J9DQpwcmludCgxKQ0KcHJpbnQoMikNCnByaW50KDMpDQpwcmludCg0KQ0KcHJpbnQoNSkNCmBgYA0KDQpgYGB7cn0NCmZvcihpIGluIDE6NSl7DQogIHByaW50KGkpDQp9DQpgYGANCiMjIHdoaWxlDQoNCmBgYHtyfQ0Kc3RhcnRfdmFsdWUgPC0gMQ0Kc3RvcF92YWx1ZSA8LSAxMA0KDQp3aGlsZSAoc3RhcnRfdmFsdWUgPCBzdG9wX3ZhbHVlKXsNCiAgc3RhcnRfdmFsdWUgPC0gc3RhcnRfdmFsdWUgKyAxDQogIHBocmFzZSA9IHBhc3RlKCJzdGFydCB2YWx1ZSBpcyIsIHN0YXJ0X3ZhbHVlKQ0KICBwcmludChwaHJhc2UpDQp9DQpgYGANCg0KIyBBbHRlcm5hdGl2ZSBpbmRleGluZw0KDQpgYGB7cn0NCndlZWtkYXlzIDwtIGMoIk1vbmRheSIsICJUdWVzZGF5IiwgIldlZG5lc2RheSIsICJUaHVyc2RheSIsICJGcmlkYXkiKQ0KDQpmb3IgKGkgaW4gMTpsZW5ndGgod2Vla2RheXMpKXsNCiAgcGhyYXNlIDwtIHBhc3RlKCJUaGUgZGF5IGlzIiwgd2Vla2RheXNbaV0pDQogIHByaW50KHBocmFzZSkNCn0NCmBgYA0KDQpgYGB7cn0NCmZvciAoaSBpbiAxOmxlbmd0aCh3ZWVrZGF5cykpew0KICB3ZWVrZGF5c1tpXSA8LSBwYXN0ZTAod2Vla2RheXNbaV0sICJzIikNCn0NCmBgYA0KDQojIE5lc3RlZCBsb29wcw0KDQpgYGB7cn0NCm15X21hdHJpeCA8LSByZXBsaWNhdGUoNSwgcm5vcm0oNSkpDQoNCmBgYA0KDQpgYGB7cn0NCmZvciAocm93X2luZGV4IGluIDE6ZGltKG15X21hdHJpeClbMV0pew0KICBmb3IoY29sX2luZGV4IGluIDE6ZGltKG15X21hdHJpeClbMl0pew0KICAgIHByaW50KG15X21hdHJpeFtyb3dfaW5kZXgsIGNvbF9pbmRleF0pDQogIH0NCn0NCmBgYA0KKipUYXNrKioNCg0KQ3JlYXRlIGEgbmVzdGVkIGZvciBsb29wIGFuZCBpZiBzdGF0ZW1lbnQgY29tYmluYXRpb24gd2hpY2ggbG9vcHMgdGhyb3VnaCB0aGUgd2Vla2RheXMgYW5kIHByaW50cyBvdXQgdGhlIHBocmFzZSDigJhMYXN0IHdlZWtkYXkh4oCZIG9uY2UgaXQgZ2V0cyB0byBGcmlkYXkuDQoNCmBgYHtyfQ0Kd2Vla2RheXMgPC0gYygiTW9uZGF5IiwgIlR1ZXNkYXkiLCAiV2VkbmVzZGF5IiwgIlRodXJzZGF5IiwgIkZyaWRheSIpDQpmb3IgKGkgaW4gc2VxX2Fsb25nKHdlZWtkYXlzKSl7DQogIGlmKHdlZWtkYXlzW2ldID09ICJGcmlkYXkiKXsNCiAgICBwaHJhc2UgPC0gcGFzdGUwKCJJdCdzICIsd2Vla2RheXNbaV0sIiEgTGFzdCB3ZWVrZGF5ISBGcmVlZG9tISIpDQogICAgcHJpbnQocGhyYXNlKQ0KICB9DQp9DQpgYGANCg0KIyBGdW5jdGlvbnMNCg0KSW4gUiwgZnVuY3Rpb25zIHJldHVybiB0aGUgbGFzdCBvdXRwdXQgYnkgZGVmYXVsdC4gVGhlIENvZGVDbGFuIHN0eWxlIGd1aWRlIHN1Z2dlc3RzIHRvIG5vdCB1c2UgYHJldHVybigpYCB1bmxlc3MgeW91J3JlIGRvaW5nIHNvbWV0aGluZyBsaWtlIGlmIHN0YXRlbWVudHMgYW5kIGhhdmUgbXVsdGlwbGUgZGlmZmVyZW50IHBvc3NpYmxlIHJldHVybiB2YWx1ZXMuDQoNCmBgYHtyfQ0KZnVuY3Rpb25fbmFtZSA8LSBmdW5jdGlvbihhcmd1bWVudF8xLCBhcmd1bWVudF8yID0gdmFsdWUpew0KDQogICAgICMgRG8gc3R1ZmYNCiAgICAgIA0KfQ0KYGBgDQoNCmBgYHtyfQ0KbXVsdGlwbHlfYnlfNSA8LSBmdW5jdGlvbih4KXsNCiAgeCo1DQp9DQoNCm11bHRpcGx5X2J5XzUoMTQpDQpgYGANCg0KYGBge3J9DQptdWx0aXBseV9ieSA8LSBmdW5jdGlvbih4LCB5KXsNCiAgeCAqIHkNCn0NCg0KbXVsdGlwbHlfYnkoMywgMTIpDQpgYGANCg0KYGBge3J9DQptdWx0aXBseV9ieV81X2RlZiA8LSBmdW5jdGlvbih4LCB5ID0gNSl7DQogIHggKiB5DQp9DQoNCm11bHRpcGx5X2J5XzVfZGVmKDQsIDIpDQpgYGANCg0KYGBge3J9DQp0cmlhbmdsZV9mIDwtIGZ1bmN0aW9uKHgpew0KICAoeCooeCArIDEpKS8yDQp9DQoNCmBgYA0KKipUYXNrIC0gNSBtaW51dGVzKioNCldyaXRlIGEgZnVuY3Rpb24gbWFrZV9wcmljZSgpIHRoYXQgdGFrZXMgYXMgaW5wdXQgYW55IHdob2xlIG51bWJlciwgYW5kIHJldHVybnMgaXQgd3JpdHRlbiBhcyBhIHByaWNlIChpLmUuIHdpdGggYSDigJjCo+KAmSBpbiBmcm9udCBvZiB0aGUgbnVtYmVyKS4gRm9yIGV4YW1wbGUgNSB3b3VsZCBiZWNvbWUgwqM1LCBhbmQgMTIzIHdvdWxkIGJlY29tZSDCozEyMy4gVHJ5IG91dCB5b3VyIGZ1bmN0aW9uIGEgZmV3IHRpbWVzIHRvIHRlc3QgdGhhdCBpdCB3b3Jrcy4NCkhpbnQNClVzZSB0aGUgc3RyX2MoKSBmdW5jdGlvbg0KDQpgYGB7cn0NCm1ha2VfcHJpY2UgPC0gZnVuY3Rpb24oeCl7DQogIGlmKGlzLm51bWVyaWMoeCkgPT0gVFJVRSl7ICANCiAgICBzdHJfYygiwqMiLCB4KX1lbHNlew0KICAgICAgcHJpbnQoInRoYXQgaXNuJ3QgYSBudW1iZXIiKQ0KICAgIH0NCn0NCg0KbWFrZV9wcmljZSgid29yZCIpDQpgYGANCg0K</div>
 
 
 

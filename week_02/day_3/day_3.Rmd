@@ -129,6 +129,8 @@ colSums(task_matrix)
 
 # Control Flow
 
+## if
+
 ```{r}
 if ( 1 %in% c(1,4,6)){
   print("yes")
@@ -188,6 +190,258 @@ if (10 != 5){
   print("Goodbye!")
 }
 ```
+**Task - 10 minutes**
+Here’s an example of a nested if statement. Predict what the code is going to print out for the following combinations:
+x is 10 and y is 3.
+x is 10 and y is 2.
+x is 2 and y is 10.
 
+```{r}
 
+if (x > y) {
+  print("Start of outer if block")
+
+  if (x %% y == 0) {
+    print("Inner if block 1")
+  }
+
+  if (y %in% c(1:5)) {
+    print("Inner if block 2")
+  }
+
+  print("End of outer if block")
+}
+
+print("After if statement")
+```
+
+1. "Start of outer if block", "Inner if block 1", "End of outer if block", "After if statement"
+2. "Start of outer if block", "Inner if block 1", "Inner if block 2", "End of outer if block", "After if statement"
+3. "After if statement"
+
+## if else
+
+```{r}
+weather = "Windy"
+if (weather == "Windy"){
+  print("weather is windy")
+} else{
+  print("weather is not windy today lets go shopping")
+}
+```
+```{r}
+if (4>5){
+  print("Yes")
+} else{
+  print("No")
+}
+```
+
+```{r}
+if (3 %in% 4:6){
+  print("3 is in range")
+} else {
+  print("its not in range")
+}
+```
+
+**Task - 5 minutes**
+
+Edit your code from the first exercise so that it prints ‘Yes that divides’ when x is divisible by 2, and prints ‘No that does not divide’ otherwise.
+
+```{r}
+x <- 4
+
+if (x %% 2 == 0){
+  print("Yes that divides by 2")
+}else {print("No that does not divide")
+    }
+```
+
+**Task - 10 minutes**
+Here’s an example of a nested if-else statement. Predict what it’s going to print out for the following conditions:.
+1. When x is 5 and y is 10
+2. When x is 6 and y is 12
+3. When x is 6 and y is 13
+
+```{r}
+x <- 6
+y <- 13
+
+if (x %in% c(3, 4, 5)){
+  
+  print("x is in our list")
+  
+  if (x == 5){
+    
+    print("x is exactly 5")
+    
+  }
+  
+} else {
+  
+  print("Start of else statement")
+  
+  if (y %% x == 0){
+    
+    print("x divides y")
+  
+  } else{
+    
+    print("x does not divide Y")
+  }
+  
+  print ("End of else statement")
+  
+}
+```
+
+1. "x is in our list", "x is exactly 5"
+2. "Start of else statement", "x divides y", "End of else statement"
+3. "Start of else statement", "x does not divide y", "End of else statement"
+
+## for
+
+```{r}
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+for (day in weekdays) {
+    phrase <- paste("The day is", day)
+    print(phrase)
+    # or could do in one line as
+    # print(paste("The day is", day))
+} 
+```
+
+**Task - 10 mins**
+
+Change the code below to use a for loop:
+```{r}
+print(1)
+print(2)
+print(3)
+print(4)
+print(5)
+```
+
+```{r}
+for(i in 1:5){
+  print(i)
+}
+```
+## while
+
+```{r}
+start_value <- 1
+stop_value <- 10
+
+while (start_value < stop_value){
+  start_value <- start_value + 1
+  phrase = paste("start value is", start_value)
+  print(phrase)
+}
+```
+
+# Alternative indexing
+
+```{r}
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+for (i in 1:length(weekdays)){
+  phrase <- paste("The day is", weekdays[i])
+  print(phrase)
+}
+```
+
+```{r}
+for (i in 1:length(weekdays)){
+  weekdays[i] <- paste0(weekdays[i], "s")
+}
+```
+
+# Nested loops
+
+```{r}
+my_matrix <- replicate(5, rnorm(5))
+
+```
+
+```{r}
+for (row_index in 1:dim(my_matrix)[1]){
+  for(col_index in 1:dim(my_matrix)[2]){
+    print(my_matrix[row_index, col_index])
+  }
+}
+```
+**Task**
+
+Create a nested for loop and if statement combination which loops through the weekdays and prints out the phrase ‘Last weekday!’ once it gets to Friday.
+
+```{r}
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+for (i in seq_along(weekdays)){
+  if(weekdays[i] == "Friday"){
+    phrase <- paste0("It's ",weekdays[i],"! Last weekday! Freedom!")
+    print(phrase)
+  }
+}
+```
+
+# Functions
+
+In R, functions return the last output by default. The CodeClan style guide suggests to not use `return()` unless you're doing something like if statements and have multiple different possible return values.
+
+```{r}
+function_name <- function(argument_1, argument_2 = value){
+
+     # Do stuff
+      
+}
+```
+
+```{r}
+multiply_by_5 <- function(x){
+  x*5
+}
+
+multiply_by_5(14)
+```
+
+```{r}
+multiply_by <- function(x, y){
+  x * y
+}
+
+multiply_by(3, 12)
+```
+
+```{r}
+multiply_by_5_def <- function(x, y = 5){
+  x * y
+}
+
+multiply_by_5_def(4, 2)
+```
+
+```{r}
+triangle_f <- function(x){
+  (x*(x + 1))/2
+}
+
+```
+**Task - 5 minutes**
+Write a function make_price() that takes as input any whole number, and returns it written as a price (i.e. with a ‘£’ in front of the number). For example 5 would become £5, and 123 would become £123. Try out your function a few times to test that it works.
+Hint
+Use the str_c() function
+
+```{r}
+make_price <- function(x){
+  if(is.numeric(x) == TRUE){  
+    str_c("£", x)}else{
+      print("that isn't a number")
+    }
+}
+
+make_price("word")
+```
 
