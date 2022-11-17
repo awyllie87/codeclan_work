@@ -1,0 +1,45 @@
+---
+title: "Week 2 Day 4 - Reproducibility"
+output: html_notebook
+---
+
+```{r libraries}
+library(tidyverse)
+```
+
+# Rules for reproducibility
+
+- Don't change the raw data! Treat it as read-only
+- R-specific : work in Projects!
+- follow a logical file naming format: lead with e.g 1_ if you need things to be done in order
+- Flexible code and automated output
+
+# Flexible code
+
+```{r}
+# Select species column
+
+iris %>% 
+  select(5)
+
+# This is more flexible to changes in the data, and also more readable
+
+iris %>% 
+  select(Species)
+```
+
+# Automated output
+
+# Functions and modular code
+
+For functions with repeated use across multiple files, rather than creating the function in each file (at the top), we can create it once and load it into each file using `source()`
+
+
+```{r}
+source("subset.R")
+```
+
+```{r}
+subset_function(1:100)
+```
+

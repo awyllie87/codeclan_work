@@ -11,7 +11,7 @@
 
 
 
-<title>Week 2 Day 4 : Assertive Programming</title>
+<title>Week 2 Day 4 - Reproducibility</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Week 2 Day 4 : Assertive Programming</h1>
+<h1 class="title toc-ignore">Week 2 Day 4 - Reproducibility</h1>
 
 </div>
 
@@ -1754,359 +1754,66 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5saWJyYXJ5KHRlc3R0aGF0KVxuYGBgIn0= -->
-<pre class="r"><code>library(tidyverse)
-library(testthat)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYdGVzdHRoYXTigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3QgaXMgbWFza2VkIGZyb20g4oCYcGFja2FnZTpkcGx5cuKAmTpcblxuICAgIG1hdGNoZXNcblxuVGhlIGZvbGxvd2luZyBvYmplY3QgaXMgbWFza2VkIGZyb20g4oCYcGFja2FnZTpwdXJycuKAmTpcblxuICAgIGlzX251bGxcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnJlYWRy4oCZOlxuXG4gICAgZWRpdGlvbl9nZXQsIGxvY2FsX2VkaXRpb25cblxuVGhlIGZvbGxvd2luZyBvYmplY3QgaXMgbWFza2VkIGZyb20g4oCYcGFja2FnZTp0aWR5cuKAmTpcblxuICAgIG1hdGNoZXNcbiJ9 -->
-<pre><code>
-Attaching package: ‘testthat’
-
-The following object is masked from ‘package:dplyr’:
-
-    matches
-
-The following object is masked from ‘package:purrr’:
-
-    is_null
-
-The following objects are masked from ‘package:readr’:
-
-    edition_get, local_edition
-
-The following object is masked from ‘package:tidyr’:
-
-    matches</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="unit-testing" class="section level1">
-<h1>Unit Testing</h1>
-<p>Function we’re going to test:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaXNfbGVhcF95ZWFyIDwtIGZ1bmN0aW9uKHllYXIpe1xuICBcbiAgaWYgKHllYXIgJSUgMTAwID09IDApe1xuICAgIGlmICh5ZWFyICUlIDQwMCA9PSAwKXtcbiAgICAgIHJldHVybihUUlVFKVxuICAgIH0gZWxzZXtcbiAgICAgIHJldHVybihGQUxTRSlcbiAgICB9XG4gIH0gXG4gICAgXG4gIGlmICh5ZWFyICUlIDQgPT0gMCl7XG4gICAgcmV0dXJuKFRSVUUpXG4gIH0gZWxzZSB7XG4gICAgcmV0dXJuKEZBTFNFKVxuICB9XG4gIFxufVxuYGBgIn0= -->
-<pre class="r"><code>is_leap_year &lt;- function(year){
-  
-  if (year %% 100 == 0){
-    if (year %% 400 == 0){
-      return(TRUE)
-    } else{
-      return(FALSE)
-    }
-  } 
-    
-  if (year %% 4 == 0){
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
-  
-}</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5gYGAifQ== -->
+<pre class="r"><code>library(tidyverse)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Function returns true if year mod 400 or year mod 4 = 0, otherwise
-returns false.</p>
-<div id="testthat" class="section level2">
-<h2><code>testthat()</code></h2>
-<p>test_that(“description”,{ test_1 test_2 … })</p>
+<div id="rules-for-reproducibility" class="section level1">
+<h1>Rules for reproducibility</h1>
+<ul>
+<li>Don’t change the raw data! Treat it as read-only</li>
+<li>R-specific : work in Projects!</li>
+<li>follow a logical file naming format: lead with e.g 1_ if you need
+things to be done in order</li>
+<li>Flexible code and automated output</li>
+</ul>
+</div>
+<div id="flexible-code" class="section level1">
+<h1>Flexible code</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdF90aGF0KGRlc2MgPSBcIkxlYXAgeWVhcnMgcmV0dXJuIGFzIFRSVUVcIiwge1xuICBleHBlY3RfZXF1YWwoaXNfbGVhcF95ZWFyKDIwMjApLCBUUlVFKVxuICBleHBlY3RfZXF1YWwoaXNfbGVhcF95ZWFyKDIwMDApLCBUUlVFKVxufSlcbmBgYCJ9 -->
-<pre class="r"><code>test_that(desc = &quot;Leap years return as TRUE&quot;, {
-  expect_equal(is_leap_year(2020), TRUE)
-  expect_equal(is_leap_year(2000), TRUE)
-})</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBTZWxlY3Qgc3BlY2llcyBjb2x1bW5cblxuaXJpcyAlPiUgXG4gIHNlbGVjdCg1KVxuXG4jIFRoaXMgaXMgbW9yZSBmbGV4aWJsZSB0byBjaGFuZ2VzIGluIHRoZSBkYXRhLCBhbmQgYWxzbyBtb3JlIHJlYWRhYmxlXG5cbmlyaXMgJT4lIFxuICBzZWxlY3QoU3BlY2llcylcbmBgYCJ9 -->
+<pre class="r"><code># Select species column
+
+iris %&gt;% 
+  select(5)
+
+# This is more flexible to changes in the data, and also more readable
+
+iris %&gt;% 
+  select(Species)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiVGVzdCBwYXNzZWQg8J+OilxuIn0= -->
-<pre><code>Test passed 🎊</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBzZWNvbmQgdGVzdCA6IG9uZSBleHBlY3RhdGlvblxudGVzdF90aGF0KFwiQ2hhcmFjdGVyIGlucHV0IHJldHVybnMgYW4gZXJyb3JcIiwge1xuICBleHBlY3RfZXJyb3IoaXNfbGVhcF95ZWFyKFwiMjAwMFwiKSlcbn0pXG5gYGAifQ== -->
-<pre class="r"><code># second test : one expectation
-test_that(&quot;Character input returns an error&quot;, {
-  expect_error(is_leap_year(&quot;2000&quot;))
-})</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiVGVzdCBwYXNzZWQg8J+MiFxuIn0= -->
-<pre><code>Test passed 🌈</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Tests that fail</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdF90aGF0KFwiTm9uLW51bWVyaWMgaW5wdXQgcmV0dXJucyBhbiBlcnJvclwiLCB7XG4gIGV4cGVjdF9lcnJvcihpc19sZWFwX3llYXIoXCJ5ZWFyXCIpKVxuICBleHBlY3RfZXJyb3IoaXNfbGVhcF95ZWFyKFRSVUUpKVxufSlcbmBgYCJ9 -->
-<pre class="r"><code>test_that(&quot;Non-numeric input returns an error&quot;, {
-  expect_error(is_leap_year(&quot;year&quot;))
-  expect_error(is_leap_year(TRUE))
-})</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoi4pSA4pSAIEZhaWx1cmUgKExpbmUgMyk6IE5vbi1udW1lcmljIGlucHV0IHJldHVybnMgYW4gZXJyb3Ig4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5gaXNfbGVhcF95ZWFyKFRSVUUpYCBkaWQgbm90IHRocm93IGFuIGVycm9yLlxuIn0= -->
-<pre><code>── Failure (Line 3): Non-numeric input returns an error ────────────────────────
-`is_leap_year(TRUE)` did not throw an error.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gcmVwb3J0ZXIkc3RvcF9pZl9uZWVkZWQoKSA6IFRlc3QgZmFpbGVkXG4ifQ== -->
-<pre><code>Error in reporter$stop_if_needed() : Test failed</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>TRUE reads as the number 1 if used in calculations, so we need to
-edit the function</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaXNfbGVhcF95ZWFyIDwtIGZ1bmN0aW9uKHllYXIpe1xuICBcbiAgaWYoIWlzLm51bWVyaWMoeWVhcikpe1xuICAgIHN0b3AoXCJOb24tbnVtZXJpYyBpbnB1dFwiKVxuICB9XG4gIFxuICAjIyBpZiB5ZWFyIG1vZCAxMDAgPSAwXG4gIGlmICh5ZWFyICUlIDEwMCA9PSAwKXtcbiAgICAjIyBpZiB5ZWFyIG1vZCA0MDAgPSAwXG4gICAgaWYgKHllYXIgJSUgNDAwID09IDApe1xuICAgICAgcmV0dXJuKFRSVUUpXG4gICAgfSBlbHNle1xuICAgICAgcmV0dXJuKEZBTFNFKVxuICAgIH1cbiAgfSBcbiAgICBcbiAgIyMgaWYgeWVhciBtb2QgNCA9IDBcbiAgaWYgKHllYXIgJSUgNCA9PSAwKXtcbiAgICByZXR1cm4oVFJVRSlcbiAgfSBlbHNlIHtcbiAgICByZXR1cm4oRkFMU0UpXG4gIH1cbiAgXG59XG5gYGAifQ== -->
-<pre class="r"><code>is_leap_year &lt;- function(year){
-  
-  if(!is.numeric(year)){
-    stop(&quot;Non-numeric input&quot;)
-  }
-  
-  ## if year mod 100 = 0
-  if (year %% 100 == 0){
-    ## if year mod 400 = 0
-    if (year %% 400 == 0){
-      return(TRUE)
-    } else{
-      return(FALSE)
-    }
-  } 
-    
-  ## if year mod 4 = 0
-  if (year %% 4 == 0){
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
-  
-}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdF90aGF0KFwiTm9uLW51bWVyaWMgaW5wdXQgcmV0dXJucyBhbiBlcnJvclwiLCB7XG4gIGV4cGVjdF9lcnJvcihpc19sZWFwX3llYXIoXCJ5ZWFyXCIpKVxuICBleHBlY3RfZXJyb3IoaXNfbGVhcF95ZWFyKFRSVUUpKVxufSlcbmBgYCJ9 -->
-<pre class="r"><code>test_that(&quot;Non-numeric input returns an error&quot;, {
-  expect_error(is_leap_year(&quot;year&quot;))
-  expect_error(is_leap_year(TRUE))
-})</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiVGVzdCBwYXNzZWQg8J+ls1xuIn0= -->
-<pre><code>Test passed 🥳</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="when-should-you-use-unit-testing" class="section level2">
-<h2>When should you use unit testing?</h2>
-<p>– If you find yourself writing lots of informal tests – for extra
-documentation - tests give information about how your function should
-run – If you’re writing a particularly challenging bit of code</p>
-<p>Not essential when using pre-tested functions (like those in the
-tidyverse)</p>
-<p>Test-Driven development</p>
-<p>Red -&gt; Green -&gt; Refactor</p>
-<p>Code initially doesn’t pass tests -&gt; RED Write nasty code to pass
-tests -&gt; GREEN refactor code to be pretty but still pass tests -&gt;
-REFACTOR</p>
+<div id="automated-output" class="section level1">
+<h1>Automated output</h1>
 </div>
-</div>
-<div id="assertive-programming" class="section level1">
-<h1>Assertive Programming</h1>
-<p>Same analysis + same data = same results</p>
-<p>We’ll often want to carry out the same analysis on new data. New data
-might not be in quite the same format, leading to errors.</p>
-<p>Assertive code tries to remedy this.</p>
-<div id="example-delhi-weather" class="section level2">
-<h2>Example – Delhi Weather</h2>
+<div id="functions-and-modular-code" class="section level1">
+<h1>Functions and modular code</h1>
+<p>For functions with repeated use across multiple files, rather than
+creating the function in each file (at the top), we can create it once
+and load it into each file using <code>source()</code></p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2xpbXBzZSh3ZWF0aGVyX29uZSlcblxuYGBgIn0= -->
-<pre class="r"><code>glimpse(weather_one)
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3Vic2V0X2Z1bmN0aW9uKDE6MTAwKVxuXG5gYGAifQ== -->
+<pre class="r"><code>subset_function(1:100)
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUm93czogNTNcbkNvbHVtbnM6IDRcbiQgZGF0ZSAgICAgICA8Y2hyPiBcIjAxLzAxLzIwMTdcIiwgXCIwMi8wMS8yMDE3XCIsIFwiMDMvMDEvMjAxN1wiLCBcIjA0LzAxLzIwMTdcIiwgXCIwNS8wMS8yMDE3XCIsIFwiMDYvMOKAplxuJCB0ZW1wICAgICAgIDxkYmw+IDE1LjkxMzA0LCAxOC41MDAwMCwgMTcuMTExMTEsIDE4LjcwMDAwLCAxOC4zODg4OSwgMTkuMzE4MTgsIDE0LjcwODMzLCAxNS42OOKAplxuJCBodW1pZGl0eSAgIDxkYmw+IDg1Ljg2OTU3LCA3Ny4yMjIyMiwgODEuODg4ODksIDcwLjA1MDAwLCA3NC45NDQ0NCwgNzkuMzE4MTgsIDk1LjgzMzMzLCA4My41MuKAplxuJCB3aW5kX3NwZWVkIDxkYmw+IDIuNzQzNDc4LCAyLjg5NDQ0NCwgNC4wMTY2NjcsIDQuNTQ1MDAwLCAzLjMwMDAwMCwgOC42ODE4MTgsIDEwLjA0MTY2NywgMS45NeKAplxuIn0= -->
-<pre><code>Rows: 53
-Columns: 4
-$ date       &lt;chr&gt; &quot;01/01/2017&quot;, &quot;02/01/2017&quot;, &quot;03/01/2017&quot;, &quot;04/01/2017&quot;, &quot;05/01/2017&quot;, &quot;06/0…
-$ temp       &lt;dbl&gt; 15.91304, 18.50000, 17.11111, 18.70000, 18.38889, 19.31818, 14.70833, 15.68…
-$ humidity   &lt;dbl&gt; 85.86957, 77.22222, 81.88889, 70.05000, 74.94444, 79.31818, 95.83333, 83.52…
-$ wind_speed &lt;dbl&gt; 2.743478, 2.894444, 4.016667, 4.545000, 3.300000, 8.681818, 10.041667, 1.95…</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEgMiAzIDQgNVxuIn0= -->
+<pre><code>[1] 1 2 3 4 5</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2VhdGhlcl9yZXBvcnQod2VhdGhlcl9vbmUpXG5cbmBgYCJ9 -->
-<pre class="r"><code>weather_report(weather_one)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiW1sxXV1cbiJ9 -->
-<pre><code>[[1]]</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6Mywic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIMOXIDMiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFCZ3R5aVREbWl1QmlZR0JnWm1CaFltSmdaZ1V5R1ZoRFE5eDBMUmlBSWtBT0l3TUxBeWVJcmdBcUVnYXJaR0RnQXdrNEdDeTVVYkdoWUNhY0h4VFR0WHJ0UlQ0NFgvclBuNnpheFgxb0JySG1KZWFtRmdNWkFoQnJ3WUtjdWFtSmVmRWxxYmtGVUFGZXNFQkdhVzVtU21aSkpWU1FEeXhZbnBtWFVseVFtcHFDWmpCblVYNjVIc3h3WGlCbWFnQVMvNEVBM1FYSk9ZbkZNQmZBQkxsU0Vrc1M5ZEtLZ1BxQnZIOW9XdGp6QzBveTgvT0FtcGhBWWNDS3BwbXhDRTFBb0RRUDVKSVUzZVNNMHJ4c1hTTkRrQTFnZVFqZ2hiSVprZGpNRUR1Wi9rUE5Zb1dheFphYWw1Nlpsd3B6ZkU1aVVtb09MRUNBWGdiN1dLK2dLRE92Qk9ZVm9HaXhYa2wrU1NKTUhWZHlmZzVNQk93NWhuOEFpSG9aVWZzQkFBQT0ifQ== -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["mean_temp"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["mean_humidity"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["mean_windspeed"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"16.64393","2":"73.44596","3":"6.997057"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5bWzJdXVxuIn0= -->
-<pre><code>
-[[2]]</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInNwZWNfdGJsX2RmIiwidGJsX2RmIiwidGJsIiwiZGF0YS5mcmFtZSJdLCJucm93Ijo3LCJuY29sIjo0LCJzdW1tYXJ5Ijp7IkEgdGliYmxlIjpbIjcgw5cgNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUJndHlpVERtaXVCaVlHQmdabUJoWW1KZ1pnVXlHVmhEUTl4MExSaUFJa0FPSXdNTEF5ZUlyZ0FxRWdZeVdJQllBSWpab1JKY1JxYjZCb2I2UmdhRzVqQVJRek45QXlOVUVYTU1FUXNNRVV0MEVTTUREQkZEdUFnREF4L0lGUTZtREdEZ1lPSUFvVTE5emdEQldRZFRCUWpmTEZiYzllQTFGUWZ6QktqODFkQlFkeFp2dVA3QTJvTEYxN2xzSFh5ZzhnR1NNNEZnbGtQZ0JpaS85V0pKakd5U2c1OEFoQjhZdFdyVk9ydTNjUDJLelVKNTAzc0RIRlFlUU9TVittTTB2aDdxZDVDRXVrdkMvTmJoMXVwUUIra0RFTDdHdW5mdnVTY3lvd1V2YTE1aWJtb3hOR2hab0lJc0tZa2xxVEIyU1dwdUFaVE5rVkdhbTVtU1dWSUpDNWJ5ekx5VStPS0MxTlFVTkdNNWkvTEw5V0JHOHdJeFV3T1ErUC8vLzA5MCs1TnpFb3RoOXNNRXVZRDJKK3FsRlFIMUEzbi8wTFN3NXhlVVpPYm5BVFV4Z2RJRks1cG14aUkwQVlIU1BKQkxVblNUTTByenNuV05ERUUyZ09VaGdCZktaa2RpczBEc1pQb1BOWXNWYWhaYmFsNTZaaDRzYkZoekVwTlNjNkFjUHFDWHdUN1dLeWpLekN1QmVRVW9XcXhYa2wrU0NGUEhsWnlmQXhNQmU0N2hId0FiNWQ4RER3TUFBQT09In0= -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["date"],"name":[1],"type":["chr"],"align":["left"]},{"label":["temp"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["humidity"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["wind_speed"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"25/01/2017","2":"21.00000","3":"69.96000","4":"8.756000"},{"1":"16/02/2017","2":"20.25000","3":"56.75000","4":"10.437500"},{"1":"17/02/2017","2":"21.30000","3":"64.40000","4":"9.280000"},{"1":"18/02/2017","2":"21.12500","3":"70.75000","4":"6.250000"},{"1":"19/02/2017","2":"22.36364","3":"66.09091","4":"6.054545"},{"1":"20/02/2017","2":"23.37500","3":"60.12500","4":"6.937500"},{"1":"21/02/2017","2":"21.83333","3":"69.41667","4":"12.341667"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[7]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTkFcbiJ9 -->
-<pre><code>NA</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Now let’s try our hopefully reproducible function on some new
-data</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2VhdGhlcl90d28gPC0gcmVhZF9jc3YoXCJkYXRhL2RlbGhpX3dlYXRoZXJfdHdvLmNzdlwiKVxuXG5gYGAifQ== -->
-<pre class="r"><code>weather_two &lt;- read_csv(&quot;data/delhi_weather_two.csv&quot;)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUm93czogMjkgQ29sdW1uczogNOKUgOKUgCBDb2x1bW4gc3BlY2lmaWNhdGlvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIBcbkRlbGltaXRlcjogXCIsXCJcbmNociAoMSk6IGRhdGVcbmRibCAoMyk6IHRlbXAsIGh1bWlkaXR5LCB3aW5kX3NwZWVkXG7ihLkgVXNlIGBzcGVjKClgIHRvIHJldHJpZXZlIHRoZSBmdWxsIGNvbHVtbiBzcGVjaWZpY2F0aW9uIGZvciB0aGlzIGRhdGEuXG7ihLkgU3BlY2lmeSB0aGUgY29sdW1uIHR5cGVzIG9yIHNldCBgc2hvd19jb2xfdHlwZXMgPSBGQUxTRWAgdG8gcXVpZXQgdGhpcyBtZXNzYWdlLlxuIn0= -->
-<pre><code>Rows: 29 Columns: 4── Column specification ────────────────────────────────────────────────────────────────────────
-Delimiter: &quot;,&quot;
-chr (1): date
-dbl (3): temp, humidity, wind_speed
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2VhdGhlcl9yZXBvcnQod2VhdGhlcl90d28pXG5cbmBgYCJ9 -->
-<pre class="r"><code>weather_report(weather_two)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiW1sxXV1cbiJ9 -->
-<pre><code>[[1]]</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6Mywic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIMOXIDMiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFCbDJRd1VyRU1CQ0dwK2xXYWFYTGdnOGhDQzJMZTltRGh6MklCNCtpc0RlSlRYU0RiVkxibE5XRElQZ2V2b2ZIdmZvMit3SzdUdE5ra1FTU3pIeVorV2NtdDFmTFdiSk1BQ0NFRVNFUVJtaENkSDkzbmMwQkNUb0JqQ0R1N3pjTU9qV1JBT01lTE9iVDdldnZ6K2JnMzF5bTVMdjRPUGhuWDlQTjR1VGNFNG9rclhpTHhtUW9hMkJjY1NvZk5LOXFDMUlEVmwwbG1ORHZGbzROWEF2SjJwcHo1Z25IalZyblRqekZUVDd4Mk9QeU95aEsycm9PSEV3WTFUUi9hakFmdloyWGNxeHFMWlRFSk5ML1FlUWxCNDBISnAzc08yRlpzZXJrUzNZeDZ5dVk5MkdsMWc3KzJlRlFrK3l0Vm1TMWpyaDhGcEs3NWt2NnlFdjNJVGl5bVRpdkd5RzFHd1ZwbTJ1bHFZdExDbFU2WW9hRDNSKzAwd3BJK3dFQUFBPT0ifQ== -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["mean_temp"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["mean_humidity"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["mean_windspeed"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"24.19118","2":"52.46915","3":"11.75623"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5bWzJdXVxuIn0= -->
-<pre><code>
-[[2]]</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInNwZWNfdGJsX2RmIiwidGJsX2RmIiwidGJsIiwiZGF0YS5mcmFtZSJdLCJucm93IjoyLCJuY29sIjo0LCJzdW1tYXJ5Ijp7IkEgdGliYmxlIjpbIjIgw5cgNCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUJndHlpVERtaXVCaVlHQmdabUJoWW1KZ1pnVXlHVmhEUTl4MExSaUFJa0FPSXdNTEF5ZUlyZ0FxRWdZeVdJQllBSWlab0JKY0JwYjZCc2I2UmdhRzVqQVJRM080Q0FNREgwaXRRMlRMSkU5bHpsa09Kcy9TUUFCRDNQZm1UQ0NZaFNHdTl1dWgrenFSYWpUSHNPWWw1cVlXUXgzQ0FoVmtTVWtzU1lXeFMxSnpDNkJzam96UzNNeVV6SkpLbVBQS00vTlM0b3NMVWxOVDBJemxMTW92MTRNWnpRdHlSd09RK1AvLy96OTArNU56RW90aDlzTUV1WUQySitxbEZRSDFBM25vV3RqekMwb3k4L09BbXBoQW9jaUtwcG14Q0UxQW9EUVA1SklVM2VTTTByeHNYU05qa0ExZ2VRamdoYktaa05nc0VEdVova1BOWW9XYXhaYWFsNTZaQndzYjFwekVwTlFjS0ljUDZHV3dqL1VLaWpMelNtQmVBWW9XNjVYa2x5VEMxSEVsNStmQVJNQ2VZL2dIQUl2Uk1IczlBZ0FBIn0= -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["date"],"name":[1],"type":["chr"],"align":["left"]},{"label":["temp"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["humidity"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["wind_speed"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"09/03/2017","2":"102.0714","3":"102.0714","4":"102.0714"},{"1":"17/03/2017","2":"20.9000","3":"59.7000","4":"11.4900"}],"options":{"columns":{"min":{},"max":[10],"total":[4]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTkFcbiJ9 -->
-<pre><code>NA</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="assertr" class="section level2">
-<h2><code>assertr</code></h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShhc3NlcnRyKVxuYGBgIn0= -->
-<pre class="r"><code>library(assertr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>some values seem inappropriate</p>
-<p>temperature much higher than recorded values</p>
-<p>51C was the highest ever recorded -34C was the lowest</p>
-<p>we might want to limit our results table to include valid data only:
-temperatures between -35 and 55 deg C, for example</p>
-<div id="verify" class="section level3">
-<h3><code>verify()</code></h3>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2VhdGhlcl9yZXBvcnQgPC0gZnVuY3Rpb24od2VhdGhlcil7XG4gIFxuICAjIHB1dCBpbiBvdXIgY2hlY2tzIGZpcnN0XG4gIHdlYXRoZXIgJT4lIFxuICAgIHZlcmlmeShodW1pZGl0eSA+PSAwICYgaHVtaWRpdHkgPD0gMTAwKSAlPiUgXG4gICAgdmVyaWZ5KHRlbXAgPj0gLTM1ICYgdGVtcCA8PSA1NSkgJT4lIFxuICAgIHZlcmlmeSh3aW5kX3NwZWVkID49IDAgJiB3aW5kX3NwZWVkIDw9IDExMClcbiAgXG4gICMgT3VyIGF2ZXJhZ2UgdGVtcGVyYXR1cmUsIGh1bWlkaXR5IGFuZCB3aW5kIHNwZWVkIFxuICB3ZWF0aGVyX21lYW5zIDwtIFxuICAgIHdlYXRoZXIgJT4lIFxuICAgIHN1bW1hcmlzZShcbiAgICAgIG1lYW5fdGVtcCA9IG1lYW4odGVtcCksXG4gICAgICBtZWFuX2h1bWlkaXR5ID0gbWVhbihodW1pZGl0eSksXG4gICAgICBtZWFuX3dpbmRzcGVlZCA9IG1lYW4od2luZF9zcGVlZClcbiAgICApXG4gIFxuICAjIFNob3cgaG90IGFuZCBodW1pZCBkYXlzXG4gIGhvdF9hbmRfaHVtaWQgPC0gXG4gICAgd2VhdGhlciAlPiUgXG4gICAgZmlsdGVyKHRlbXAgPiAyMCkgJT4lIFxuICAgIGZpbHRlcihodW1pZGl0eSA+IDU1KVxuICBcbiAgcmV0dXJuKGxpc3Qod2VhdGhlcl9tZWFucywgaG90X2FuZF9odW1pZCkpXG59XG5cbmBgYCJ9 -->
-<pre class="r"><code>weather_report &lt;- function(weather){
-  
-  # put in our checks first
-  weather %&gt;% 
-    verify(humidity &gt;= 0 &amp; humidity &lt;= 100) %&gt;% 
-    verify(temp &gt;= -35 &amp; temp &lt;= 55) %&gt;% 
-    verify(wind_speed &gt;= 0 &amp; wind_speed &lt;= 110)
-  
-  # Our average temperature, humidity and wind speed 
-  weather_means &lt;- 
-    weather %&gt;% 
-    summarise(
-      mean_temp = mean(temp),
-      mean_humidity = mean(humidity),
-      mean_windspeed = mean(wind_speed)
-    )
-  
-  # Show hot and humid days
-  hot_and_humid &lt;- 
-    weather %&gt;% 
-    filter(temp &gt; 20) %&gt;% 
-    filter(humidity &gt; 55)
-  
-  return(list(weather_means, hot_and_humid))
-}
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>When verify throws an error, it pushes a data frame containing rows
-that failed verification</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2VhdGhlcl9yZXBvcnQod2VhdGhlcl90d28pXG5gYGAifQ== -->
-<pre class="r"><code>weather_report(weather_two)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="stopifnot" class="section level3">
-<h3><code>stopifnot()</code></h3>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYyhcInRlbXBcIiwgXCJodW1pZGl0eVwiLCBcIndpbmRfc3BlZWRcIiAlaW4lIG5hbWVzKHdlYXRoZXJfdHdvKSlcblxuYGBgIn0= -->
-<pre class="r"><code>c(&quot;temp&quot;, &quot;humidity&quot;, &quot;wind_speed&quot; %in% names(weather_two))
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwidGVtcFwiICAgICBcImh1bWlkaXR5XCIgXCJUUlVFXCIgICAgXG4ifQ== -->
-<pre><code>[1] &quot;temp&quot;     &quot;humidity&quot; &quot;TRUE&quot;    </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2VhdGhlcl9yZXBvcnQod2VhdGhlcl90d28pXG5cbmBgYCJ9 -->
-<pre class="r"><code>weather_report(weather_two)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gd2VhdGhlcl9yZXBvcnQod2VhdGhlcl90d28pIDogXG4gIGMoXCJ0ZW1wXCIsIFwiaHVtaWRpdHlcIiwgXCJ3aW5kX3NwZWVkXCIgJWluJSBuYW1lcyh3ZWF0aGVyKSkgYXJlIG5vdCBhbGwgVFJVRVxuIn0= -->
-<pre><code>Error in weather_report(weather_two) : 
-  c(&quot;temp&quot;, &quot;humidity&quot;, &quot;wind_speed&quot; %in% names(weather)) are not all TRUE</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-</div>
-</div>
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIldlZWsgMiBEYXkgNCA6IEFzc2VydGl2ZSBQcm9ncmFtbWluZyINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyfQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KHRlc3R0aGF0KQ0KYGBgDQoNCiMgVW5pdCBUZXN0aW5nDQoNCkZ1bmN0aW9uIHdlJ3JlIGdvaW5nIHRvIHRlc3Q6DQoNCmBgYHtyfQ0KaXNfbGVhcF95ZWFyIDwtIGZ1bmN0aW9uKHllYXIpew0KICANCiAgIyMgaWYgeWVhciBtb2QgMTAwID0gMA0KICBpZiAoeWVhciAlJSAxMDAgPT0gMCl7DQogICAgIyMgaWYgeWVhciBtb2QgNDAwID0gMA0KICAgIGlmICh5ZWFyICUlIDQwMCA9PSAwKXsNCiAgICAgIHJldHVybihUUlVFKQ0KICAgIH0gZWxzZXsNCiAgICAgIHJldHVybihGQUxTRSkNCiAgICB9DQogIH0gDQogICAgDQogICMjIGlmIHllYXIgbW9kIDQgPSAwDQogIGlmICh5ZWFyICUlIDQgPT0gMCl7DQogICAgcmV0dXJuKFRSVUUpDQogIH0gZWxzZSB7DQogICAgcmV0dXJuKEZBTFNFKQ0KICB9DQogIA0KfQ0KYGBgDQoNCkZ1bmN0aW9uIHJldHVybnMgdHJ1ZSBpZiB5ZWFyIG1vZCA0MDAgb3IgeWVhciBtb2QgNCA9IDAsIG90aGVyd2lzZSByZXR1cm5zIGZhbHNlLg0KDQojIyBgdGVzdHRoYXQoKWANCg0KdGVzdF90aGF0KCJkZXNjcmlwdGlvbiIsew0KICB0ZXN0XzENCiAgdGVzdF8yDQogIC4uLg0KfSkNCg0KYGBge3J9DQp0ZXN0X3RoYXQoZGVzYyA9ICJMZWFwIHllYXJzIHJldHVybiBhcyBUUlVFIiwgew0KICBleHBlY3RfZXF1YWwoaXNfbGVhcF95ZWFyKDIwMjApLCBUUlVFKQ0KICBleHBlY3RfZXF1YWwoaXNfbGVhcF95ZWFyKDIwMDApLCBUUlVFKQ0KfSkNCmBgYA0KYGBge3J9DQojIHNlY29uZCB0ZXN0IDogb25lIGV4cGVjdGF0aW9uDQp0ZXN0X3RoYXQoIkNoYXJhY3RlciBpbnB1dCByZXR1cm5zIGFuIGVycm9yIiwgew0KICBleHBlY3RfZXJyb3IoaXNfbGVhcF95ZWFyKCIyMDAwIikpDQp9KQ0KYGBgDQoNClRlc3RzIHRoYXQgZmFpbA0KDQpgYGB7cn0NCnRlc3RfdGhhdCgiTm9uLW51bWVyaWMgaW5wdXQgcmV0dXJucyBhbiBlcnJvciIsIHsNCiAgZXhwZWN0X2Vycm9yKGlzX2xlYXBfeWVhcigieWVhciIpKQ0KICBleHBlY3RfZXJyb3IoaXNfbGVhcF95ZWFyKFRSVUUpKQ0KfSkNCmBgYA0KDQpUUlVFIHJlYWRzIGFzIHRoZSBudW1iZXIgMSBpZiB1c2VkIGluIGNhbGN1bGF0aW9ucywgc28gd2UgbmVlZCB0byBlZGl0IHRoZSBmdW5jdGlvbg0KDQpgYGB7cn0NCmlzX2xlYXBfeWVhciA8LSBmdW5jdGlvbih5ZWFyKXsNCiAgDQogIGlmKCFpcy5udW1lcmljKHllYXIpKXsNCiAgICBzdG9wKCJOb24tbnVtZXJpYyBpbnB1dCIpDQogIH0NCiAgDQogICMjIGlmIHllYXIgbW9kIDEwMCA9IDANCiAgaWYgKHllYXIgJSUgMTAwID09IDApew0KICAgICMjIGlmIHllYXIgbW9kIDQwMCA9IDANCiAgICBpZiAoeWVhciAlJSA0MDAgPT0gMCl7DQogICAgICByZXR1cm4oVFJVRSkNCiAgICB9IGVsc2V7DQogICAgICByZXR1cm4oRkFMU0UpDQogICAgfQ0KICB9IA0KICAgIA0KICAjIyBpZiB5ZWFyIG1vZCA0ID0gMA0KICBpZiAoeWVhciAlJSA0ID09IDApew0KICAgIHJldHVybihUUlVFKQ0KICB9IGVsc2Ugew0KICAgIHJldHVybihGQUxTRSkNCiAgfQ0KICANCn0NCmBgYA0KDQpgYGB7cn0NCnRlc3RfdGhhdCgiTm9uLW51bWVyaWMgaW5wdXQgcmV0dXJucyBhbiBlcnJvciIsIHsNCiAgZXhwZWN0X2Vycm9yKGlzX2xlYXBfeWVhcigieWVhciIpKQ0KICBleHBlY3RfZXJyb3IoaXNfbGVhcF95ZWFyKFRSVUUpKQ0KfSkNCmBgYA0KDQojIyBXaGVuIHNob3VsZCB5b3UgdXNlIHVuaXQgdGVzdGluZz8NCg0KLS0gSWYgeW91IGZpbmQgeW91cnNlbGYgd3JpdGluZyBsb3RzIG9mIGluZm9ybWFsIHRlc3RzDQotLSBmb3IgZXh0cmEgZG9jdW1lbnRhdGlvbiAtIHRlc3RzIGdpdmUgaW5mb3JtYXRpb24gYWJvdXQgaG93IHlvdXIgZnVuY3Rpb24gc2hvdWxkIHJ1bg0KLS0gSWYgeW91J3JlIHdyaXRpbmcgYSBwYXJ0aWN1bGFybHkgY2hhbGxlbmdpbmcgYml0IG9mIGNvZGUNCg0KTm90IGVzc2VudGlhbCB3aGVuIHVzaW5nIHByZS10ZXN0ZWQgZnVuY3Rpb25zIChsaWtlIHRob3NlIGluIHRoZSB0aWR5dmVyc2UpDQoNClRlc3QtRHJpdmVuIGRldmVsb3BtZW50DQoNClJlZCAtPiBHcmVlbiAtPiBSZWZhY3Rvcg0KDQpDb2RlIGluaXRpYWxseSBkb2Vzbid0IHBhc3MgdGVzdHMgLT4gUkVEDQpXcml0ZSBuYXN0eSBjb2RlIHRvIHBhc3MgdGVzdHMgLT4gR1JFRU4NCnJlZmFjdG9yIGNvZGUgdG8gYmUgcHJldHR5IGJ1dCBzdGlsbCBwYXNzIHRlc3RzIC0+IFJFRkFDVE9SDQoNCiMgQXNzZXJ0aXZlIFByb2dyYW1taW5nDQoNClNhbWUgYW5hbHlzaXMgKyBzYW1lIGRhdGEgPSBzYW1lIHJlc3VsdHMNCg0KV2UnbGwgb2Z0ZW4gd2FudCB0byBjYXJyeSBvdXQgdGhlIHNhbWUgYW5hbHlzaXMgb24gbmV3IGRhdGEuIE5ldyBkYXRhIG1pZ2h0IG5vdCBiZSBpbiBxdWl0ZSB0aGUgc2FtZSBmb3JtYXQsIGxlYWRpbmcgdG8gZXJyb3JzLg0KDQpBc3NlcnRpdmUgY29kZSB0cmllcyB0byByZW1lZHkgdGhpcy4NCg0KIyMgRXhhbXBsZSAtLSBEZWxoaSBXZWF0aGVyDQoNCmBgYHtyfQ0Kd2VhdGhlcl9vbmUgPC0gcmVhZF9jc3YoImRhdGEvZGVsaGlfd2VhdGhlcl9vbmUuY3N2IikNCg0KZ2xpbXBzZSh3ZWF0aGVyX29uZSkNCmBgYA0KDQpgYGB7cn0NCndlYXRoZXJfcmVwb3J0IDwtIGZ1bmN0aW9uKHdlYXRoZXIpew0KICAjIE91ciBhdmVyYWdlIHRlbXBlcmF0dXJlLCBodW1pZGl0eSBhbmQgd2luZCBzcGVlZCANCiAgd2VhdGhlcl9tZWFucyA8LSANCiAgICB3ZWF0aGVyICU+JSANCiAgICBzdW1tYXJpc2UoDQogICAgICBtZWFuX3RlbXAgPSBtZWFuKHRlbXApLA0KICAgICAgbWVhbl9odW1pZGl0eSA9IG1lYW4oaHVtaWRpdHkpLA0KICAgICAgbWVhbl93aW5kc3BlZWQgPSBtZWFuKHdpbmRfc3BlZWQpDQogICAgKQ0KICANCiAgIyBTaG93IGhvdCBhbmQgaHVtaWQgZGF5cw0KICBob3RfYW5kX2h1bWlkIDwtIA0KICAgIHdlYXRoZXIgJT4lIA0KICAgIGZpbHRlcih0ZW1wID4gMjApICU+JSANCiAgICBmaWx0ZXIoaHVtaWRpdHkgPiA1NSkNCiAgDQogIHJldHVybihsaXN0KHdlYXRoZXJfbWVhbnMsIGhvdF9hbmRfaHVtaWQpKQ0KfQ0KDQp3ZWF0aGVyX3JlcG9ydCh3ZWF0aGVyX29uZSkNCmBgYA0KDQpOb3cgbGV0J3MgdHJ5IG91ciBob3BlZnVsbHkgcmVwcm9kdWNpYmxlIGZ1bmN0aW9uIG9uIHNvbWUgbmV3IGRhdGENCg0KYGBge3J9DQp3ZWF0aGVyX3R3byA8LSByZWFkX2NzdigiZGF0YS9kZWxoaV93ZWF0aGVyX3R3by5jc3YiKQ0KYGBgDQpgYGB7cn0NCndlYXRoZXJfcmVwb3J0KHdlYXRoZXJfdHdvKQ0KYGBgDQoNCiMjIGBhc3NlcnRyYA0KDQpgYGB7cn0NCmxpYnJhcnkoYXNzZXJ0cikNCmBgYA0KDQpzb21lIHZhbHVlcyBzZWVtIGluYXBwcm9wcmlhdGUNCg0KdGVtcGVyYXR1cmUgbXVjaCBoaWdoZXIgdGhhbiByZWNvcmRlZCB2YWx1ZXMNCg0KNTFDIHdhcyB0aGUgaGlnaGVzdCBldmVyIHJlY29yZGVkDQotMzRDIHdhcyB0aGUgbG93ZXN0DQoNCndlIG1pZ2h0IHdhbnQgdG8gbGltaXQgb3VyIHJlc3VsdHMgdGFibGUgdG8gaW5jbHVkZSB2YWxpZCBkYXRhIG9ubHk6IHRlbXBlcmF0dXJlcyBiZXR3ZWVuIC0zNSBhbmQgNTUgZGVnIEMsIGZvciBleGFtcGxlDQoNCiMjIyBgdmVyaWZ5KClgDQoNCmBgYHtyfQ0Kd2VhdGhlcl9yZXBvcnQgPC0gZnVuY3Rpb24od2VhdGhlcil7DQogIA0KICAjIHB1dCBpbiBvdXIgY2hlY2tzIGZpcnN0DQogIHdlYXRoZXIgJT4lIA0KICAgIHZlcmlmeShodW1pZGl0eSA+PSAwICYgaHVtaWRpdHkgPD0gMTAwKSAlPiUgDQogICAgdmVyaWZ5KHRlbXAgPj0gLTM1ICYgdGVtcCA8PSA1NSkgJT4lIA0KICAgIHZlcmlmeSh3aW5kX3NwZWVkID49IDAgJiB3aW5kX3NwZWVkIDw9IDExMCkNCiAgDQogICMgT3VyIGF2ZXJhZ2UgdGVtcGVyYXR1cmUsIGh1bWlkaXR5IGFuZCB3aW5kIHNwZWVkIA0KICB3ZWF0aGVyX21lYW5zIDwtIA0KICAgIHdlYXRoZXIgJT4lIA0KICAgIHN1bW1hcmlzZSgNCiAgICAgIG1lYW5fdGVtcCA9IG1lYW4odGVtcCksDQogICAgICBtZWFuX2h1bWlkaXR5ID0gbWVhbihodW1pZGl0eSksDQogICAgICBtZWFuX3dpbmRzcGVlZCA9IG1lYW4od2luZF9zcGVlZCkNCiAgICApDQogIA0KICAjIFNob3cgaG90IGFuZCBodW1pZCBkYXlzDQogIGhvdF9hbmRfaHVtaWQgPC0gDQogICAgd2VhdGhlciAlPiUgDQogICAgZmlsdGVyKHRlbXAgPiAyMCkgJT4lIA0KICAgIGZpbHRlcihodW1pZGl0eSA+IDU1KQ0KICANCiAgcmV0dXJuKGxpc3Qod2VhdGhlcl9tZWFucywgaG90X2FuZF9odW1pZCkpDQp9DQoNCmBgYA0KDQpXaGVuIHZlcmlmeSB0aHJvd3MgYW4gZXJyb3IsIGl0IHB1c2hlcyBhIGRhdGEgZnJhbWUgY29udGFpbmluZyByb3dzIHRoYXQgZmFpbGVkIHZlcmlmaWNhdGlvbg0KDQpgYGB7cn0NCndlYXRoZXJfcmVwb3J0KHdlYXRoZXJfdHdvKQ0KYGBgDQoNCiMjIyBgc3RvcGlmbm90KClgDQoNCmBgYHtyfQ0Kd2VhdGhlcl9yZXBvcnQgPC0gZnVuY3Rpb24od2VhdGhlcil7DQogIA0KICAjIHB1dCBpbiBvdXIgY2hlY2tzIGZpcnN0DQogIHN0b3BpZm5vdCgNCiAgICBucm93KHdlYXRoZXIpID4gMCwNCiAgICBuY29sKHdlYXRoZXIpID09IDQsDQogICAgYygidGVtcCIsICJodW1pZGl0eSIsICJ3aW5kX3NwZWVkIiAlaW4lIG5hbWVzKHdlYXRoZXJfdHdvKSkNCiAgKQ0KICANCiAgIyBPdXIgYXZlcmFnZSB0ZW1wZXJhdHVyZSwgaHVtaWRpdHkgYW5kIHdpbmQgc3BlZWQgDQogIHdlYXRoZXJfbWVhbnMgPC0gDQogICAgd2VhdGhlciAlPiUgDQogICAgc3VtbWFyaXNlKA0KICAgICAgbWVhbl90ZW1wID0gbWVhbih0ZW1wKSwNCiAgICAgIG1lYW5faHVtaWRpdHkgPSBtZWFuKGh1bWlkaXR5KSwNCiAgICAgIG1lYW5fd2luZHNwZWVkID0gbWVhbih3aW5kX3NwZWVkKQ0KICAgICkNCiAgDQogICMgU2hvdyBob3QgYW5kIGh1bWlkIGRheXMNCiAgaG90X2FuZF9odW1pZCA8LSANCiAgICB3ZWF0aGVyICU+JSANCiAgICBmaWx0ZXIodGVtcCA+IDIwKSAlPiUgDQogICAgZmlsdGVyKGh1bWlkaXR5ID4gNTUpDQogIA0KICByZXR1cm4obGlzdCh3ZWF0aGVyX21lYW5zLCBob3RfYW5kX2h1bWlkKSkNCn0NCmBgYA0KDQpgYGB7cn0NCndlYXRoZXJfcmVwb3J0KHdlYXRoZXJfdHdvKQ0KYGBgDQoNCg0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIldlZWsgMiBEYXkgNCAtIFJlcHJvZHVjaWJpbGl0eSINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIGxpYnJhcmllc30NCmxpYnJhcnkodGlkeXZlcnNlKQ0KYGBgDQoNCiMgUnVsZXMgZm9yIHJlcHJvZHVjaWJpbGl0eQ0KDQotIERvbid0IGNoYW5nZSB0aGUgcmF3IGRhdGEhIFRyZWF0IGl0IGFzIHJlYWQtb25seQ0KLSBSLXNwZWNpZmljIDogd29yayBpbiBQcm9qZWN0cyENCi0gZm9sbG93IGEgbG9naWNhbCBmaWxlIG5hbWluZyBmb3JtYXQ6IGxlYWQgd2l0aCBlLmcgMV8gaWYgeW91IG5lZWQgdGhpbmdzIHRvIGJlIGRvbmUgaW4gb3JkZXINCi0gRmxleGlibGUgY29kZSBhbmQgYXV0b21hdGVkIG91dHB1dA0KDQojIEZsZXhpYmxlIGNvZGUNCg0KYGBge3J9DQojIFNlbGVjdCBzcGVjaWVzIGNvbHVtbg0KDQppcmlzICU+JSANCiAgc2VsZWN0KDUpDQoNCiMgVGhpcyBpcyBtb3JlIGZsZXhpYmxlIHRvIGNoYW5nZXMgaW4gdGhlIGRhdGEsIGFuZCBhbHNvIG1vcmUgcmVhZGFibGUNCg0KaXJpcyAlPiUgDQogIHNlbGVjdChTcGVjaWVzKQ0KYGBgDQoNCiMgQXV0b21hdGVkIG91dHB1dA0KDQojIEZ1bmN0aW9ucyBhbmQgbW9kdWxhciBjb2RlDQoNCkZvciBmdW5jdGlvbnMgd2l0aCByZXBlYXRlZCB1c2UgYWNyb3NzIG11bHRpcGxlIGZpbGVzLCByYXRoZXIgdGhhbiBjcmVhdGluZyB0aGUgZnVuY3Rpb24gaW4gZWFjaCBmaWxlIChhdCB0aGUgdG9wKSwgd2UgY2FuIGNyZWF0ZSBpdCBvbmNlIGFuZCBsb2FkIGl0IGludG8gZWFjaCBmaWxlIHVzaW5nIGBzb3VyY2UoKWANCg0KDQpgYGB7cn0NCnNvdXJjZSgic3Vic2V0LlIiKQ0KYGBgDQoNCmBgYHtyfQ0Kc3Vic2V0X2Z1bmN0aW9uKDE6MTAwKQ0KYGBgDQoNCg==</div>
 
 
 
@@ -2153,7 +1860,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("day_4_assertive_programming.Rmd");
+  window.initializeSourceEmbed("reproducibility.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>
