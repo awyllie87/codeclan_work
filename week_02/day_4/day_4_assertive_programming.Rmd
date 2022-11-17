@@ -1,0 +1,257 @@
+---
+title: "Week 2 Day 4"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(testthat)
+```
+
+# Unit Testing
+
+Function we're going to test:
+
+```{r}
+is_leap_year <- function(year){
+  
+  ## if year mod 100 = 0
+  if (year %% 100 == 0){
+    ## if year mod 400 = 0
+    if (year %% 400 == 0){
+      return(TRUE)
+    } else{
+      return(FALSE)
+    }
+  } 
+    
+  ## if year mod 4 = 0
+  if (year %% 4 == 0){
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+  
+}
+```
+
+Function returns true if year mod 400 or year mod 4 = 0, otherwise returns false.
+
+## `testthat()`
+
+test_that("description",{
+  test_1
+  test_2
+  ...
+})
+
+```{r}
+test_that(desc = "Leap years return as TRUE", {
+  expect_equal(is_leap_year(2020), TRUE)
+  expect_equal(is_leap_year(2000), TRUE)
+})
+```
+```{r}
+# second test : one expectation
+test_that("Character input returns an error", {
+  expect_error(is_leap_year("2000"))
+})
+```
+
+Tests that fail
+
+```{r}
+test_that("Non-numeric input returns an error", {
+  expect_error(is_leap_year("year"))
+  expect_error(is_leap_year(TRUE))
+})
+```
+
+TRUE reads as the number 1 if used in calculations, so we need to edit the function
+
+```{r}
+is_leap_year <- function(year){
+  
+  if(!is.numeric(year)){
+    stop("Non-numeric input")
+  }
+  
+  ## if year mod 100 = 0
+  if (year %% 100 == 0){
+    ## if year mod 400 = 0
+    if (year %% 400 == 0){
+      return(TRUE)
+    } else{
+      return(FALSE)
+    }
+  } 
+    
+  ## if year mod 4 = 0
+  if (year %% 4 == 0){
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+  
+}
+```
+
+```{r}
+test_that("Non-numeric input returns an error", {
+  expect_error(is_leap_year("year"))
+  expect_error(is_leap_year(TRUE))
+})
+```
+
+## When should you use unit testing?
+
+-- If you find yourself writing lots of informal tests
+-- for extra documentation - tests give information about how your function should run
+-- If you're writing a particularly challenging bit of code
+
+Not essential when using pre-tested functions (like those in the tidyverse)
+
+Test-Driven development
+
+Red -> Green -> Refactor
+
+Code initially doesn't pass tests -> RED
+Write nasty code to pass tests -> GREEN
+refactor code to be pretty but still pass tests -> REFACTOR
+
+# Assertive Programming
+
+Same analysis + same data = same results
+
+We'll often want to carry out the same analysis on new data. New data might not be in quite the same format, leading to errors.
+
+Assertive code tries to remedy this.
+
+## Example -- Delhi Weather
+
+```{r}
+weather_one <- read_csv("data/delhi_weather_one.csv")
+
+glimpse(weather_one)
+```
+
+```{r}
+weather_report <- function(weather){
+  # Our average temperature, humidity and wind speed 
+  weather_means <- 
+    weather %>% 
+    summarise(
+      mean_temp = mean(temp),
+      mean_humidity = mean(humidity),
+      mean_windspeed = mean(wind_speed)
+    )
+  
+  # Show hot and humid days
+  hot_and_humid <- 
+    weather %>% 
+    filter(temp > 20) %>% 
+    filter(humidity > 55)
+  
+  return(list(weather_means, hot_and_humid))
+}
+
+weather_report(weather_one)
+```
+
+Now let's try our hopefully reproducible function on some new data
+
+```{r}
+weather_two <- read_csv("data/delhi_weather_two.csv")
+```
+```{r}
+weather_report(weather_two)
+```
+
+## `assertr`
+
+```{r}
+library(assertr)
+```
+
+some values seem inappropriate
+
+temperature much higher than recorded values
+
+51C was the highest ever recorded
+-34C was the lowest
+
+we might want to limit our results table to include valid data only: temperatures between -35 and 55 deg C, for example
+
+### `verify()`
+
+```{r}
+weather_report <- function(weather){
+  
+  # put in our checks first
+  weather %>% 
+    verify(humidity >= 0 & humidity <= 100) %>% 
+    verify(temp >= -35 & temp <= 55) %>% 
+    verify(wind_speed >= 0 & wind_speed <= 110)
+  
+  # Our average temperature, humidity and wind speed 
+  weather_means <- 
+    weather %>% 
+    summarise(
+      mean_temp = mean(temp),
+      mean_humidity = mean(humidity),
+      mean_windspeed = mean(wind_speed)
+    )
+  
+  # Show hot and humid days
+  hot_and_humid <- 
+    weather %>% 
+    filter(temp > 20) %>% 
+    filter(humidity > 55)
+  
+  return(list(weather_means, hot_and_humid))
+}
+
+```
+
+When verify throws an error, it pushes a data frame containing rows that failed verification
+
+```{r}
+weather_report(weather_two)
+```
+
+### `stopifnot()`
+
+```{r}
+weather_report <- function(weather){
+  
+  # put in our checks first
+  stopifnot(
+    nrow(weather) > 0,
+    ncol(weather) == 4,
+    c("temp", "humidity", "wind_speed" %in% names(weather_two))
+  )
+  
+  # Our average temperature, humidity and wind speed 
+  weather_means <- 
+    weather %>% 
+    summarise(
+      mean_temp = mean(temp),
+      mean_humidity = mean(humidity),
+      mean_windspeed = mean(wind_speed)
+    )
+  
+  # Show hot and humid days
+  hot_and_humid <- 
+    weather %>% 
+    filter(temp > 20) %>% 
+    filter(humidity > 55)
+  
+  return(list(weather_means, hot_and_humid))
+}
+```
+
+```{r}
+weather_report(weather_two)
+```
+
+
