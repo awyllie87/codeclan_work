@@ -1787,9 +1787,6 @@ iris %&gt;%
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="automated-output" class="section level1">
-<h1>Automated output</h1>
-</div>
 <div id="functions-and-modular-code" class="section level1">
 <h1>Functions and modular code</h1>
 <p>For functions with repeated use across multiple files, rather than
@@ -1811,9 +1808,36 @@ and load it into each file using <code>source()</code></p>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiMDFfbXVsdGlwbHlfZnVuY3Rpb24uUlwiKVxuc291cmNlKFwiMDJfYWRkX2Z1bmN0aW9uLlJcIilcbmBgYCJ9 -->
+<pre class="r"><code>source(&quot;01_multiply_function.R&quot;)
+source(&quot;02_add_function.R&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVsdGlwbHlfYnlfbigyLCA0KSAlPiUgXG4gIGFkZF90d28oKVxuYGBgIn0= -->
+<pre class="r"><code>multiply_by_n(2, 4) %&gt;% 
+  add_two()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEwXG4ifQ== -->
+<pre><code>[1] 10</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="documentation" class="section level1">
+<h1>Documentation</h1>
+<p>Include - an outline of the purpose of the project - instructions if
+people want to do the project / perform the analysis themselves -
+discussion of assumptions: it’s good to have a record of any assumptions
+you made - dates / version history: I did this with these packages at
+this time.</p>
+<!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIldlZWsgMiBEYXkgNCAtIFJlcHJvZHVjaWJpbGl0eSINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIGxpYnJhcmllc30NCmxpYnJhcnkodGlkeXZlcnNlKQ0KYGBgDQoNCiMgUnVsZXMgZm9yIHJlcHJvZHVjaWJpbGl0eQ0KDQotIERvbid0IGNoYW5nZSB0aGUgcmF3IGRhdGEhIFRyZWF0IGl0IGFzIHJlYWQtb25seQ0KLSBSLXNwZWNpZmljIDogd29yayBpbiBQcm9qZWN0cyENCi0gZm9sbG93IGEgbG9naWNhbCBmaWxlIG5hbWluZyBmb3JtYXQ6IGxlYWQgd2l0aCBlLmcgMV8gaWYgeW91IG5lZWQgdGhpbmdzIHRvIGJlIGRvbmUgaW4gb3JkZXINCi0gRmxleGlibGUgY29kZSBhbmQgYXV0b21hdGVkIG91dHB1dA0KDQojIEZsZXhpYmxlIGNvZGUNCg0KYGBge3J9DQojIFNlbGVjdCBzcGVjaWVzIGNvbHVtbg0KDQppcmlzICU+JSANCiAgc2VsZWN0KDUpDQoNCiMgVGhpcyBpcyBtb3JlIGZsZXhpYmxlIHRvIGNoYW5nZXMgaW4gdGhlIGRhdGEsIGFuZCBhbHNvIG1vcmUgcmVhZGFibGUNCg0KaXJpcyAlPiUgDQogIHNlbGVjdChTcGVjaWVzKQ0KYGBgDQoNCiMgQXV0b21hdGVkIG91dHB1dA0KDQojIEZ1bmN0aW9ucyBhbmQgbW9kdWxhciBjb2RlDQoNCkZvciBmdW5jdGlvbnMgd2l0aCByZXBlYXRlZCB1c2UgYWNyb3NzIG11bHRpcGxlIGZpbGVzLCByYXRoZXIgdGhhbiBjcmVhdGluZyB0aGUgZnVuY3Rpb24gaW4gZWFjaCBmaWxlIChhdCB0aGUgdG9wKSwgd2UgY2FuIGNyZWF0ZSBpdCBvbmNlIGFuZCBsb2FkIGl0IGludG8gZWFjaCBmaWxlIHVzaW5nIGBzb3VyY2UoKWANCg0KDQpgYGB7cn0NCnNvdXJjZSgic3Vic2V0LlIiKQ0KYGBgDQoNCmBgYHtyfQ0Kc3Vic2V0X2Z1bmN0aW9uKDE6MTAwKQ0KYGBgDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIldlZWsgMiBEYXkgNCAtIFJlcHJvZHVjaWJpbGl0eSINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIGxpYnJhcmllc30NCmxpYnJhcnkodGlkeXZlcnNlKQ0KYGBgDQoNCiMgUnVsZXMgZm9yIHJlcHJvZHVjaWJpbGl0eQ0KDQotIERvbid0IGNoYW5nZSB0aGUgcmF3IGRhdGEhIFRyZWF0IGl0IGFzIHJlYWQtb25seQ0KLSBSLXNwZWNpZmljIDogd29yayBpbiBQcm9qZWN0cyENCi0gZm9sbG93IGEgbG9naWNhbCBmaWxlIG5hbWluZyBmb3JtYXQ6IGxlYWQgd2l0aCBlLmcgMV8gaWYgeW91IG5lZWQgdGhpbmdzIHRvIGJlIGRvbmUgaW4gb3JkZXINCi0gRmxleGlibGUgY29kZSBhbmQgYXV0b21hdGVkIG91dHB1dA0KDQojIEZsZXhpYmxlIGNvZGUNCg0KYGBge3J9DQojIFNlbGVjdCBzcGVjaWVzIGNvbHVtbg0KDQppcmlzICU+JSANCiAgc2VsZWN0KDUpDQoNCiMgVGhpcyBpcyBtb3JlIGZsZXhpYmxlIHRvIGNoYW5nZXMgaW4gdGhlIGRhdGEsIGFuZCBhbHNvIG1vcmUgcmVhZGFibGUNCg0KaXJpcyAlPiUgDQogIHNlbGVjdChTcGVjaWVzKQ0KYGBgDQoNCiMgRnVuY3Rpb25zIGFuZCBtb2R1bGFyIGNvZGUNCg0KRm9yIGZ1bmN0aW9ucyB3aXRoIHJlcGVhdGVkIHVzZSBhY3Jvc3MgbXVsdGlwbGUgZmlsZXMsIHJhdGhlciB0aGFuIGNyZWF0aW5nIHRoZSBmdW5jdGlvbiBpbiBlYWNoIGZpbGUgKGF0IHRoZSB0b3ApLCB3ZSBjYW4gY3JlYXRlIGl0IG9uY2UgYW5kIGxvYWQgaXQgaW50byBlYWNoIGZpbGUgdXNpbmcgYHNvdXJjZSgpYA0KDQoNCmBgYHtyfQ0Kc291cmNlKCJzdWJzZXQuUiIpDQpgYGANCg0KYGBge3J9DQpzdWJzZXRfZnVuY3Rpb24oMToxMDApDQpgYGANCg0KYGBge3J9DQpzb3VyY2UoIjAxX211bHRpcGx5X2Z1bmN0aW9uLlIiKQ0Kc291cmNlKCIwMl9hZGRfZnVuY3Rpb24uUiIpDQpgYGANCg0KYGBge3J9DQptdWx0aXBseV9ieV9uKDIsIDQpICU+JSANCiAgYWRkX3R3bygpDQpgYGANCg0KIyBEb2N1bWVudGF0aW9uDQoNCkluY2x1ZGUNCi0gYW4gb3V0bGluZSBvZiB0aGUgcHVycG9zZSBvZiB0aGUgcHJvamVjdA0KLSBpbnN0cnVjdGlvbnMgaWYgcGVvcGxlIHdhbnQgdG8gZG8gdGhlIHByb2plY3QgLyBwZXJmb3JtIHRoZSBhbmFseXNpcyB0aGVtc2VsdmVzDQotIGRpc2N1c3Npb24gb2YgYXNzdW1wdGlvbnM6IGl0J3MgZ29vZCB0byBoYXZlIGEgcmVjb3JkIG9mIGFueSBhc3N1bXB0aW9ucyB5b3UgbWFkZQ0KLSBkYXRlcyAvIHZlcnNpb24gaGlzdG9yeTogSSBkaWQgdGhpcyB3aXRoIHRoZXNlIHBhY2thZ2VzIGF0IHRoaXMgdGltZS4=</div>
 
 
 

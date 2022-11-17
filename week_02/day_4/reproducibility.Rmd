@@ -28,8 +28,6 @@ iris %>%
   select(Species)
 ```
 
-# Automated output
-
 # Functions and modular code
 
 For functions with repeated use across multiple files, rather than creating the function in each file (at the top), we can create it once and load it into each file using `source()`
@@ -43,3 +41,20 @@ source("subset.R")
 subset_function(1:100)
 ```
 
+```{r}
+source("01_multiply_function.R")
+source("02_add_function.R")
+```
+
+```{r}
+multiply_by_n(2, 4) %>% 
+  add_two()
+```
+
+# Documentation
+
+Include
+- an outline of the purpose of the project
+- instructions if people want to do the project / perform the analysis themselves
+- discussion of assumptions: it's good to have a record of any assumptions you made
+- dates / version history: I did this with these packages at this time.
