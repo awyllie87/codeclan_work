@@ -1,0 +1,204 @@
+---
+title: "Recap Lab"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    css: ../../../styles.css
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F)
+```
+
+```{r libraries}
+library(tidyverse)
+library(janitor)
+```
+
+
+<br>
+
+Use this lab to recap (almost) everything you've learnt so far on the course.
+ 
+The data for this lab comes from Our World in Data and contains the average daily per capita supply of calories from a range of food commodities by country across many years. You can read more about the data [here](https://ourworldindata.org/grapher/dietary-composition-by-country) in the 'Sources' tab.
+
+<br>
+
+**Question 1**
+
+Read in the data containing dietary compositions and familiarise yourself with it.
+
+<br>
+
+```{r q1}
+composition <- read_csv("data/dietary-composition-by-country.csv")
+```
+
+
+**Question 2**
+
+Change the data to long format with food categories going to a column called `kcal_source` and the calorie values going to a column called `avg_daily_kcals`. Save into variable `diet_comp_clean`
+
+
+```{r q2}
+diet_comp_clean <- composition %>% 
+  pivot_longer(cols = 4:28,
+               names_to = "kcal_source",
+               values_to = "avg_daily_kcals")
+```
+
+<br>
+
+**Question 3**
+
+Clean `kcal_source` categories by removing any unnecessary information. Then clean all column names, and rename the column 'entity' to 'country'. Overwrite `diet_comp_clean` with your results. [**Hint:** you'll probably have to use some regex to clean `kcal_source` categories]
+
+```{r}
+diet_comp_clean <- diet_comp_clean %>% 
+  separate(kcal_source, c("kcal_source"), sep = "\\s\\(") %>% 
+  clean_names() %>% 
+  rename(country = entity)
+```
+
+
+<br>
+
+**Question 4**
+
+Check how many missing values there are in each column
+
+```{r}
+colSums(is.na(diet_comp_clean))
+```
+
+
+<br>
+
+**Question 5**
+
+Let's investigate the missing values in column `code` further. First, check which countries are missing a code. Save these as a character vector, and use this vector to check whether you can find their code anywhere in the dataset, i.e. is the code missing for every observation for these countries.
+
+```{r}
+diet_comp_clean %>% 
+  filter(is.na(code)) %>% 
+  group_by(country) %>% 
+  summarise %>% 
+  pull()
+```
+
+
+<br>
+
+**Question 6**
+
+Ok, we have no available country codes for Cabo Verde and the US in this dataset. Is there anything in the data source about what these should be? No... Ok, better find something online then. Google tells us there's something called ISO Alpha-3 codes which look pretty promising. Wait, what's that in your data folder? Read it in! Then find the missing codes!
+
+```{r}
+country_codes <- read_csv("data/country_codes.csv") %>% 
+  clean_names()
+```
+
+```{r}
+country_codes %>% 
+  filter(country == "Cape Verde" | country == "United States")
+```
+
+<br>
+
+**Question 7**
+
+Using a suitable recoding function, fill in the lost (but now found) country codes. Overwrite `diet_comp_clean` again. Finally, check that there are now no missing values in the code column.
+
+```{r}
+diet_comp_clean <- diet_comp_clean %>% 
+  mutate(code = case_when(
+    country == "United States of America" ~ "USA",
+    country == "Cabo Verde" ~ "CPV",
+    TRUE ~ code
+  ))
+```
+
+
+<br>
+
+**Question 8**
+
+_Note: Do **NOT** overwrite `diet_comp_clean` with the result of this question._ 
+
+Join the two datasets so only countries with matches in both are retained. Create a new logical column that is `TRUE` if the first two letters of `code` is the same as `alpha_2_code`.
+
+```{r}
+diet_comp_clean %>% 
+  inner_join(country_codes) %>% 
+  mutate(code_match = case_when(
+    alpha_2_code == str_extract(code, "..") ~ TRUE,
+    TRUE ~ FALSE
+  )) %>% 
+  group_by(country) %>% 
+  summarise(code, alpha_2_code, code_match) %>% 
+  distinct()
+```
+
+
+<br>
+
+**Question 9**
+
+That's enough of country codes! Let's look at the actual diets of some countries. Using `diet_comp_clean`, which is hopefully untarnished by the monstrosity that was Question 8, create a new variable called `uk_diet` which only contains data from the UK and with all NAs from `avg_daily_kcals` dropped.
+
+```{r}
+uk_diet <- diet_comp_clean %>% 
+  filter(country == "United Kingdom") %>% 
+  drop_na(avg_daily_kcals)
+```
+
+
+<br>
+
+**Question 10**
+
+Using `uk_diet`, create a new column that contains the difference in total calories between a year and the year before. Then find the year where there was the biggest positive difference and the biggest negative difference.
+
+```{r}
+uk_diet %>% 
+  group_by(year) %>% 
+  summarise(total_cals = avg_daily_kcals - lag(avg_daily_kcals)) %>% 
+  ungroup() %>% 
+  slice(which(total_cals == max(total_cals, na.rm = TRUE) | total_cals == min(total_cals, na.rm = TRUE)))
+```
+
+<br>
+
+**Question 11**
+
+Back to `diet_comp_clean` again. For every year between 1990 and 2000, find which country got the most average daily calories from alcoholic beverages, i.e. you want to end up with one country per year.
+
+```{r}
+diet_comp_clean %>% 
+  filter(kcal_source == "Alcoholic Beverages" & year >= 1990 & year <= 2000) %>% 
+  group_by(year) %>% 
+  filter(avg_daily_kcals == max(avg_daily_kcals, na.rm = TRUE)) %>% 
+  arrange(year)
+```
+
+<br>
+
+**Question 12**
+
+Now write a function which finds the top calorie source for a user-specified vector of both countries and years. Then use your function to find the top calorie source for the UK and Zimbabwe in 1965, 1975, 1985, 1995 and 2005. Try out your function a few more times for countries/years that you find interesting! Also consider whether there are any limitations of your function.
+
+<br>
+
+**Question 13**
+
+Use your function to find the top calorie source in 1970 for all countries starting with B.
+
+<br>
+
+**Question 14**
+
+If you have made it this far, well done! If you are still itching to do some more data analysis/coding, you can explore the dataset yourself and try to discover something interesting or just practice anything you still feel unsure about!
