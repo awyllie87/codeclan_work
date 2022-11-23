@@ -1,0 +1,81 @@
+---
+title: "Week 3, Day 3 : R and SQL"
+output: html_notebook
+---
+
+```{r}
+library(RPostgres)
+library(tidyverse)
+```
+
+
+# Connecting R to an SQL Database
+
+## Storing Access Credentials Securely
+
+Two strategies when working in Git -
+
+- Don't store the credentials anywhere near the Git repository
+- Use a .gitignore file
+
+### .gitignore
+
+1) modify / create .gitignore to ignore the file
+2) commit the .gitignore
+3) add file with credentials to project
+4) source file into script/notebook
+
+```{r}
+source("secrets.R")
+```
+
+## Connecting
+
+```{r}
+omni_connect <- dbConnect(
+  drv = Postgres(),
+  dbname = database,
+  host = host,
+  port = port,
+  user = username,
+  password = password
+)
+
+rm(username, password)
+```
+
+# Things we can do with our connection
+
+## Tables
+
+```{r}
+# see what tables are in the database
+dbListTables(conn = omni_connect)
+```
+
+```{r}
+# see what columns are in a table
+dbListFields(conn = omni_connect, name = "employees")
+```
+
+```{r}
+# lets us query the database
+employees <- dbGetQuery(conn = omni_connect, statement = "SELECT * FROM employees LIMIT 10")
+```
+
+```{sql, connection = omni_connect, output.var = "highest_earners"}
+/*
+Querying in SQL code chunks
+*/
+
+SELECT *
+FROM employees
+ORDER BY salary DESC
+LIMIT 100;
+```
+
+```{r}
+highest_earners %>% 
+  filter(department == "Accounting")
+```
+
