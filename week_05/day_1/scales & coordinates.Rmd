@@ -1,0 +1,108 @@
+---
+title: "Scales & Coordinates"
+output: html_notebook
+---
+
+# Labels
+
+## Breaks
+
+```{r}
+library(tidyverse)
+
+pets <- read_csv("data/pets.csv")
+```
+
+```{r}
+ggplot(pets) +
+  aes(age, weight, colour = sex) +
+  geom_point(size = 5)
+```
+```{r}
+ggplot(pets) +
+  aes(age, weight, colour = sex) +
+  geom_point(size = 5) +
+  scale_x_continuous(breaks = 1:13) +
+  scale_y_continuous(breaks = c(5, 7, 9, 11))
+```
+
+## Scale Limits
+
+```{r}
+ggplot(pets) +
+  aes(age, weight, colour = sex) +
+  geom_point() +
+  scale_x_continuous(
+    breaks = 1:13,
+    limits = c(1,8)
+  ) +
+  scale_y_continuous(
+    limits = c(1,8)
+  )
+```
+
+## Flipping a plot
+
+```{r}
+ggplot(pets) +
+  aes(animal, fill = sex) +
+  geom_bar() +
+  coord_flip()
+```
+
+## Formatting of labels
+
+```{r}
+monthly_sales <- read_csv("data/monthly_sales.csv")
+```
+
+```{r}
+monthly_sales <- monthly_sales %>% 
+  mutate(month = factor(month, levels = c("Jan", "Feb", "March", "April")))
+
+ggplot(monthly_sales) +
+  aes(branch, sales, fill = month) +
+  geom_col(position = "dodge") +
+  coord_flip()
+```
+
+```{r}
+monthly_sales %>% 
+  mutate(sales_thousands = sales/1000) %>% 
+  ggplot() +
+  aes(branch, sales_thousands, fill = month) +
+  geom_col(position = "dodge") +
+  labs(y = "Sales (1000 units)") +
+  coord_flip()
+```
+
+Or we can use scales to change formatting so have comma separators in the thousands places
+
+```{r}
+ggplot(monthly_sales) +
+  aes(branch, sales, fill = month) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::comma) +
+  coord_flip()
+```
+
+## Transforming the scale
+
+```{r}
+pets_update <- read_csv("data/pets_update.csv")
+```
+
+```{r}
+ggplot(pets_update) +
+  aes(age, weight, colour = sex) +
+  geom_point()
+```
+
+
+```{r}
+ggplot(pets_update) +
+  aes(age, weight, colour = sex) +
+  geom_point() +
+  scale_y_continuous(trans = "log10", name = "log(weight)") +
+  scale_x_continuous(trans = "log10", name = "log(age)")
+```

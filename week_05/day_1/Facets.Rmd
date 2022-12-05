@@ -1,0 +1,76 @@
+---
+title: "Facets"
+output: html_notebook
+---
+
+## Facetting
+We convert one plot into multiple related plots
+- helps ease the clarity of data
+- provides a convenient and quick way to group data in related categories
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+chick_weight <- janitor::clean_names(ChickWeight)
+```
+
+```{r}
+ggplot(chick_weight) +
+  aes(x = time, y = weight, group = chick, colour = diet) +
+  geom_line() +
+  facet_wrap(~ diet, ncol = 4)
+```
+
+```{r}
+benefits <- read_csv("data/benefits.csv")
+```
+Use geom_histogram to create a histogram showing the number of unemployed by age. Then facet the graph based on biological sex.
+Hint: geom_histogram is almost the same as geom_bar, but is better suited to plotting continuous data because of the binning.
+
+```{r}
+ggplot(benefits) +
+  aes(x = age, fill = sex) +
+  geom_histogram() +
+  facet_wrap(~ sex)
+```
+
+## `facet_grid()`
+
+Pretty similar to `facet_wrap()` but gives more control when plotting two or more variables
+x*y plots, even if some plots are empty
+
+```{r}
+ggplot(benefits) +
+  aes(x = age, fill = sex) +
+  geom_histogram(col = "white") +
+  facet_wrap(married ~ sex)
+```
+
+```{r}
+ggplot(benefits) +
+  aes(x = age, fill = sex) +
+  geom_histogram(col = "white") +
+  facet_grid(married ~ sex)
+```
+
+Use the same dataset, but base the facet_grid() on marital status (married) and if the individual has children (dkids).
+Extension: can you improve the way that the facets are labled.
+
+```{r}
+ggplot(benefits) +
+  aes(x = age, fill = sex) +
+  geom_histogram(col = "white") +
+  facet_grid(married ~ dkids, labeller = "label_both")
+```
+
+## scales and space
+
+```{r}
+ggplot(benefits) +
+  aes(x = age, fill = sex) +
+  geom_histogram(col = "white") +
+    facet_wrap(~ sex, ncol = 2, scales = "free_y")
+```
+

@@ -1,0 +1,29 @@
+"branch","month","sales","difference_from_jan"
+"Edinburgh","Jan",160000,0
+"Glasgow","Jan",150000,0
+"Manchester","Jan",50000,0
+"Leatherhead","Jan",2e+05,0
+"Leeds","Jan",150000,0
+"London","Jan",450000,0
+"Welwyn Garden City","Jan",4000,0
+"Edinburgh","Feb",140000,-20000
+"Glasgow","Feb",160000,10000
+"Manchester","Feb",60000,10000
+"Leatherhead","Feb",175000,-25000
+"Leeds","Feb",2e+05,50000
+"London","Feb",460000,10000
+"Welwyn Garden City","Feb",12000,8000
+"Edinburgh","March",150000,-10000
+"Glasgow","March",170000,20000
+"Manchester","March",70000,20000
+"Leatherhead","March",160000,-40000
+"Leeds","March",175000,25000
+"London","March",440000,-10000
+"Welwyn Garden City","March",13000,9000
+"Edinburgh","April",170000,10000
+"Glasgow","April",190000,40000
+"Manchester","April",70000,20000
+"Leatherhead","April",130000,-70000
+"Leeds","April",190000,40000
+"London","April",410000,-40000
+"Welwyn Garden City","April",12000,8000

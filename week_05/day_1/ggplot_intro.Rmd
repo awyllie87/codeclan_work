@@ -1,0 +1,197 @@
+---
+title: "Intro to ggplot"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+students <- read_csv("data/students.csv")
+```
+
+```{r}
+ggplot(data = students) + 
+      aes(x = superpower) + 
+      geom_bar()
+```
+
+```{r}
+ggplot(students) +
+      aes(x = superpower) +
+      geom_bar(fill = "light blue", colour = "red")
+```
+```{r}
+ggplot(students) +
+  aes(x = superpower, fill = school_year) +
+  geom_bar()
+```
+
+```{r}
+ggplot(students) +
+  aes(x = superpower, fill = school_year) +
+  geom_bar(position = "dodge")
+```
+
+```{r}
+ggplot(students) +
+  aes(x = superpower, fill = school_year) +
+  geom_bar(position = "fill")
+```
+
+## Statistical transformations
+
+"count" is the default.
+
+```{r}
+ggplot(students) +
+  aes(x = superpower, fill = school_year) +
+  geom_bar(stat = "count")
+```
+
+```{r}
+count_data <- students %>% 
+  group_by(superpower, school_year) %>% 
+  summarise(count = n())
+
+ggplot(count_data) +
+  aes(x = superpower, y = count, fill = school_year) +
+  geom_bar(stat = "identity")
+```
+
+## Labels
+
+```{r}
+ggplot(students) +
+  aes(x = superpower, fill = school_year) +
+  geom_bar() +
+  labs(
+    x = "\nSuperpower",
+    y = "Count",
+    title = "Preferred Superpower by School Year",
+    subtitle = "Data from students around the world",
+    fill = "School Year"
+  )
+```
+
+```{r}
+ggplot(students) +
+  aes(x = superpower, fill = school_year) +
+  geom_bar() +
+  xlab("\nSuperpower") +
+  ylab("Count") +
+  ggtitle("Preferred Superpower by School Year",
+          subtitle = "Data from students around the world\n") +
+  labs(fill = "School Year")
+```
+
+```{r}
+olympics_overall_medals <- read_csv("data/olympics_overall_medals.csv")
+```
+
+```{r}
+top_10 <- olympics_overall_medals %>%
+  filter(season == "Summer", medal == "Gold") %>%
+  arrange(desc(count)) %>%
+  top_n(10)
+
+top_10
+```
+
+```{r}
+ggplot(top_10) +
+  aes(x = team, y = count) +
+  geom_bar(stat = "identity", fill = "gold") +
+    labs(
+    x = "Team",
+    y = "Medal Count",
+    title = "Gold medals by Olympic Team (Top 10)\n",
+    fill = "Team")
+```
+# Layers
+
+```{r}
+library(janitor)
+```
+```{r}
+chick_weight <- clean_names(ChickWeight)
+```
+
+```{r}
+ggplot(chick_weight) +
+  geom_line(aes(x = time, y = weight, group = chick, colour = diet))
+```
+```{r}
+ggplot(chick_weight) +
+  geom_line(aes(x = time, y = weight, group = chick, colour = diet)) +
+  geom_point(aes(x = time, y = weight, colour = diet))
+```
+
+```{r}
+ggplot(chick_weight) +
+  geom_line(aes(x = time, y = weight, group = chick, colour = diet)) +
+  geom_point(aes(x = time, y = weight, colour = diet),
+             alpha = 0.3) +
+  geom_smooth(aes(x = time, y = weight, colour = diet))
+```
+```{r}
+ggplot(chick_weight) +
+  aes(x = time, y = weight, colour = diet) +
+  geom_line(aes(group = chick)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth()
+```
+
+Task 1 - 10 mins
+Go back to using the students dataset:
+Use geom_point to make a scatter graph, with the height of students on the x-axis and their reaction time of the y axis.
+Make all the points blue. For geom_bar, the colour of the bar is controlled by fill, but for geom_point the colour of the points are controlled by colour.
+Make the colour of the points depend on the superpower the student wishes they had.
+Write down what the graph tells you overall.
+
+```{r}
+ggplot(students) +
+  aes(x = height_cm, y = reaction_time, colour = superpower) +
+  geom_point(fill = "Blue", size = 5) +
+  labs(title = "Student Height vs Reaction Time",
+       y = "Reaction time",
+       x = "Height",
+       colour = "Superpower")
+```
+
+Different layers can use different datasets, specified using `data` argument in a `geom`
+
+```{r}
+pets <- read_csv("data/pets.csv")
+```
+
+
+```{r}
+ggplot(pets) +
+  aes(x = age, y = weight) +
+  geom_point(aes(colour = sex, shape = animal), size = 4) +
+  geom_text(
+    aes(label = name),
+    nudge_x = 0.5,
+    nudge_y = 0.15,
+    data = subset(pets, name == "Fluffy")
+  )
+```
+
+# Saving
+
+`ggsave` saves the last image by default
+
+```{r}
+ggplot(pets) +
+  aes(x = age, y = weight) +
+  geom_point(aes(colour = sex, shape = animal), size = 4) +
+  geom_text(
+    aes(label = name),
+    nudge_x = 0.5,
+    nudge_y = 0.15,
+    data = subset(pets, name == "Fluffy")
+  )
+
+ggsave("g1_sav.pdf")
+ggsave("g1_sav.png")
+```
