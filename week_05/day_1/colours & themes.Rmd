@@ -1,0 +1,171 @@
+---
+title: "Colours and Themes"
+output: html_notebook
+---
+
+# Colours in R
+
+## Pre-defined colours in R
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+pets <- read_csv("data/pets.csv")
+```
+
+```{r}
+ggplot(pets) +
+  aes(weight, age) +
+  geom_point(colour = "blue")
+```
+
+## RGB Encoding
+
+```{r}
+ggplot(pets) +
+  aes(weight, age) +
+  geom_point(color = "#3333cc")
+```
+
+```{r}
+ggplot(pets) +
+  aes(animal, fill = sex) +
+  geom_bar()
+```
+
+```{r}
+ggplot(pets) +
+  aes(x = age, y = weight, colour = sleep) +
+  geom_point()
+```
+
+```{r}
+ggplot(pets) +
+  aes(weight, age, colour = sleep) +
+  geom_point() +
+  scale_colour_gradient(low = "grey0", high = "grey100")
+```
+
+## Diverging scale
+
+```{r}
+ggplot(pets) +
+  aes(weight, age, colour = sleep) +
+  geom_point() +
+  scale_colour_gradient2(midpoint = 15, low = "blue", high = "red", mid = "white")
+```
+
+## Discrete Colours
+
+```{r}
+students <- read_csv("data/students.csv")
+```
+```{r}
+students <- students %>% 
+  mutate(school_year = factor(school_year, levels = c("Year 7", "Year 8", "Year 9", "Year 10",
+                                                    "Year 11", "Year 12")))
+```
+
+```{r}
+ggplot(students) +
+  aes(school_year, fill = superpower) +
+  geom_bar() +
+  scale_fill_manual(
+    values = c(
+      "Fly" = "coral",
+      "Freeze time" = "seagreen",
+      "Invisibility" = "orange",
+      "Telepathy" = "red"
+    )
+  )
+```
+
+## Color Brewer
+
+```{r}
+ggplot(pets) +
+  aes(weight, age, colour = sleep) +
+  geom_point() +
+  scale_colour_distiller(palette = "Purples")
+```
+
+```{r}
+ggplot(students) +
+  aes(school_year, fill = superpower) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Set1")
+```
+
+## colour blindness-friendly palettes
+
+```{r}
+ggplot(students) +
+  aes(school_year, fill = superpower) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+```{r}
+ggplot(students) +
+  aes(school_year, fill = superpower) +
+  geom_bar() +
+  ggthemes::scale_fill_wsj()
+```
+
+# Themes
+
+`theme_`
+
+```{r}
+ggplot(students) +
+  aes(school_year, fill = superpower) +
+  geom_bar() +
+  theme_classic()
+```
+
+## Elements
+
+### Text
+
+```{r}
+ggplot(students) +
+  aes(school_year, fill = superpower) +
+  geom_bar() +
+  theme(axis.text = element_text(size = 12, face = "bold"))
+```
+
+```{r}
+ggplot(students) +
+  aes(favorite_school_subject) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+scottish_exports <- read_csv("data/scottish_exports.csv")
+```
+```{r}
+library(stringr)
+```
+
+
+```{r}
+scottish_exports %>% 
+  mutate(sector = case_when(
+    str_detect(sector, "^Agri") ~ "Agriculture, Forestry & Fishing",
+    str_detect(sector, "^Min") ~ "Mining & Quarrying",
+    TRUE ~ sector
+  )) %>% 
+  ggplot() +
+  geom_line(aes(x = year, y = exports, colour = sector), show.legend = FALSE) +
+  facet_wrap(~sector, scales = 'free_y') +
+  labs(x = "Year",
+       y = "Exports\n",
+       color = "Sector") +
+  ggthemes::scale_color_wsj() +
+  theme_minimal()
+```
+
+
