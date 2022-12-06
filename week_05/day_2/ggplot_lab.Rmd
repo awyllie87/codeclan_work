@@ -1,0 +1,141 @@
+---
+title: "ggplot lab"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+# Comparison
+
+```{r}
+late_deliveries <- read_csv("data/late_deliveries.csv")
+recovery_times <-  read_csv("data/recovery_times.csv")
+fitness_levels <-  read_csv("data/fitness_levels.csv")
+```
+
+```{r}
+late_deliveries %>% 
+  ggplot(aes(date, late_deliveries)) +
+  geom_line() +
+  geom_smooth(se = FALSE) +
+  labs(title = "Late Deliveries")
+```
+
+```{r}
+recovery_times %>% 
+  mutate(prognosis = factor(prognosis, levels = c("Excellent", "Good", "Average", "Poor" ))) %>% 
+  ggplot() +
+  geom_col(aes(x = reorder(treatment_group, -recovery), y = recovery, fill = prognosis)) +
+  labs(title = "Recovery Times")
+```
+
+```{r}
+ggplot(recovery_times, aes(x = reorder(prognosis, -recovery), 
+                           y = recovery, group = treatment_group, 
+                           fill = treatment_group))+
+  geom_col()
+```
+
+```{r}
+fitness_levels %>% 
+  ggplot(aes(x = child, y = fitness_score, fill = age)) +
+  geom_col() +
+  facet_wrap(~ group, scales = "free")
+```
+
+```{r}
+fitness_levels %>% 
+  mutate(label = if_else(age == max(age), child, NA_character_)) %>% 
+  ggplot(aes(x = age, y = fitness_score, colour = child)) +
+  geom_line() +
+  ggrepel::geom_label_repel(aes(label = label), nudge_x = 0.1, na.rm = TRUE) +
+  facet_wrap(~ group, scales = "free") +
+  theme(legend.position = "none")
+```
+
+```{r}
+fitness_levels %>%
+  group_by(group, age) %>% 
+  mutate(mean_group_score = mean(fitness_score)) %>%
+  mutate(group = as_factor(group)) %>% 
+  ggplot() +
+  aes(x = age, y = mean_group_score, group = group, colour = group) +
+  geom_line() +
+  labs(
+    x = "Age",
+    y = "Mean Group Fitness Score",
+    title = "Fitness vs Age\n"
+  )+
+  theme_minimal()
+```
+
+# Connection
+
+```{r}
+blood_pressure <- read_csv("data/blood_pressure.csv")
+car_use <- read_csv("data/car_use.csv")
+```
+
+```{r}
+blood_pressure %>% 
+  ggplot(aes(daily_saturated_fat_intake_mg, systolic_blood_pressure_mm_hg)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+```{r}
+car_use %>% 
+  mutate(car_use_percent = car_use_percent * 100) %>% 
+  ggplot(aes(x = population, y = air_so2_concentration_ppm, colour = car_use_percent)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggrepel::geom_label_repel(aes(label = city))
+```
+
+# Distribution
+
+```{r}
+d20_outcomes <- read_csv("data/d20_outcomes.csv")
+d20x5_outcomes <- read_csv("data/d20x5_outcomes.csv")
+```
+
+```{r}
+d20_outcomes %>% 
+  ggplot(aes(outcome, group = outcome, colour = outcome)) +
+  geom_histogram(bins = 20)
+```
+
+```{r}
+d20x5_outcomes %>% 
+  ggplot(aes(outcome, group = outcome, fill = outcome)) +
+  geom_histogram(binwidth = 5)
+```
+
+# Composition
+
+```{r}
+pension_surplus <- read_csv("data/pension_surplus.csv")
+pension_liabilities <- read_csv("data/pension_liabilities.csv")
+```
+
+```{r}
+pension_surplus %>% 
+  ggplot(aes(x = "", y = abs(balance),  fill = item)) +
+  geom_bar(stat = "identity", position = "fill") +
+  coord_polar("y", start = 0) +
+  facet_wrap(~ sign)
+```
+
+```{r}
+pension_surplus %>%
+  mutate(sign = ifelse(sign == "positive", "Surplus", "Deficit")) %>%
+  ggplot(aes(x = sign, y = abs(balance), fill = item)) +
+  geom_bar(stat = "identity", position = "fill")  +
+  facet_grid(~sign) +
+  coord_polar("y", start = 0) +
+  scale_fill_brewer(palette = "Set1") +
+  labs(title = "Pension Surplus Items",
+       y = "Value",) +
+  theme_minimal()
+```
+

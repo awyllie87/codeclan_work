@@ -1,0 +1,115 @@
+---
+title: "Visual Encoding"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+total_sales <- read_csv("data/total_sales.csv")
+```
+
+```{r}
+total_sales %>% 
+  ggplot(aes(branch, sales)) +
+  geom_col() +
+  coord_flip()
+```
+
+```{r}
+total_sales %>% 
+  ggplot(aes(x = reorder(branch, sales), y = sales)) +
+  geom_col() +
+  coord_flip()
+```
+
+```{r}
+total_sales %>% 
+  ggplot(aes(branch, sales, fill = branch == "Leeds")) +
+  geom_col() +
+  scale_fill_manual(values = c("grey40", "orange"), guide = "none") +
+  coord_flip()
+```
+
+```{r}
+annotate <- total_sales %>% 
+  mutate(label_text = ifelse(branch == "Leeds",
+                             "Leeds had 715k sales",
+                             NA))
+
+annotate %>% 
+  ggplot(aes(branch, sales,
+             fill = branch == "Leeds")) +
+  geom_col() +
+  scale_fill_manual(values = c("grey40", "orange"),
+                    guide = "none") +
+  coord_flip() +
+  geom_text(aes(label = label_text),
+            colour = "orange", size = 4, hjust = 0)
+```
+
+This graph is pretty cluttered and it’s not clear what we are trying to show.
+Rewrite the graph above in a more compelling manner. Consider how you could emphasise which branches have been most successful in the month of April compared to January.
+
+```{r}
+monthly_sales <- read_csv("data/monthly_sales.csv") %>%
+  mutate(month = factor(month, levels = c("Jan", "Feb", "March", "April")))
+
+head(monthly_sales)
+ggplot(monthly_sales) +
+  aes(x = reorder(branch, -difference_from_jan), y = sales, fill = month) +
+  geom_col(position = "dodge") +
+  coord_flip()
+```
+
+```{r}
+monthly_sales %>% 
+  ggplot(aes(x = month, y = sales, group = branch, col = branch)) +
+  geom_line()
+```
+
+```{r}
+ggplot(monthly_sales) +
+  aes(x = month, y = sales, group = branch, colour = branch) +
+  geom_line() 
+```
+
+
+A senior manager suspects the proportion of sales arising from Northern offices (Edinburgh, Glasgow, Leeds, Manchester) are growing relative to southern offices. Produce a visualisation that speaks to this.
+
+```{r}
+monthly_sales %>% 
+  mutate(region = if_else(branch %in% c("Edinburgh", "Glasgow", "Leeds", "Manchester"), "North", "South")) %>% 
+  ggplot(aes(x = month, y = sales, group = branch, colour = branch)) +
+  geom_line() +
+  facet_wrap(~ region, scales = "free_y")
+```
+Task
+The dataset got_ratings contains the episode ratings for the TV series Game of Thrones. Produce a graph.
+The viewer should:
+be able to understand the chronology of the ratings
+be able to attribute each rating to a particular season
+be able to view some indicator of the perceived quality of each season overall
+notice the perceived decline of the series in the final season
+You do not need to use the data on number of reviews.
+
+```{r}
+got_ratings <- read_csv("data/got_ratings.csv")
+```
+
+```{r}
+got_ratings %>% 
+  mutate(show_avg = mean(average_rating)) %>% 
+  group_by(series) %>% 
+  mutate(series_avg = mean(average_rating)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = episode, y = average_rating, colour = average_rating)) +
+  geom_line() +
+  geom_line(aes(episode, y = series_avg), colour = "red") +
+  geom_line(aes(episode, y = show_avg), colour = "orange") +
+  scale_x_continuous(breaks = 1:10) +
+  facet_wrap(~ series, scales = "free_y")
+```
+
