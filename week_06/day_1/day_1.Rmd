@@ -1,0 +1,567 @@
+---
+title: "Probability"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(gtools)
+source("prob.R")
+```
+
+```{r}
+s_two_dice <- rolldie(2)
+```
+
+```{r}
+s_two_dice %>% 
+  summarise(size_of_s = n())
+```
+Extract how many of our combinations lead to a total of 7
+
+```{r}
+s_sum_equals_seven <- s_two_dice %>% 
+  filter(X1 + X2 == 7)
+```
+
+```{r}
+s_two_dice <- s_two_dice %>% 
+  mutate(total = X1 + X2)
+```
+
+We can use the new random variable `total` to define various event spaces
+
+```{r}
+s_sum_equals_seven <- s_two_dice %>% 
+  filter(total == 7)
+```
+
+
+```{r}
+s_sum_greater_than_10 <- s_two_dice %>% 
+  filter(total > 10)
+```
+
+```{r}
+s_two_dice <- s_two_dice %>% 
+  mutate(
+    first_die_even = (X1 %% 2 == 0),
+    die2_minus_die1 = (X2 - X1),
+    differ_by_two = case_when(
+      X1 - X2 == 2 | X2 - X1 == 2 ~ TRUE,
+      TRUE ~ FALSE)
+  )
+```
+
+```{r}
+s_two_dice %>% 
+  filter(first_die_even == TRUE)
+```
+
+# Counting Rules
+
+A way to figure out the number of outcomes in a probability problem.
+
+## Single step experiments
+
+Throwing two dice at the same time is a single step experiment.
+
+All outcomes are equally likely - no control over how the die rolls.
+
+prob(event) = num(event outcomes) / num(all)
+
+```{r}
+# get all combinations of 2 die rolls
+s <- rolldie(2)
+
+total_seven <- s %>% 
+  filter(X1 + X2 == 7)
+```
+
+Now, using the above equation, we can work out the prob of getting a set of die rolls
+that total 7
+
+```{r}
+(prob_total_seven <- nrow(total_seven) / nrow(s))
+```
+## Multiple step experiments
+
+Let's say we throw one die, see the results, then flip a coin
+
+If an experiment can be visualised as a sequence of N steps, with n1 possible outcomes
+on the first step (e.g. 6), n2 possible outcomes on the second step (e.g. 2 : heads or tails)
+
+We simply multiply the number of outcomes at each step to get the total number of outcomes.
+
+n_total = n1 * n2 * ...
+
+This means the above example has 12 total outcomes.
+
+### Why do we need to know this?
+
+The number of total outcomes can change the probability calculation.
+
+e.g. What is the probability of getting heads on a coin toss and a 6 on a die throw?
+
+- prob of heads = 0.5 or 1/2
+- prob of getting a 6 in a die roll = 1/6
+- prob of both events happening together = 1/2 * 1/6 = 1/12
+
+```{r}
+
+# set up one die roll
+s_die <-  rolldie(1)
+
+# set up one coin toss
+s_coin <- tosscoin(1)
+
+# merge them together
+(s_total <- merge(s_coin, s_die))
+
+# Q: Heads and a 6
+(head_six <- s_total %>% 
+    filter(toss1 == "H",
+           X1 == 6))
+
+# calculate the probability
+(prob_head_six <- nrow(head_six) / nrow(s_total))
+```
+
+# Permutations
+
+A permutation is an arrangement of objects in which **order matters**
+
+e.g. locker code
+Your code is 5243 - if you enter 3452 it wouldn't open because order matters
+5243 is a different **permutation** than 3452
+
+suppose you've remembered that your locker code involves the numbers
+2, 3 , 4 and 5 but you can't remember the specific order
+
+Q: how many permutations exist of these 4 numbers so you can figure out how long you'll have to spend trying to break into your locker.
+
+Counting rule:
+In plain language, it's "The number of permutations of N things taken r at a time"
+
+N! / (N - r)!
+
+! is a `factorial`
+e.g. 5! = 5 * 4 * 3 * 2 * 1
+
+e.g. Company hiring
+
+Imagine we are filling 3 senior company positions (CEO, CTO, COO) from a board
+of 10 employees
+
+These 10 employees are pretty much equal in competence, and so for the sake of time we want to choose 3 of them **randomly** to fill the positions
+
+Q: How many different permutations of possible employees are there that could end up making the 3 senior positions?
+
+Note: counting rules exist so we don't have to list all the different possible outcomes.
+
+```{r}
+# create a vector of choices containing ten employees, n = 10
+
+employees <- c("Alice", "Bob", "Carole", "David", "Elaine", "Fred", "Gabra", "Hua", "Inigo", "Hugo")
+
+# Choose three at a time, r = 3
+# Don't replace an employee once chosen: repeats.allowed = FALSE
+# permutations = order matters, combinations = order doesn't matter
+
+seniors <- as_tibble(gtools::permutations(n = 10, 
+                                          r = 3, 
+                                          v = employees, 
+                                          repeats.allowed = FALSE)) %>% 
+  rename(CEO = V1,
+         CTO = V2,
+         COO = V3)
+
+# how many permutations do we have?
+
+nrow(seniors)
+```
+
+This leads us nicely to asking an interesting analysis question from our data:
+
+** what is the probability of Alice being selected as CEO and Bob being selected
+as CTO, if the selection process is random? **
+
+```{r}
+# first we'll get the event space
+alice_CEO_bob_CTO <- seniors %>% 
+  filter(CEO == "Alice",
+         CTO == "Bob")
+
+# how many permutations do we have?
+
+nrow(alice_CEO_bob_CTO)
+
+# calculate the prob
+nrow(alice_CEO_bob_CTO) / nrow(seniors)
+```
+
+This tells us there is a prob of 0.01 of Alice being CEO and Bob being CTO together
+
+# Combinations
+
+Combinations differ from permutations in that **the order of objects does not matter**
+
+e.g lottery numbers
+you select numbers, they're drawn, but the order of your numbers doesn't matter
+
+A quick guide:
+- permutations: you draw objects from a collection and place them into a group
+**with** internal structure (e.g. hierarchy: CEO, CTO, COO)
+- combinations: you draw objects from a collection and place them into a group 
+**without** an internal struction, i.e. no labelled positions, roles or precedence
+in the group
+
+## Lottery example
+
+Q1: Given a lottery with 50 numbers drawn in lots of 6, how many possible combinations
+are there?
+
+Q2: If you buy 10 tickets, each with a different set of numbers, what is your prob
+of winning?
+
+```{r}
+# use choose() function, which just computes the number of choices from 
+# 50 numers, drawn in ltos of 6
+
+num_draws <- choose(50, 6)
+
+# then we can calculate the prob as follows
+prob_win_per_ticket <- 1 / num_draws
+prob_win_per_ticket
+
+# what if we have 10 tickets?
+prob_win_per_ticket * 10
+```
+
+Task - 5 mins
+
+Use the combinations() function in gtools for this task (don't try to do it manually). I have five flavours of ice cream to choose from:
+
+flavours <- c("vanilla", "chocolate", "raspberry", "strawberry", "pistachio") 
+and a bowl that can hold three scoops. How many different variations in bowls of ice cream can I have assuming:
+
+Each scoop must be a different flavour
+I can repeat flavours if I wish?
+
+```{r}
+flavours <- c("vanilla", "chocolate", "raspberry", "strawberry", "pistachio") 
+
+ice_cream <- as_tibble(combinations(n = 5, 
+                                    r = 3, 
+                                    v = flavours, 
+                                    repeats.allowed = TRUE))
+
+nrow(ice_cream)
+```
+
+# Combining Events
+
+- Understand the concept of the complement of an event
+- Be able to form 'AND' and 'OR' combinations of events
+- Understand what it means for events to be **mutually exclusive**
+
+## Complement
+
+What happens if we want to know the likelihood of all observations **other** than
+the one we're considering? This is the complement of an event
+
+- Flip a coin, event is heads, complement is tails
+- Pick a card from a deck and get spades suit, the complement is
+{hearts, clubs, diamonds}
+
+### Calculating the complement of an event
+
+prob(roll = 4) = 1/6
+prob(not rolling a 4) = 5/6
+
+### Examples
+
+Toss 4 coins
+
+```{r}
+s_four_coins <- tosscoin(4) %>% 
+  mutate(row = row_number())
+```
+
+What is the probability of the event that at least 2 heads are thrown?
+
+```{r}
+s_four_coins <- s_four_coins %>% 
+  mutate(num_heads = rowSums(. == "H"))
+
+# now we can filter for where we have 2 heads thrown and calculate the prob
+
+s_at_least_two_heads <- s_four_coins %>% 
+  filter(num_heads >= 2)
+
+# calculate the prob
+
+prob_two_heads <- nrow(s_at_least_two_heads) / nrow(s_four_coins)
+```
+What about the **complement**? In this case, fewer than 2 heads.
+
+```{r}
+s_less_than_two_heads <- s_four_coins %>% 
+  filter(num_heads <)
+
+# prob
+
+prob_less_two_heads <- nrow(s_less_than_two_heads) / nrow(s_four_coins)
+```
+
+```{r}
+prob_two_heads + prob_less_two_heads
+```
+
+As datasets grow, and calculations become more complex, the complement rule
+can save you time (1 - calculated_probability)
+
+# AND combinations
+
+"Compound event" -- just an event composed of a combination of other events.
+
+e.g. roll a single die
+  - Event A: one of {1, 2, 3, 4} is rolled
+  - Event B: one of {3, 4, 5, 6} is rolled
+  
+What is the prob that both A **and** B occur?
+
+The conditions that which both happen is called the "intersection". 
+In maths the symbol is ∩
+
+For equally likely outcomes, the prob of A **and** B is just defined the usual way:
+the num of outcomes in the intersection, divided by the size of the sample space
+
+prob(A AND B) = num(A AND B) / num(S) = 2/6 = 1/3
+
+Task - 5 mins
+
+Given our four coin tossing example from above, what is the probability of tossing at least one head and at least one tail?
+
+To do this, you'll need to add a num_tails column to s_four_coins
+Then think about filtering to satisfy the two conditions
+
+```{r}
+s_four_coins <- s_four_coins %>% 
+  mutate(num_tails = rowSums(. == "T"))
+```
+
+```{r}
+s_one_of_each <- s_four_coins %>% 
+  filter(num_tails >= 1 & num_heads >= 1)
+
+prob_one_of_each = nrow(s_one_of_each) / nrow(s_four_coins)
+```
+
+## Mutually exclusive events
+
+What about the case that two (or more) events have no outcomes in common?
+In this case, the prob of the intersection is zero, **it is not possible for the
+events to occur together**
+
+e.g. 4 coins tossed: prob of at least 3 heads **and** at least 2 tails
+
+```{r}
+s_four_coins %>% 
+  filter(num_heads >= 3 & num_tails >= 2) %>% 
+  summarise(prob = n() / nrow(s_four_coins))
+```
+
+The events (3+ heads and 2+ tails) are **mutually exclusive** when we flip 4 coins
+
+# OR combinations
+
+e.g. roll a single die
+  - event A: roll an even number {2, 4, 6}
+  - event B: roll one of {4,5}
+  
+  What is the prob that A **or** B occurs?
+  
+The condition where this happens is called the `Union` and is represented by ∪ in maths
+
+----
+
+Let's do it with two dice. To
+
+
+Experiment consists of rolling 2 die rolls and defining the two events.
+
+```{r}
+s_two_dice <- rolldie(2)
+
+# filter down to cases where X1 is even or X2 is 4 or 5
+
+s_two_dice %>% 
+  filter(X1 %% 2 == 0 | (X2 == 4 | X2 == 5)) %>% 
+  summarise(prob = n() / nrow(s_two_dice))
+```
+
+# Conditional probability
+
+So far, we've looked at the prob of one or two events happening totally apart from each other e.g. two coin flips, dice rolls etc.
+
+But more often we'd like to be able to calculate the prob of one event **given that**
+another has occurred
+
+e.g. what are the chances of selling item X **if** we've already sold item Y
+
+We call this **conditional probability** - written prob(A | B)
+
+e.g. "What is the prob that a 5 was rolled **given that** we know an odd number was rolled?"
+
+In this case, the event space contains 3 outcomes: {1,3,5}
+
+prob(5 | odd) = 1/3
+
+The **conditioning event** (i.e. number is odd in this case) **filters down**
+the space of our outcomes we have to consider.
+
+## Dependent and independent events
+
+We say that 2 events A and B are **independent** if
+  prob(A | B) = prob(A)
+
+i.e. the prob of event A is **not affected** by whether event B has happened or not
+
+Example: colour blindness data
+
+```{r}
+cb <- read_csv("data/colour_blindness.csv")
+```
+Can view this simple categorical data set with a **contingency table**
+
+```{r}
+table <- cb %>% 
+  janitor::tabyl(bio_sex, cblind)
+```
+
+```{r}
+table2 <- table %>% 
+  janitor::adorn_totals(where = c("row", "col"))
+```
+
+If we prefer to see this data in terms of relative proporations, we can use
+adorn_percentages() function
+
+```{r}
+table3 <- table2 %>% 
+  janitor::adorn_percentages(denominator = "all") %>% 
+  janitor::adorn_title()
+```
+
+## Marginal probabilities
+
+The numbers in the Total row and col correspond to what are called
+**marginal probs** (because they appear at the table margins)
+
+If we didn't have access to this contingency table, we could calculate the 
+prob(female) using pipes:
+
+```{r}
+prob_female <- cb %>% 
+  summarise(prob = sum(bio_sex == "female") / n()) %>% 
+  pull()
+```
+
+Task - 5 mins
+
+What are the marginal probabilities of:
+
+being male
+being colour blind
+not being colour blind?
+Get these probabilities from the contingency table, and also calculate them using pipes. Save each probability in a sensibly named variable, we'll need it later!
+
+```{r}
+prob_male <- cb %>% 
+  summarise(prob = sum(bio_sex == "male") / n()) %>% 
+  pull()
+
+prob_cb <- cb %>% 
+  summarise(prob = sum(cblind) / n()) %>% 
+  pull()
+
+prob_not_cb <- cb %>% 
+  summarise(prob = sum(!cblind) / n()) %>% 
+  pull()
+```
+
+## Marginal probabilities
+
+The probs in the main body of the table are called **joint probs** and they correspond
+to the AND combination of the corresponding levels
+
+```{r}
+prob_female_cb <- cb %>% 
+  filter(bio_sex == "female",
+         cblind == TRUE) %>% 
+  summarise(prob = n() / nrow(cb)) %>% 
+  pull()
+
+prob_male_cb <- cb %>% 
+  filter(bio_sex == "male",
+         cblind == TRUE) %>% 
+  summarise(prob = n() / nrow(cb)) %>% 
+  pull()
+```
+
+## Dependent and independent events
+
+Is the event 'being female' dependent or independent of the event 'being colourblind'?
+
+```{r}
+prob_female
+prob_female * prob_cb
+```
+
+These values are unequal! This means that the two events (being female and being
+colour blind) are **dependent**
+
+```{r}
+prob_male
+prob_male * prob_cb
+```
+
+## Conditional probability
+
+The easiest way to see the dependence of events if by calculating their
+**conditional probabilities** 
+in this case: What is the prob of a person being colour blind **given** that
+we know they are female?
+
+i.e. what proportion of female people are colour blind?
+  prob(colour blind | female)
+  = prob (colour blind AND female) / prob(female)
+  = 0.0016 / 0.4
+  = 0.004
+  = 0.4%
+
+```{r}
+prob_cb_given_female <- cb %>% 
+  filter(bio_sex == "female") %>% 
+  summarise(prob = sum(cblind == TRUE) / n())
+
+prob_cb_given_female
+```
+
+```{r}
+prob_cb_given_male <- cb %>% 
+  filter(bio_sex == "male") %>% 
+  summarise(prob = sum(cblind == TRUE) / n())
+
+prob_cb_given_male
+```
+
+The prob of an individual being collur blind **depends** upon their biological
+sex. This is true for this set of 10,000 individuals - what about more generally?
+
+If this 10,000 was a sample of a broader population, are prob(colourblind | female)
+and prob(colourblind | male) sufficiently different in this sample to convince us
+that this is also likely to be a real effect in the broader population?
+
+Covered later in statistical testing.
