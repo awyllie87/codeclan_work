@@ -1,0 +1,548 @@
+---
+title: "Distribution"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+source("prob.R")
+```
+
+tosscoin(3)
+```{r}
+s_three_coins <- tosscoin(3)
+```
+
+```{r}
+s_three_coins <- s_three_coins %>% 
+  mutate(label = str_c(toss1, toss2, toss3, sep = " ")) %>% 
+  mutate(prob = 1 / n())
+```
+
+```{r}
+s_three_coins %>% 
+  ggplot(aes(x = label, y = prob)) +
+  geom_col() +
+  labs(x = "coin toss result",
+       y = "probability")
+```
+
+```{r}
+s_three_coins <- s_three_coins %>% 
+  mutate(num_heads = rowSums(. == "H"))
+```
+
+```{r}
+prob_num_heads <- s_three_coins %>% 
+  group_by(num_heads) %>% 
+  summarise(prob = sum(prob))
+```
+
+```{r}
+prob_num_heads %>% 
+  ggplot(aes(x = num_heads, y = prob)) +
+  geom_col() +
+  labs(x = "Number of Heads Thrown",
+       y = "Probability")
+```
+
+This gives us a *discrete* probability distribution.
+
+```{r}
+air_con_sales <- read_csv("data/AirConSales.csv") %>% 
+  clean_names() %>% 
+  mutate(date = as.Date(date, format = "%m/%d/%Y"))
+```
+
+```{r}
+sales_freq_table <- air_con_sales %>% 
+  tabyl(units_sold) %>% 
+  as.tibble()
+```
+
+```{r}
+rolls <- sample(1:6, 1000, replace = TRUE)
+freqs <- tabyl(rolls) %>% 
+  as.tibble()
+```
+
+The *relative frequencies* are obtained by dividing the observed frequencies (n in the table of results) by the total number of rolls (1000).
+
+We can interpret these as *empirical probabilities* - "empirical" just means
+that we got this information through observation.
+
+**If all we knew about the die were these results, then the empirical probabilities**
+**would be our best estimate of the behaviour of the die**
+
+```{r}
+sales_freq_table %>% 
+  ggplot(aes(x = units_sold, y = percent)) +
+  geom_col()
+```
+
+## Distribution Centres
+
+Described by mean, median, and mode.
+
+Mean is given the symbol μ for population or x̄ for a sample
+
+Median is the value for which one-half of the values in the data set lie below it and on-half
+above.
+
+R makes this calculation easy with the `median()` function.
+
+```{r}
+get_mode <- function(data){
+  
+  tabled_data <- table(data)
+  table_names <- names(tabled_data)
+  
+  return( table_names[tabled_data == max(tabled_data)])
+}
+```
+
+```{r}
+air_con_sales %>% 
+  summarise(mean_daily_sales = mean(units_sold),
+            mode_daily_sales = get_mode(units_sold))
+```
+
+```{r}
+library(e1071)
+```
+
+```{r}
+left_skewed <- read_csv("data/leftskew.csv")
+right_skewed <- read_csv("data/rightskew.csv")
+```
+
+```{r}
+left_skewed %>% 
+  summarise(skewness = skewness(x, type = 1))
+```
+
+```{r}
+right_skewed %>% 
+  summarise(skewness = skewness(x, type = 1))
+```
+
+```{r}
+air_con_sales %>% 
+  summarise(skewness = skewness(units_sold, type = 1))
+```
+
+## Measures of spread
+
+Measures of spread - range, quartiles, interquartile range
+
+Boxplots
+
+Definition of an outlier from the interquartile range
+
+Sample variances
+
+```{r}
+jobs <- read_csv("data/TyrellCorpJobs.csv") %>% 
+  clean_names()
+```
+
+```{r}
+head(jobs)
+```
+
+```{r}
+jobs %>% 
+  summarise(salary_range = max(salary) - min(salary))
+```
+
+```{r}
+jobs %>% 
+  ggplot(aes(x = salary)) +
+  geom_histogram(bins = 25) +
+  facet_wrap(~position)
+```
+
+```{r}
+jobs %>% 
+  group_by(position) %>% 
+  summarise(range = max(salary) - min(salary))
+```
+
+## Quartiles
+
+Values split the distribution into sections
+
+* Q1 = the value that splits the distribution into a lower 25% and higher 75%
+
+* Q2 = The value that splits the distribution into a lower 50% and higher 50% (median)
+
+* Q3 = The value that splits the distribution into a lower 75% and higher 25%
+
+```{r}
+jobs %>% 
+  group_by(position) %>% 
+  summarise(Q1 = quantile(salary, 0.25),
+            Q2 = quantile(salary, 0.5),
+            Q3 = quantile(salary, 0.75))
+```
+
+**Inter-Quartile Range (IQR)**
+
+$$IQR = Q3 - Q1$$
+
+```{r}
+jobs %>% 
+  group_by(position) %>% 
+  summarise(Q1 = quantile(salary, 0.25),
+            Q2 = quantile(salary, 0.5),
+            Q3 = quantile(salary, 0.75),
+            IQR = Q3 - Q1)
+```
+
+```{r}
+jobs %>% 
+  group_by(position) %>% 
+  summarise(IQR = IQR(salary))
+```
+
+```{r}
+jobs %>% 
+  select(-x1) %>% 
+  group_by(position) %>% 
+  skimr::skim()
+```
+
+Task - 10 mins
+Investigate and comment on the centrality and spreads of distribution_1 and distribution_2 produced by the following function calls.
+Use geom_boxplot() and skim() first
+Next, plot histograms to confirm your descriptions.
+[Don’t worry about what the functions generating distribution_1 and distribution_2 are doing]
+
+```{r}
+set.seed(42)
+distribution_1 <- tibble(
+  y = append(rnorm(n = 100, mean = 5, sd = 10), rnorm(n = 200, mean = 5, sd = 1))
+)
+
+distribution_2 <- tibble(
+  y = runif(n = 1000, min = -30, max = 30)
+)
+```
+
+```{r}
+distribution_1 %>% 
+  skimr::skim()
+```
+
+```{r}
+distribution_2 %>% 
+  skimr::skim()
+```
+
+```{r}
+distribution_1 %>% 
+  ggplot(aes(x = y)) +
+  geom_histogram()
+```
+
+```{r}
+distribution_2 %>% 
+  ggplot(aes(x = y)) +
+  geom_histogram()
+```
+
+```{r}
+distribution_1 %>% 
+  ggplot(aes(x = y)) +
+  stat_boxplot(geom = "errorbar", width = 0.5) +
+  geom_boxplot()
+```
+
+```{r}
+distribution_2 %>% 
+  ggplot(aes(x = y)) +
+    stat_boxplot(geom = "errorbar", width = 0.5) +
+  geom_boxplot()
+```
+# Skewness in Box Plots
+
+
+```{r}
+heavily_right_skewed <- read_csv("data/heavily_right_skewed.csv")
+
+heavily_right_skewed %>% 
+  summarise(skewness = skewness(x, type = 1))
+
+heavily_right_skewed %>% 
+  ggplot(aes(y = x)) +
+  coord_flip() +
+  stat_boxplot(geom = "errorbar", width = 0.3) +
+  geom_boxplot()
+
+heavily_right_skewed %>% 
+  ggplot(aes(y = x)) +
+  geom_histogram() +
+  coord_flip()
+  
+
+```
+
+```{r}
+jobs %>% 
+  group_by(position) %>% 
+  summarise(var = var(salary))
+```
+
+```{r}
+jobs %>% 
+  group_by(position) %>% 
+  summarise(sd = sd(salary))
+```
+
+# Common distributions
+
+## Cumulative distribution functions (CDF)
+
+```{r}
+dice <- tibble(
+  x = 1:6,
+  f_x = replicate(6, 1/6)
+) %>% 
+  mutate(F_x = cumsum(f_x))
+
+dice %>% 
+  ggplot(aes(x = x, y = F_x)) +
+  geom_step() +
+  labs(x = "number rolled on die",
+       y = "probability") +
+  scale_x_continuous(breaks = 1:6) +
+  scale_y_continuous(breaks = seq(0, 1, 0.1)) +
+  ylim(0, 1)
+```
+
+## Continuous distributions
+
+### Continuous uniform
+
+"brain breaks" at Codeclan example - breaks were monitored for a week and found
+to be distributed uniformly between 5 and 22 minutes
+
+l is our "length" variable in minutes
+
+this is continuous.
+
+What will the probability density function f(l) for the continuous random variable
+l look like?
+
+R functions we can use:
+  - a uniform density function `dunif(x, min, max)`
+  - a cumulative density function `punif(q, min, max)`
+  
+```{r}
+brain_breaks <- tibble(
+  l = seq(4, 23, b = 0.001),
+  f_l = dunif(x = l, min = 5, max = 22)
+)
+
+brain_breaks %>% 
+  ggplot(aes(x = l, y = f_l)) +
+  geom_line() +
+  ylim(0, 0.075) +
+  xlab("l (minutes)") +
+  ylab("f_l (probability density)")
+```
+
+How do we use continuous CDF? Just as we did for the discrete CDF: like so -
+
+> What is the probability of a brain break lasting between 8.4 and 10.751 mins?
+
+```{r}
+punif(q = 10.751, min = 5, max = 22) - punif(q = 8.4, min = 5, max = 22)
+```
+
+```{r}
+brain_breaks %>% 
+  ggplot(aes(x = l, y = f_l)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = 0, 
+                  ymax = ifelse(l >= 8.4 & l <= 10.751, f_l, 0)),
+              fill = "red",
+              alpha = 0.6)
+```
+
+## Normal distributions
+
+Let's plot the probability density for a normal distribution to get a sense of
+what it looks like
+
+We'll use `dnorm(x, mean, sd)` function - this provides the normal probability
+density.
+
+```{r}
+three_norms <- tibble(
+  x = seq(0, 20, 0.1),
+  f1_x = dnorm(x = x, mean = 10, sd = 1),
+  f2_x = dnorm(x = x, mean = 10, sd = 2),
+  f3_x = dnorm(x = x, mean = 10, sd = 3)
+)
+
+three_norms %>% 
+  ggplot() +
+  geom_line(aes(x = x, y = f3_x), col = "black")
+```
+
+Let's plot all three together to compare.
+
+```{r}
+three_norms %>% 
+  ggplot() +
+    geom_line(aes(x = x, y = f1_x), col = "black") +
+    geom_line(aes(x = x, y = f2_x), col = "red") +
+    geom_line(aes(x = x, y = f3_x), col = "blue")
+```
+
+## fitting a normal disribution to a data set
+
+if we have a data set that we believe is normally distributed,
+we can "fit" a normal distribution to the probability distribution
+or density by calculating the mean and sd of the data
+
+```{r}
+library(janitor)
+
+accounts_salary_stats <- jobs %>% 
+  filter(position == "Accounting") %>% 
+  summarise(
+    num = n(),
+    mean = mean(salary),
+    sd = sd(salary)
+  )
+```
+
+Now let's fit a normal distribution to our data:
+
+```{r}
+jobs %>% 
+  filter(position == "Accounting") %>% 
+  ggplot(aes(x = salary)) +
+  geom_histogram(aes(y = after_stat(density)),
+                      col = "white",
+                      bins = 25) +
+  stat_function(
+    fun = dnorm,
+    args = list(
+      mean = accounts_salary_stats$mean,
+      sd = accounts_salary_stats$sd
+    ),
+    col = "red"
+  )
+```
+## Standard normal
+
+Often, we describe a normal distribution in terms of a **standardised variable**,
+which is called `z` by convention.
+
+Z just tells us how far away we are from the mean (the center of the distribution),
+and the sign tells us the direction.
+
+e.g. z = -1 tells us we are "one SD below the mean"
+z = 2.6 tells us we are "2.6 SDs above the mean"
+
+```{r}
+management_scaled <- jobs %>% 
+  filter(position == "Management") %>% 
+  mutate(z_salary = scale(salary))
+```
+
+Now let's look for outliers based upon z-scores beyond z = +- 3
+
+```{r}
+management_scaled %>% 
+  filter(!between(z_salary, left = -3, right = 3))
+```
+
+If we use z rather than x in the normal equation, it assumed a simpler form known
+as the **standard normal distribution** - this would have mean = 0, SD = 1
+
+```{r}
+standard_normal <- tibble(
+  z = seq(from = -4, to = 4, by = 0.01),
+  f_z = dnorm(x = z)
+)
+
+standard_normal %>% 
+  ggplot(aes(x = z, y = f_z)) +
+  geom_line()
+```
+
+What about the standard normal CDF?
+
+This works in exactly the same way as for the continuous uniform distribution above:
+we provide a z-value, and R provides the probability of the random variable taking a 
+value less than or equal to that z-value.
+
+e.g. 
+
+> what is the prob of the standard normally distributed random variable z, assuming a value z <= 0?
+
+```{r}
+# first, let's get the prob z <= 0
+pnorm(q = 0)
+```
+
+```{r}
+shade_standard_normal <- function(shade_from, shade_to){
+  standard_normal <- tibble(
+    z = seq(from = -4, to = 4, by = 0.001),
+    f_z = dnorm(x = z)
+  )
+  standard_normal %>%
+    ggplot(aes(x = z, y = f_z)) +
+    geom_line() +
+    geom_ribbon(aes(ymin = 0, ymax = ifelse(z >= shade_from & z <= shade_to, f_z, 0)), fill = "red", alpha = 0.6)
+}
+
+shade_standard_normal(shade_from = -Inf, shade_to = 0)
+```
+
+## The empirical 3 SD rule
+
+We've said that most values lie within 3 SDs of the mean
+- we can calculate the %s of values lying within 1, 2, and 3 SDs of the mean
+
+## Within 1 SD
+
+```{r}
+100 * (pnorm(q = 1) - pnorm(q = -1))
+```
+
+```{r}
+shade_standard_normal(shade_from = -1, shade_to = 1)
+```
+
+## Within 2 SDs
+
+```{r}
+100 * (pnorm(q = 2) - pnorm(q = -2))
+```
+
+```{r}
+shade_standard_normal(shade_from = -2, shade_to = 2)
+```
+
+
+## Within 3 SDs
+
+```{r}
+100 * (pnorm(q = 3) - pnorm(q = -3))
+```
+
+```{r}
+shade_standard_normal(shade_from = -3, shade_to = 3)
+```
+We call these results the **empirical 3 SD rule**, or the
+**68-95-99.7 rule**
+
+The proportions of values lying within
