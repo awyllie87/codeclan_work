@@ -1,0 +1,120 @@
+---
+title: "One Sample - Proportions"
+output: html_notebook
+---
+
+>Does the proportion of books in the Goodreads database that lack text reviews different significantly from 7%?
+
+```{r setup}
+library(tidyverse)
+library(infer)
+```
+
+```{r}
+books <- read_csv("data/books.csv") %>% 
+  janitor::clean_names()
+```
+# Test process
+
+## Define our test and significance level
+
+H0: prop_without_text_review == 0.07 (7%)
+HA: prop_without_text_review != 0.07
+
+alpha = 0.05
+
+## Calculate test statistic
+
+```{r}
+books_tidy <- books %>% 
+  drop_na(text_reviews_count)
+
+# prop_without_text_review
+observed_stat <- books_tidy %>% 
+  group_by(text_reviews_count) %>% 
+  summarise(prop = n() / nrow(books_tidy)) %>% 
+  filter(text_reviews_count == 0)
+
+observed_stat
+```
+
+## Generate null distribution & visualise
+
+```{r}
+null_distribution <- books_tidy %>% 
+  mutate(has_text_review = text_reviews_count > 0) %>% 
+  specify(response = has_text_review, success = "FALSE") %>% 
+  hypothesise(null = "point", p = 0.07) %>% 
+  generate(reps = 2000, type = "draw") %>% 
+  calculate(stat = "prop")
+```
+
+```{r}
+null_distribution %>% 
+  visualise() +
+  shade_p_value(obs_stat = observed_stat$prop,
+                direction = "both")
+```
+## Calculate p value
+
+```{r}
+null_distribution %>% 
+  get_p_value(
+    obs_stat = observed_stat$prop,
+    direction = "both"
+  )
+```
+
+## Conclude
+
+For our significance level of 0.05, we may reject H0 given our p value of 0.02: the proportion of books in the Goodreads database that lack text reviews differs significantly from 7%
+
+# Practice
+
+>Let's say you work for a publishing company and you want to use the Goodreads database to provide insight for future investment. Your CEO has decided they want to invest in French language books, if there is compelling evidence that there is a lack of such books in the market. Based on their experience of the industry, they have decided that if the proportion of books published in French is less than 1.5% then they will invest in publishing more.
+
+## Define Test
+
+H0: πFrench - 0.015 >= 0
+Ha: πFrench - 0.015 < 0
+
+alpha = 0.01
+
+## Calculate test statistic
+
+```{r}
+observed_stat <- books_tidy %>% 
+  summarise(prop = sum(books_tidy$language_code == "fre") / n())
+
+observed_stat
+```
+
+## Generate null distribution & visualise
+
+```{r}
+null_distribution <- books_tidy %>% 
+  mutate(is_french = language_code == "fre") %>% 
+  specify(response = is_french, success = "TRUE") %>% 
+  hypothesise(null = "point", p = 0.015) %>% 
+  generate(reps = 2000, type = "draw") %>% 
+  calculate(stat = "prop")
+```
+
+```{r}
+null_distribution %>% 
+  visualise() +
+  shade_p_value(obs_stat = observed_stat$prop,
+                direction = "less")
+```
+
+## Calculate p value
+
+```{r}
+null_distribution %>% 
+  get_p_value(observed_stat$prop,
+              direction = "less")
+```
+
+## Conclude
+
+For our significance level of 0.01, we may not reject H0 given our p value of 0.431: there is not enough evidence to say that the proportion of books in French is less than 1.5%

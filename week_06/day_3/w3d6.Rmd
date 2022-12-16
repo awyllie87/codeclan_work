@@ -1,0 +1,112 @@
+---
+title: "Sampling Distributions"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(infer)
+
+telco <- read_csv("data/telecomms_churn.csv") %>% 
+  clean_names()
+```
+
+```{r}
+skimr::skim(telco)
+```
+
+
+For the purposes of this lesson, let's pretend this is the entire population, which we hardly ever get to see in real life.
+
+
+```{r}
+summary_pop <- telco %>% 
+  summarise(mean_monthly_charges = mean(monthly_charges),
+           mean_tenure = mean(tenure),
+           median_tenure = median(tenure),
+           prop_churn = sum(churn == "Yes") / n())
+```
+
+```{r}
+telco %>% 
+  ggplot(aes(x = monthly_charges)) +
+  geom_histogram(col = "white")
+```
+
+```{r}
+telco %>% 
+  ggplot(aes(x = tenure)) +
+  geom_histogram(col = "white") +
+  scale_x_continuous(breaks = seq(0, max(telco$tenure), 6))
+```
+
+```{r}
+telco %>% 
+  ggplot(aes(x = churn)) +
+  geom_bar(col = "white")
+```
+
+Now we'll simulate the circumstances of having small samples of data from this population, so that we can see how large a role random variation plays.
+
+```{r}
+sample_200 <- telco %>% 
+  rep_sample_n(200)
+
+sample_200
+```
+
+```{r}
+summary_sample_200 <- sample_200 %>% 
+  ungroup() %>% 
+  summarise(mean_monthly_charges = mean(monthly_charges),
+           mean_tenure = mean(tenure),
+           median_tenure = median(tenure),
+           prop_churn = sum(churn == "Yes") / n())
+```
+
+"Sampling Error"
+
+Difference between the point estimate (e.g. sample mean) and the population parameter (e.g. population mean)
+
+```{r}
+summary_sample_200 - summary_pop
+```
+
+```{r}
+sample_200_n <- telco %>% 
+  rep_sample_n(200, reps = 5000)
+```
+
+```{r}
+summary_sample_200_n <- sample_200_n %>% 
+  summarise(mean_monthly_charges = mean(monthly_charges),
+           mean_tenure = mean(tenure),
+           median_tenure = median(tenure),
+           prop_churn = sum(churn == "Yes") / n())
+```
+
+```{r}
+summary_sample_200_n %>% 
+  ggplot(aes(x = mean_tenure)) +
+  geom_histogram(col = "white")
+```
+
+```{r}
+library(fastGraph)
+
+std_errors <- summary_sample_200_n %>% 
+  summarise(sd_mean_monthly_charges = sd(mean_monthly_charges))
+
+shadeDist(xshade = c(60, 70),
+          lower.tail = FALSE,
+          ddist = "dnorm",
+          parm1 = mean(summary_sample_200_n$mean_monthly_charges),
+          parm2 = std_errors$se_mean_monthly_charges,
+          xlab = "Mean Monthly Charges")
+
+summary_sample_200_n %>% 
+  filter(mean_monthly_charges >= 60,
+         mean_monthly_charges <= 70) %>% 
+  summarise(prob = n() / nrow(summary_sample_200_n))
+```

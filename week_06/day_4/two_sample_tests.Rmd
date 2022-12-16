@@ -1,0 +1,249 @@
+---
+title: "Two Sample Tests"
+output: html_notebook
+---
+
+# Two sample tests
+
+When performing two sample tests, the first step is to examine the relationship between the samples.
+
+Are they **independent** or **paired**?
+
+Paired (clones) examples:
+
+The same books sold at two different shops
+The same students being marked in two different schools
+The same people before and after some drug treatment
+
+Independent:
+
+Two different sets of books sold at two different shops
+School results from different students at two different schools
+Holiday let prices at two different locations
+
+## Independent samples
+
+```{r}
+library(tidyverse)
+library(infer)
+```
+
+```{r}
+nice <- read_csv("data/nice.csv")
+algarve <- read_csv("data/algarve.csv")
+```
+
+>We have two samples of prices (in £s) for 2-bedroom, 14-day holiday apartment lets in Nice and the Algarve. We would like to know whether the mean price of lets in the Algarve is significantly higher than the mean price of comparable lets in Nice.
+
+### Define test and significance level
+
+H0: price in algarve is the same as (or less than) the price in Nice
+H0: mean(algarve) - mean(nice) <= 0
+HA: price in Algarve is higher than the price in Nice
+HA: mean(algarve) - mean(nice) > 0
+
+significance level = 0.05
+
+### Calculate sample statistic
+
+```{r}
+let_prices <- bind_rows(list(
+  "algarve" = algarve,
+  "nice" = nice
+), .id = "location") %>% 
+  select(location, price)
+```
+
+```{r}
+observed_stat <- let_prices %>% 
+  group_by(location) %>% 
+  summarise(mean_price = mean(price)) %>% 
+  pivot_wider(names_from = location, values_from = mean_price) %>% 
+  mutate(price_diff = algarve - nice)
+```
+
+### Generate null distribution and visualise
+
+```{r}
+null_distribution <- let_prices %>% 
+  specify(price ~ location) %>%               # does price depend on location?
+  hypothesise(null = "independence") %>%      # H0 there is no dependence
+  generate(reps = 1000, type = "permute") %>% # permute to shuffle labels
+  calculate(stat = "diff in means",
+            order = c("algarve", "nice"))     # algarve - nice
+```
+
+```{r}
+null_distribution %>% 
+  visualise() +
+  shade_p_value(
+    obs_stat = observed_stat$price_diff,
+    direction = "greater"
+  )
+```
+
+### Calculate p value
+
+```{r}
+p_value <- null_distribution %>% 
+  get_p_value(
+    obs_stat = observed_stat$price_diff,
+    direction = "greater"
+  ) %>% 
+  pull()
+
+format.pval(p_value)
+```
+
+p < 0.0001
+
+### Conclude
+
+Our p value for our observed stat is lower than our significance level. We may reject H0 in favour of HA: Holiday let prices are more expensive in the Algarve than in comparable lets in Nice
+
+# Practice
+> On average, is the price of 2-bedroom, 14-day holiday apartment lets in Florence significantly lower than that of comparable lets in Corfu?
+
+## Define test and alpha
+
+H0 = mean(price_florence) - mean(price_corfu) >= 0 
+HA = mean(price_florence) - mean(price_corfu) < 0
+
+alpha = 0.05
+
+## Calculate sample statistic
+
+```{r}
+corfu <- read_csv("data/corfu.csv")
+florence <- read_csv("data/florence.csv")
+```
+
+```{r}
+let_prices <- bind_rows(list(
+  "corfu" = corfu,
+  "florence" = florence
+), .id = "location") %>% 
+  select(location, price)
+```
+
+```{r}
+observed_stat <- let_prices %>% 
+  group_by(location) %>% 
+  summarise(mean_price = mean(price)) %>% 
+  pivot_wider(names_from = location, values_from = mean_price) %>% 
+  mutate(price_diff = florence - corfu)
+```
+
+
+## Generate null distribution and visualise
+```{r}
+null_distribution <- let_prices %>% 
+  specify(price ~ location) %>% 
+  hypothesise(null = "independence") %>%
+  generate(2000, type = "permute") %>% 
+  calculate(stat = "diff in means",
+            order = c("florence", "corfu"))
+
+visualise(null_distribution) +
+  shade_p_value(observed_stat$price_diff, "less")
+```
+
+
+## Calculate p value
+```{r}
+p_value <- null_distribution %>% 
+  get_p_value(
+    obs_stat = observed_stat$price_diff,
+    direction = "less"
+  ) %>% 
+  pull()
+
+format.pval(p_value, )
+```
+
+## Conclude
+
+p approaches 1, therefore we can not reject our null hypothesis: lets in Corfu are most likely not more expensive than in Florence.
+
+# 2 Sample Paired
+
+Paired means a row in Sample A relates to a row in Sample B
+
+Amazon                        Waterstones
+The Catcher in the Rye        The Catcher in the Rye
+
+Before Treatment              After Treatment
+Test Subject: A               Test Subject: A
+
+We're going to consider textbook prices sold from two sellers. One at a campus bookshop, one at Amazon. We want to know:
+
+> Is there a significant difference between the prices for new texts offered by the campus bookshop vs the prices for the same texts on Amazon
+
+Let's assume the opposite. That there is no difference between the prices of texts from the two sellers. We'd expect mean_campus - mean_amazon = 0, forming our null hypothesis.
+
+```{r}
+textbooks <- read_csv("data/ucla_textbooks_f18.csv") %>% 
+  janitor::clean_names()
+
+head(textbooks, 10)
+```
+
+## Wrangle data
+
+Extra step in the process for paired samples :
+
+Do a calculation that represents the question to allow the row to contain just one value of interest, allowing you to treat it the same as a one sample mean test.
+
+In this case, doing `bookstore_new - amazon_new` calculates the difference we require, and we can just look at the mean of this one value, bringing a row of 2 observations down to a row of 1 observation.
+
+```{r}
+diff_textbooks <- textbooks %>% 
+  select(textbook_isbn, bookstore_new, amazon_new) %>% 
+  mutate(price_diff = bookstore_new - amazon_new) %>% 
+  drop_na(price_diff)
+```
+
+## Define test and alpha
+
+H0 = mean_price_diff = 0
+HA = mean_price_diff != 0 (Two-tailed test)
+
+alpha = 0.05
+
+## Calculate observed stat
+
+```{r}
+observed_stat <- diff_textbooks %>% 
+  summarise(mean_price_diff = mean(price_diff))
+```
+
+
+## Generate null distribution and visualise
+
+```{r}
+null_distribution <- diff_textbooks %>% 
+  specify(response = price_diff) %>% 
+  hypothesise(null = "point", mu = 0) %>% 
+  generate(5000, type = "bootstrap") %>% 
+  calculate(stat = "mean") 
+
+null_distribution %>% 
+  visualise() +
+  shade_p_value(obs_stat = observed_stat$mean_price_diff,
+                direction = "both")
+```
+
+## Calculate p-value
+
+```{r}
+null_distribution %>% 
+  get_p_value(observed_stat$mean_price_diff,
+              direction = "both")
+```
+
+## Conclusion
+
+p value = 0.038
+alpha = 0.05
+
+p_value < alpha, therefore we can reject our null hypothesis and conclude it is likely there is a significant difference between campus book prices and those on Amazon. 

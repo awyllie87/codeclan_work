@@ -1,0 +1,111 @@
+---
+title: "minilab"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+
+heart <- read_csv("data/heart.csv")
+```
+
+```{r}
+skimr::skim(heart)
+```
+
+```{r}
+heart %>% 
+  ggplot(aes(x = thalach)) +
+  geom_histogram() +
+  geom_boxplot()
+```
+
+```{r}
+heart %>% 
+  ggplot(aes(x = exang)) +
+  geom_bar() +
+  scale_x_discrete(breaks = c(0, 1))
+```
+
+```{r}
+exang_patients <- heart %>% 
+  filter(exang == 1)
+
+heart_summary <- heart %>%
+  summarise(mean_thalach = mean(thalach),
+            exang_prob = nrow(exang_patients) / n())
+
+```
+
+```{r}
+sample_50 <- heart %>% 
+  rep_sample_n(50)
+
+exang_patients_sample <- sample_50 %>% 
+  filter(exang == 1)
+
+heart_summary_sample <- sample_50 %>%
+  summarise(mean_thalach = mean(thalach),
+            exang_prob = sum(exang == 1) / n()) %>% 
+  select(-replicate)
+
+sample_errors <- heart_summary_sample - heart_summary
+```
+
+```{r}
+rep_sample_50 <- heart %>% 
+  rep_sample_n(50, reps = 5000)
+
+exang_patients_re_sample <- rep_sample_50 %>% 
+  filter(exang == 1)
+
+rep_sample_summary <- rep_sample_50 %>% 
+  summarise(mean_thalach = mean(thalach),
+            exang_prob = sum(exang == 1) / n())
+```
+
+```{r}
+rep_sample_summary %>% 
+  ggplot(aes(x = mean_thalach)) +
+  geom_histogram()
+
+rep_sample_summary %>% 
+  ggplot(aes(x = exang_prob)) +
+  geom_histogram(col = "white",
+                 binwidth = 0.02)
+```
+
+```{r}
+std_errors <- rep_sample_summary %>% 
+  summarise(sd_mean_thalach = sd(mean_thalach),
+            sd_exang_prob = sd(exang_prob))
+```
+
+```{r}
+rep_sample_100 <- heart %>% 
+  rep_sample_n(100, reps = 5000)
+
+rep_sample_summary_100 <- rep_sample_100 %>% 
+  summarise(mean_thalach = mean(thalach),
+            exang_prob = sum(exang == 1) / n())
+
+std_errors_100 <- rep_sample_summary_100 %>% 
+  summarise(sd_mean_thalach = sd(mean_thalach),
+            sd_exang_prob = sd(exang_prob))
+
+rep_sample_200 <- heart %>% 
+  rep_sample_n(200, reps = 5000)
+
+rep_sample_summary_200 <- rep_sample_200 %>% 
+  summarise(mean_thalach = mean(thalach),
+            exang_prob = sum(exang == 1) / n())
+
+std_errors_200 <- rep_sample_summary_200 %>% 
+  summarise(sd_mean_thalach = sd(mean_thalach),
+            sd_exang_prob = sd(exang_prob))
+
+std_error <- std_errors %>% 
+  rbind(std_errors_100, std_errors_200)
+```
+

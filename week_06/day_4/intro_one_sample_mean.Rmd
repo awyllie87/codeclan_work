@@ -1,0 +1,202 @@
+---
+title: "Intro to Hypothesis Testing"
+output: html_notebook
+---
+
+# One Sample Tests - Mean
+
+Confidence Intervals:
+
+>Over time, 95% of the Confidence Intervals will include the population mean
+
+Hypothesis Testing lets us answer specific questions about population parameters given a sample of the population. *Note:* if we have access to the population, we don't need to perform *inferential statistics* 
+
+Given a sample of 1250 credit records, can we reliably say that the mean credit score of the population is 450?
+
+From a sample of 20,000 adults, can we reliably say the mean height of adults in Scotland is 170cm?
+
+From a sample of 200 tortoises, can we sat that tortoises from David island have larger shells than tortoises from Al island?
+
+## Ingredients of a Hypothesis Test
+
+- a sample or group of samples
+- a question
+- a threshold that we'll use to determine if our result is significant enough
+
+## Starting point -- investigating the sample
+
+```{r}
+library(tidyverse)
+library(infer)
+```
+
+```{r}
+books <- read_csv("data/books.csv") %>% 
+  janitor::clean_names()
+
+skimr::skim(books)
+```
+## The question
+
+The mean average_rating for books in the Goodreads database in 2016 was 3.93. 
+
+Does the mean of books from 2020 (using our sample) differ significantly from the 2016 value?
+
+What does the distribution of average ratings look like?
+
+```{r}
+books_tidy <- books %>% 
+  drop_na(average_rating)
+
+ggplot(books_tidy, aes(x = average_rating)) +
+  geom_histogram(colour = "white")
+
+ggplot(books_tidy, aes(x = average_rating)) +
+  geom_boxplot()
+```
+
+The distribution of average ratings looks to be left-skewed, centred around 3.93ish.
+
+## Steps of a Hypothesis Test
+
+Data: sample of Goodreads data from 2020 database
+Question: Does the average rating differ significantly from 3.93?
+
+###1. Define our test and significance level (0.01 -- strict or 0.05 -- less strict)
+
+H0 (the null hypothesis) - the current mean average rating of books is the same as the mean average ratomg of books in 2016
+
+HA (sometimes H1) - the alternative hypothesis - the current mean average rating of books is NOT the same as the average rating of books in 2016
+
+As a rule, the null hypothesis represents the conservative stance: business as usual, no change, nothing of interest is happening.
+
+By contrast, the alternative hypothesis states: something interesting is happening.
+
+H0: mean_average_rating == 3.93
+HA: mean_average_rating != 3.93
+
+Significance level for this test - 0.05
+
+###2. Calculate our test statistic 
+
+What is the statistic of interest from your sample (what is the mean_average_rating in 2020?)
+
+```{r}
+observed_stat <- books_tidy %>% 
+  summarise(mean_average_rating = mean(average_rating))
+
+observed_stat
+```
+
+mean_average_rating = 3.9375..., which is slightly higher than the mean for 2016. Is this higher than 3.93 by enough to be classed as statistically significant? Could this have just been a lucky sample? Or does this represent a higher average rating for 2020 books?
+
+###3. Generate null distribution
+
+Generate the null distribution:
+
+If the null hypothesis were true. What would the sampling distribution look like? What kind of result would we get from sampling from the imagined world where the mean average rating of books in 2020 was 3.93.
+
+Using `infer`...
+
+Generate the null distribution by simulating the world where H0 is true (mean = 3.93)
+
+```{r}
+null_distribution <- books_tidy %>% 
+  specify(response = average_rating) %>%        # response = what we care about
+  hypothesise(null = "point", mu = 3.93) %>%    
+  generate(reps = 2000, type = "bootstrap") %>% # type will change for different tests
+  calculate(stat = "mean") 
+```
+
+```{r}
+null_distribution %>% 
+  visualise(bins = 25)
+```
+
+Visualise observed statistic on null distribution
+
+```{r}
+null_distribution %>% 
+  visualise(bins = 25) +
+  shade_p_value(obs_stat = observed_stat$mean_average_rating,
+                direction = "both") # direction depends on your hypotheses
+```
+
+We see the observed stat indicated by the vertical red line.
+
+###4. Calculate p-value
+
+How likely is it to see a result as extreme as your observed result, if H0 is true?
+
+```{r}
+null_distribution %>% 
+  get_p_value(
+    obs_stat = observed_stat$mean_average_rating,
+    direction = "both"
+  )
+```
+
+A low p-value (close to 0) means it was unlikely to see your obs stat given H0.
+
+###5. Use p-value to reject or fail to reject H0
+
+alpha (significance level) = 0.05
+
+If p is less than or equal to alpha, we may reject H0 in favour of HA.
+
+Since p = 0.02 is less than our significance level, we may reject H0 in favour of HA: books from 2020 differ in average rating when compared with books from 2016.
+
+#Practice
+
+>Do books in Spanish have a `mean(average_rating)` significantly less than 3.96?
+
+## Define test 
+
+H0: mean_average_rating - 3.96 >= 0
+HA: mean_average_rating - 3.96 < 0
+
+alpha = 0.05
+
+## Calculate statistic
+
+```{r}
+observed_stat <- books_tidy %>% 
+  filter(language_code == "spa") %>% 
+  summarise(mean_average_rating = mean(average_rating))
+
+observed_stat
+```
+
+## Generate null distribution
+
+```{r}
+null_distribution <- books_tidy %>% 
+  filter(language_code == "spa") %>% 
+  specify(response = average_rating) %>%        # response = what we care about
+  hypothesise(null = "point", mu = 3.96) %>%    
+  generate(reps = 2000, type = "bootstrap") %>% # type will change for different tests
+  calculate(stat = "mean") 
+```
+
+## Calculate p-value
+
+```{r}
+null_distribution %>% 
+  get_p_value(
+    obs_stat = observed_stat$mean_average_rating,
+    direction = "less"
+  )
+
+null_distribution %>% 
+  visualise(bins = 25) +
+  shade_p_value(obs_stat = observed_stat$mean_average_rating,
+                direction = "less")
+```
+
+## Use p-value to reject or fail to reject H0
+
+alpha = 0.05
+p_value = 0.165
+
+0.165 < 0.05 is false, therefore we must fail to reject H0 and we can not say books in Spanish have a mean rating significantly less than 3.96
+

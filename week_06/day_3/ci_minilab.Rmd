@@ -1,0 +1,82 @@
+---
+title: "Confidence Intervals mini lab"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(infer)
+
+houses <- read_csv("data/ames.csv") %>% 
+  clean_names()
+```
+#Question 2
+>Plot a histogram of sale_price. Is the distribution normal?
+
+```{r}
+houses %>% 
+  ggplot(aes(x = sale_price)) +
+  geom_histogram()
+```
+
+Not a normal distribution.
+
+# Question 3
+>Calculate the population parameter mean of sale_price. Store it in a variable, as we’ll need this value later when we check if each CI contains the parameter value or not.
+
+```{r}
+mean_sale_price <- houses %>% 
+  summarise(mean_sale_price = mean(sale_price)) %>% 
+  pull()
+```
+
+# Question 4
+Now we are going to: 
+- take 1000 random samples each of size 100 from sale_price in ames 
+- create a boostrap sampling distribution of mean(sale_price) from each 100-observation sample (use 1000 reps) 
+- calculate the 95% CI for each bootstrap distribution - store the upper and lower bounds of the CI in a tibble called results
+
+Use the infer workflow to generate the bootstrap distributions and CIs. This code will be pretty hard to write. Think about wrapping the sample creation and infer code in a for loop to generate 1000 random samples and CIs. Create an empty results tibble before the loop, and bind_rows() to it every time you generate a new set of CI bounds.
+
+```{r}
+sample_2000 <- houses %>% 
+  rep_sample_n(100, reps = 1000)
+```
+
+```{r}
+results <- tibble()
+
+for(i in 1:1000){
+  
+  sample_100 <- houses %>% 
+    rep_sample_n(100)
+  
+  infer_resample <- sample_100 %>% 
+    specify(response = sale_price) %>% 
+    generate(reps = 1000, type = "bootstrap") %>% 
+    calculate(stat = "mean")
+  
+  sample_ci <- infer_resample %>% 
+    get_ci(level = 0.95, type = "percentile")
+  
+  results <- results %>% 
+    bind_rows(sample_ci)
+}
+
+results <- results %>% 
+  mutate(sample_no = row_number()) %>% 
+  select(sample_no, lower_ci, upper_ci)
+```
+
+
+```{r}
+results <- results %>% 
+  mutate(popn_param_in_ci = if_else(mean_sale_price >= lower_ci & 
+                                      mean_sale_price <= upper_ci, TRUE, FALSE))
+
+results %>% 
+  group_by(popn_param_in_ci) %>% 
+  summarise(propn = n() / nrow(results))
+```
+

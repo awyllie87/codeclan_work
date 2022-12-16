@@ -1,0 +1,64 @@
+---
+title: "Confidence Intervals"
+output: html_notebook
+---
+
+```{r}
+library(infer)
+library(janitor)
+library(tidyverse)
+
+telco <- read_csv("data/telecomms_churn.csv") %>% 
+  clean_names()
+
+summary_pop <- telco %>%
+  summarise(
+    mean_monthly_charges = mean(monthly_charges), 
+    mean_tenure = mean(tenure),
+    prop_churn = mean(churn == "Yes")
+  ) 
+
+sample_200 <- telco %>% 
+  rep_sample_n(size = 200)
+
+summary_sample_200 <- sample_200 %>% 
+  summarise(mean_monthly_charges = mean(monthly_charges),
+            mean_tenure = mean(tenure),
+            prop_churn = mean(churn == "Yes"))
+
+```
+
+```{r}
+sample_200 <- read_csv("data/telecomms_churn_200_sample.csv")
+```
+
+```{r}
+infer_resample <- sample_200 %>% 
+  specify(response = tenure) %>% 
+  generate(reps = 5000, type = "bootstrap") %>% 
+  calculate(stat = "mean")
+```
+
+```{r}
+infer_ci_95 <- infer_resample %>% 
+  get_ci(level = 0.95, type = "percentile")
+```
+
+```{r}
+sample_200 %>% 
+  summarise(mean = mean(tenure))
+```
+
+```{r}
+mean_infer <- infer_resample %>% 
+  summarise(mean = mean(stat))
+```
+
+
+
+```{r}
+infer_resample %>% 
+  visualise(bins = 30) +
+  shade_ci(endpoints = infer_ci_95)
+```
+
