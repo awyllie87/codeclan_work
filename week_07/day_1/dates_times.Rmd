@@ -1,0 +1,91 @@
+---
+title: "Dates and Times"
+output: html_notebook
+---
+
+```{r}
+"2023-01-01"
+as.Date("2023-01-01")
+```
+
+```{r}
+library(tidyverse)
+library(lubridate)
+
+today() + 13
+today() + days(13)
+today() + months(2)
+today() + years(2)
+
+today() + 1 - today()
+
+now()
+
+now() + hours(2)
+```
+
+```{r}
+netflix <- read_csv("data/netflix.csv")
+```
+
+```{r}
+netflix_fixed <- netflix %>% 
+  mutate(date_added = mdy(date_added))
+
+netflix_fixed <- netflix_fixed %>% 
+  mutate(day = day(date_added),
+         month = month(date_added, label = TRUE, abbr = FALSE),
+         year = year(date_added),
+         .after = date_added)
+
+netflix_fixed <- netflix_fixed %>% 
+  mutate(weekday = wday(date_added, label = TRUE, abbr = FALSE),
+         .after = day)
+
+netflix_fixed <- netflix_fixed %>% 
+  mutate(made_date = make_datetime(year, month, day, hour = 1),
+         .after = date_added)
+
+netflix_simple <- netflix_fixed %>%
+  select(title, date_added:year)
+```
+
+## Time spans
+
+`Difftime`: represents days
+`Period`: weeks / months / days
+`Duration`: exact number of seconds
+
+```{r}
+netflix_simple %>% 
+  select(date_added) %>% 
+  mutate(time_difftime = today() - date_added,
+         .before = 1) %>% 
+  mutate(time_period = as.period(today() - date_added),
+         time_years = as.numeric(time_period, "years"),
+         time_hours = as.numeric(time_period, "hours"))
+```
+
+### Durations
+
+```{r}
+netflix_simple %>% 
+  select(date_added) %>% 
+  mutate(time_duration = as.duration(today() - date_added))
+```
+
+### Timezones
+
+```{r}
+# OlsonNames() will shwo you all the timezones
+
+ymd_hms("2023-09-13 10:22:01", tz = "US/Arizona")
+```
+
+```{r}
+netflix_simple %>% 
+  select(date_added) %>% 
+  mutate(date_tz_1 = force_tz(date_added, tzone = "Asia/Singapore"),
+         date_tz_2 = with_tz(date_added, tzone = "Asia/Singapore"))
+```
+
