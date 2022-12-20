@@ -1,0 +1,202 @@
+---
+title: "Spatial Data"
+output: html_notebook
+---
+
+# Geospatial Analysis / Visualisation in R
+
+```{r}
+library(tidyverse)
+library(sf)
+```
+
+An example dataset from the sf package:
+
+```{r}
+north_carolina = st_read(system.file("shape/nc.shp", package = "sf"))
+```
+Spatial data looks a bit like our usual rectangular data, but with a geometry column attached.
+
+1 row per "feature" -- geometric thing (a state, a county, a country, a motorwar, a flightpath, a city)
+
+n columns for attributes fo the feature - (how many new born babies in that county, the population of that county, the name of the river, the id of the plane on the flightpath)
+
+```{r}
+county_geometries <- north_carolina %>% 
+  st_geometry()
+```
+
+```{r}
+# the first geometry
+county_geometries[[1]]
+
+plot(county_geometries[[1]])
+```
+
+Geometries are made of:
+
+an instruction (type of geometry)
+a point / series of points made using x-y co-ordinates
+
+Types of geometries allowed: The Big 7
+
+1. POINT((-81.47 36.23))
+2. LINESTRING ((-81.47 36.23, -81.54 36.27))
+3. POLYGON - first co-ord = last co-ord
+ (( -81.47276 36.23436, ... , -81.47276 36.23436)))
+4. MULTIPOINT
+5. MULTILINESTRING
+6. MULTIPOLYGON ((multiple enclosed shapes))
+7. GEOMETRY COLLECTION - can have any amount of the previous 6 geometries
+
+- we use geom_sf()
+
+```{r}
+ggplot(north_carolina) + 
+  geom_sf(aes(fill = AREA), colour = "white") +
+  geom_sf_text(label = north_carolina$NAME, colour = "white")
+```
+
+```{r}
+library(rgeos)
+library(rnaturalearth)
+library(rnaturalearthdata)
+```
+
+```{r}
+world <- ne_countries(scale = "medium", type = "countries",
+                      returnclass = "sf")
+
+world %>% 
+  head(6)
+```
+
+```{r}
+ggplot(world) +
+  geom_sf(aes(fill = pop_est), size = 0.1, colour = "black") +
+  scale_fill_viridis_c(trans = "sqrt") +
+  theme_void()
+```
+
+## Subsetting Simple Features
+
+What if we only care about one particular country?
+
+Can subset sf, just like filtering for particular rows, using dplyr. This time each row is a country
+
+```{r}
+faeroe_is <- world %>% 
+  filter(name == "Faeroe Is.")
+
+ggplot(faeroe_is) +
+  geom_sf()
+```
+
+A really nice thing about natural earth packages. We can use ne_states to get regions in countries.
+
+```{r}
+uk <- ne_states(country = "United Kingdom", returnclass = "sf")
+africa <- ne_countries(continent = "Africa", returnclass = "sf")
+
+ggplot(uk) +
+geom_sf()
+
+ggplot(africa) +
+  geom_sf(aes(fill = pop_est))
+
+world %>% 
+  filter(name == "United Kingdom") %>% 
+  ggplot() +
+  geom_sf()
+```
+
+
+
+
+## `coord_sf()` to zoom in, or change co-ordinate reference system
+
+`expand = FALSE` means don't add a little bit more to the plotting area
+
+```{r}
+uk %>% 
+  ggplot() +
+  geom_sf(aes(fill = geonunit)) +
+  coord_sf(xlim = c(-15, 5),
+           ylim = c(49.5, 61.5),
+           expand = FALSE)
+```
+
+```{r}
+world %>% 
+  ggplot() +
+  geom_sf(aes(fill = income_grp)) +
+  coord_sf(xlim = c(-102.15, -74.12),
+           ylim = c(7.65, 33.97),
+           expand = FALSE) +
+  geom_sf_text(aes(label = name), size = 2)
+```
+
+## Leaflet
+
+- Interactive Geospatial Visualisation
+
+```{r}
+library(leaflet)
+```
+
+Individual points (not from data)
+
+```{r}
+first_map <- leaflet() %>% 
+  addTiles() %>% # adds OpenStreetMap base map by default
+  addMarkers(lng = 174.768, lat = -36.852,
+             popup = "The Birthplace of R")
+```
+
+```{r}
+first_map
+```
+
+Getting values from data
+
+```{r}
+library(jsonlite)
+
+colorado_data_url <- "https://data.colorado.gov/resource/j5pc-4t32.json?&county=BOULDER"
+
+water_data_df <- fromJSON(colorado_data_url) %>%
+  jsonlite::flatten(recursive = TRUE) 
+
+# turn columns to numeric and remove NA values
+water_data_df_clean <- water_data_df %>%
+  mutate(across(c(amount, location.latitude, location.longitude), as.numeric)) %>%
+  filter(!is.na(location.latitude))
+
+water_data <- water_data_df_clean %>% 
+  select(
+    station_name, amount, starts_with("location")
+  )
+```
+
+Plotting individual points on a map:
+
+```{r}
+leaflet(water_data) %>% 
+  addTiles() %>% 
+  addCircleM(lng = ~location.longitude, lat = ~location.latitude,
+             radius = ~amount, # radius of circle
+             weight = 0.1 # thickness of edge of circle
+             )
+```
+
+## Other Options ..
+
+Clustering
+
+```{r}
+leaflet(water_data) %>% 
+  addTiles() %>% 
+  addCircleMarkers(lng = ~location.longitude, lat = ~location.latitude,
+                   clusterOptions = markerClusterOptions())
+```
+
