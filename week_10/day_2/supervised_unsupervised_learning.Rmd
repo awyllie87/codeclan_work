@@ -1,0 +1,244 @@
+---
+title: "Supervised and Unsupervised Learning"
+output: html_notebook
+---
+
+## Learning objectives
+
+- understand what variable engineering is
+- understand what dummy variables are and how to create and use them
+- understand the difference between raw and derived variables
+- know what feature scaling is and how to use it
+
+## Variable engineering
+
+Variable engineering works to create new features to improve the performance of your model
+
+AKA feature engineering 
+
+```{r}
+library(tidyverse)
+library(fastDummies)
+
+grades <- read_csv("data/grades.csv")
+```
+
+```{r}
+colSums(is.na(grades))
+```
+Dataset contains missing data.
+
+Could ignore the variables with any missing data
+    - not idea if only a few NAs present as we risk removing potentially significant sources of data
+    
+Could remove the data points with our missing values (i.e. the rows)
+    - we risk losing valuable data from other variables within this row
+
+Could impute to replace the NAs with some standardised value
+    - but how to decide on this value?
+    - for categorical data, we could assign a generic "unknown" value
+    - for continuous data, NAs are harder to replace - mean? median? mode?
+        can't guarantee accuracy but at least we won't be adding in outliers
+        
+```{r}
+grades <- grades %>% 
+    mutate(across(c("take_home", "final"), ~ coalesce(.x, mean(.x, na.rm = TRUE))))
+```
+
+
+## Recap 2: Dealing with outlies
+
+Almost the same choices as above: remove them, consider them separately, replace with imputation.
+
+Remember z-scores (measured in standard deviations from the mean) - z = +3/-3 could be considered outliters
+
+## Recap 3: Transformations
+
+Our real data may not be normally distributed, but we need it to be for the model (assumption). We can use log transformations to do this.
+
+## Now we can do the "real" variable engineering
+
+Okay so we've replaced msising values (and dealt with outliers and transformations if needed), our continuous data is ready to go (bar one step later on)
+
+What about categorical data? Need to convert to numberical representations for models such as regression.
+
+e.g. subject variable: can't just leave it as words - needs to be numeric
+
+- English = 1, Physics = 2, Maths = 3? No, because the computer thinks that Maths is now greater than Physics and English, which would mess up the regression model.
+
+y = a * x + b
+final = subject_gradient * subject + intercept
+This would mean Maths (being the highest) would always lead to the highest final grade
+
+What about categories with order?
+
+Small = 1, Medium = 2, Large = 3? No, because the computer assumed the levels have equal distance between them -- which may not be the case.
+
+We need to create a new column for each subject with 0s or 1s depending of it the subject of that row matches the subject of that column.
+
+```{r}
+grades_subject_dummy <- grades_subject_dummy %>%
+  mutate(subject_phys = ifelse(subject == "physics", 1, 0)) %>%
+  mutate(subject_maths = ifelse(subject == "maths", 1, 0)) %>%
+  mutate(subject_fren = ifelse(subject == "french", 1, 0)) %>%
+  mutate(subject_bio = ifelse(subject == "biology", 1, 0))
+```
+
+Now we can drop the redundant subject column:
+
+```{r}
+grades_subject_dummy <- grades_subject_dummy %>% 
+    select(-subject)
+
+grades_subject_dummy
+```
+
+## The dummy variable trap
+
+We've actually done more work than we really needed to here:
+- we've created a dummy variable for every possible value, but in fact it's one more than we need
+
+- if we remove one of the dummy variables, e.g. subject_engl, then when all the other subj columns are 0, we'd know that the subject for that row was english
+
+In general, **if we have n values, we only need n-1 dummy variables**
+
+## Dummying with a package
+
+Now we've assigned dummy variables by hand, let's use an R package to do it for us.
+
+`fastDummies` gives us access to the `dummy_cols()` function to create dummy variables for us.
+
+Needs 3 arguments:
+    1) The column(s) to dummy
+    2) `remove_first_dummy` set to TRUE to avoid the dummy variable trap
+    3) `remove_selected_columns` set to TRUE to remove the unneeded variable (here, subject)
+    
+```{r}
+grades_subject_dummy2 <- grades %>% 
+    dummy_cols(select_columns = "subject",
+               remove_first_dummy = TRUE,
+               remove_selected_columns = TRUE)
+
+head(grades_subject_dummy2)
+```
+
+This wrangled and engineered dataset looks the same as before when we did it manually (and no dummy variable trap!). Usually we don't need this step when regression modelling in R as it does it for us (i.e. using `lm()` as we will see)
+
+Only have 5 levels in the subect category here. But what if we had 30?
+This would make a very wide table with all those dummy variables!
+Can group low frequency categories into a new category prior if needed.
+
+## Binning
+
+Let's look at the `final` mark/score. This is represented as a continuous variable, but this might not be the best format for this info if we want to use it in a model.
+    - 99 students in this dataset, which would mean 99 unique values (likely)
+        - can make modelling difficult
+    - can split our data into discrete groups (while also mitigating the impact of outliers) by "binning"
+    
+F: score < 50
+C: 50 <= score < 60
+B: 60 <= score < 70
+A: 70 <= score
+
+```{r}
+grades_final_dummy <- grades %>% 
+  mutate(grade_a = ifelse(final >= 70, 1, 0)) %>% 
+  mutate(grade_b = ifelse(final >= 60 & final < 70, 1, 0)) %>% 
+  mutate(grade_c = ifelse(final >= 50 & final < 60, 1, 0)) %>% 
+  select(-final)
+
+grades_final_dummy
+```
+
+This can be time consuming to do manually if we have many bins. The function `cut()` can also be useful in creating bins, but we won't cover that today.
+
+## Raw vs derived variables
+
+When we gather data, like our test results here, the dataset representing it is made up of **raw variables** - i.e. those which represent something gathered directly from the source
+
+Some of these may be continuous (like the scores above) but many will be categorical
+    - in some cases, the raw variables will be enough for our model, but not always.
+
+If that is the case, we need to calculate **derived variables** e.g. binning scores.
+    
+    e.g. data of birth is the raw variable from which we can derive age (the derived variable)
+    
+## Variable scaling
+
+What if one variable is measured in 1000s and another in 1s?
+With no context, the larger number will have a bigger impact than it should on our model.
+
+To address this we bring all our variables down to the same magnitude (**variable scaling**)
+
+This ensures that all our variables lie within the same interval
+    - usually between 0 and 1, or -1 and 1
+    - crucially, they **retain some difference in size**
+    
+One method for this is **standardisation**:
+    centres the column at 0 with standard deviation (SD) of 1.
+    - brings the variable closer to the normal distribution
+    
+```{r}
+# Calculate the mean and SD of the variable
+assignment_mean <- mean(grades$assignment)
+assignment_sd <- sd(grades$assignment)
+```
+
+The standardisation formula is (xi - mean of x) / SD of x
+
+Then we use our standardisation formula in a mutate to overwrite our assignment column with the standardised version:
+
+```{r}
+grades_assign_stand <- grades %>% 
+    mutate(assignment_scaled = (assignment - assignment_mean) / assignment_sd)
+```
+
+Let's compare distribution plots
+
+```{r}
+grades %>% 
+    ggplot(aes(x = assignment)) +
+    geom_density() +
+    geom_vline(xintercept = mean(grades$assignment), size = 1, col = "red") +
+    ggtitle("Raw data")
+```
+
+```{r}
+grades_assign_stand %>% 
+    ggplot(aes(x = assignment_scaled)) +
+    geom_density() +
+    geom_vline(xintercept = mean(grades_assign_stand$assignment_scaled), size = 1, col = "red") +
+    ggtitle("Standardised data")
+```
+
+Same distribution, but now the mean is 0 (and SD is 1)
+
+```{r}
+# 1. Standardisation of assignment (default)
+grades %>% 
+  mutate(assignment = scale(assignment)) # default is to centre by the mean and
+# scale by the SD of the assignment column, don't need to specify other arguments
+# as this is sufficient000
+```
+
+```{r}
+# 2. Min-max scaling - calculates and subtracts the minimum value for every feature,
+# before scaling by the interval
+assignment_min <- min(grades$assignment)
+assignment_max <- max(grades$assignment)
+assignment_interval <- assignment_max - assignment_min
+
+grades %>% 
+    mutate(assignment = scale(assignment, center = assignment_min,
+                              scale = assignment_interval))
+```
+
+```{r}
+# 3. Mean-value normalisation - calculates and subtracts the mean for every feature
+# (as with standardisation), but is often scaled by the interval rather than the SD
+
+grades %>% 
+    mutate(assignment = scale(assignment, scale = assignment_interval))
+# the default here is to centre by the mean so we don't need to specify the argument
+```
+

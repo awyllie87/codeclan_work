@@ -1,0 +1,293 @@
+---
+title: "Multiple Regression"
+output: html_notebook
+---
+
+```{r}
+library(mosaic) # for model plots
+library(mosaicData) # for our RailTrail data
+library(janitor)
+library(tidyverse)
+library(GGally) # for pair plot
+library(ggfortify) # for model diagnostics
+```
+
+# Elements of Multiple Regression
+
+- multiple terms in regression equation
+- interpretation of multiple regression
+- categorical predictors (+ interpretation)
+- interactions of predictors
+
+Simple Linear Regression:
+
+height ~ weight
+
+Multiple Linear Regression:
+
+volume ~ avgtemp + cloudiness + weekend
+
+bill_length ~ species + bill_depth
+
+ice_cream ~ temperature + sunny_day + location_glasgow
+
+## setup - understanding the data
+
+```{r}
+RailTrail
+```
+
+## Data Preparation (Variable Engineering)
+
+- dayType isn't snakecase
+- cloudcover isn't one word
+- some columns contain the same information (duplicate info)
+- the seasonal columns are encoded as integers even though that are logical/boolean type (TRUE / FALSE) [there's also no winter in this data]
+
+```{r}
+railtrail_clean <- RailTrail %>% 
+    clean_names() %>% 
+    rename(cloudage = cloudcover) %>% 
+    mutate(across(spring:fall, as.logical))
+```
+
+```{r}
+head(railtrail_clean)
+```
+
+`alias()` can detect perfect collinearity (this is when a variab;e can be constructed by another / a combination of other variables in the data)
+
+```{r}
+# volume ~ (. means every other variable)
+alias(volume ~ ., data = railtrail_clean)
+```
+
+From our alias table we see that 
+    - avgtemp is a combination of lowtel and hightemp
+    - fall is work-outable from spring and summer
+    - day_type is work-outable from weekday
+    
+```{r}
+railtrail_trim <- railtrail_clean %>% 
+    select(-c(lowtemp, hightemp, fall, day_type))
+```
+    
+```{r}
+# check there are no aliassed variables
+alias(volume ~ ., data = railtrail_trim)
+```
+
+## a pairs plot
+
+- a tool for examining the relationship between all pairs of variables
+
+```{r}
+ggpairs(railtrail_trim, progress = FALSE)
+```
+
+What are we looking for?
+
+Significant relationships between:
+
+- our outcome and any predictor
+- any predictor and another predictor
+
+Variables we might want to try modelling:
+
+- cloudage
+- avgtemp
+- precip
+- Summer
+- weekday
+
+## Starting point: simple linear regression
+
+volume ~ avgtemp
+
+cor = 0.427
+
+volume = b0 + b1 * avgtemp
+
+```{r}
+model <- lm(volume ~ avgtemp, data = railtrail_trim)
+
+autoplot(model)
+```
+
+```{r}
+summary(model)
+```
+Model results:
+
+avgtemp is a significant term in our model
+avgtemp only provides 0.18 (18%) proportion of variance explained in volume
+
+rse = 115.9
+
+```{r}
+ggplot(railtrail_trim, aes(avgtemp, volume)) +
+    geom_point()
+```
+
+volume = b0 + b1 * avgtemp
+
+b0 IS INTERCEPT COEFFICIENT ESTIMATE
+B1 IS AVGTEMP COEFFICIENT ESTIMATE
+
+volume = 99.602 + 4.802 * 60 = 387.7
+
+# Building a (hopefully) better model: multiple regression
+
+Adding a categorical variable to a linear regression
+
+Task - 2 mins
+Try plotting an appropriate visualisation to determine whether user volume is associated with the weekday predictor.
+
+```{r}
+railtrail_trim %>% 
+    ggplot(aes(x = weekday, y = volume)) +
+    geom_col()
+```
+Can also grav the correlation coefficient:
+
+```{r}
+railtrail_trim %>% 
+    summarise(cor = cor(weekday, volume))
+```
+-0.2932675
+
+a weak negative correlation (expect more people using the trail on weekends compared to weekdays)
+
+so, to add weekday to the model --
+
+volume = b0 + b1 * avgtemp + b2 * weekday
+
+```{r}
+model_2 <- lm(
+    volume ~ avgtemp + weekday,
+    data = railtrail_trim
+)
+
+autoplot(model_2)
+summary(model_2)
+```
+
+plot 1: no clear pattern to residuals
+plot 2: residuals appear normally distributed
+plot 3: again, some evidence of heteroskedasticity but variance appears reasonably uniform.
+
+b0 = 163.022  
+b1 = 4.541
+b2 = -70.320
+
+how many users if avgtemp is 65 on a saturday?
+
+volume = b0 + b1 * avgtemp + b2 * weekday
+
+volume = 163.02 + 4.54 * 65 + -70.32 * 0 = 458 [we'd expect 70 fewer people on a weekday]
+
+```{r}
+plotModel(model_2)
+```
+
+We call this a __parallel slopes model__, whether weekday is "on" or "off" the slope of the line does not change.
+
+Task - 5 mins
+
+Try adding the summer categorical predictor to the existing model with avgtemp and weekday.
+
+How many lines do you expect to see in this model?
+Is this a parallel slopes model? [Hint try plotModel() on the model object]
+Is the addition of this predictor justified [Hint what is the p-value of b_summer]?
+
+```{r}
+model_3 <- lm(
+    volume ~ avgtemp + weekday + summer,
+    data = railtrail_trim
+)
+
+autoplot(model_3)
+summary(model_3)
+plotModel(model_3)
+```
+
+As summer does not seem to be a statistically significant term in our model (perhaps due to high variation being explained from avgtemp already), we won't add it as a term
+
+Current model:
+
+volume ~ avgtemp + weekday
+
+- interactions: terms involving two or more predictors
+
+Does the volume of users on the trail depend on whether or not it's a weekday and how does temperature factor into this?
+
+```{r}
+railtrail_trim %>% 
+    ggplot(aes(x = avgtemp, y = volume, colour = weekday)) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE)
+```
+What does this say?
+
+The two lines have different gradients. On a weekday, increasing the avgtemp results in a larger increase in users.
+
+How do we add this into our model?
+
+- add an interaction
+
+volume = b0 + b1 * avgtemp + b2 * weekday + b3 * avgtemp * weekday
+
+equation of the two lines:
+
+when weekday = 0
+volume = b0 + b1 * avgtemp
+
+when weekday = 1 
+volume = b0 + b1 * avgtemp + b2 + b3 * avgtemp
+
+or in it's "simplest" form
+volume = (b0 + b2) + (b1 + b3) * avgtemp
+
+formula is volume varies with average temp and weekday and the interaction of avg temp and weekday
+
+```{r}
+model_interaction <- lm(
+    formula = volume ~ avgtemp + weekday + avgtemp:weekday,
+    data = railtrail_trim
+)
+```
+
+```{r}
+summary(model_interaction)
+```
+```{r}
+autoplot(model_interaction)
+```
+
+While the diagnostic plots look fine (ish - still a bit of heteroskedasticity in Scale-Location), the p-vlaues suggest the interaction is not statistically significant.
+
+```{r}
+model_3terms <- lm(
+    volume ~ avgtemp + weekday + cloudage,
+    data = railtrail_trim
+)
+```
+
+```{r}
+summary(model_3terms)
+```
+Interpreting this
+
+volume = b0 + b1 * avgtemp + b2 * weekday + b3 * cloudage
+
+y = ax + bz + c 
+
+how many users on a saturday if 5 cloudage and 55F
+
+200.1 + 5.2 * 55 + -47.9 * 0 + -16 * 4
+
+200.1 + 5.2 * 55 + -16 * 5
+
+406
+422
+411

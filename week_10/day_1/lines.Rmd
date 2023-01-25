@@ -1,0 +1,138 @@
+---
+title: "Lines"
+output: html_notebook
+---
+
+## Learning objectives
+
+- understand independent and dependent variables
+- understand the shape of lines
+- understand how we might fit a line to data
+
+## Variables
+
+We are interested in **bivariate** data
+    - one **independent** variable - AKA a predictor/explanatory variable
+        - which we call x by convention
+    - one **dependent** variable - AKA response/outcome variable
+        - we call y by convention##
+        
+## Lines
+
+The general form of a line is
+
+    y = a * x + b
+    
+a: this is the gradient (i.e. "how many units of y do we travel if we travel one x unit to the right?)
+Gradient also known as slope
+
+e.g. a = 6 means we go 6 units upward along y for every 1 unit rightward along x
+e.g. a = -4 means we go 4 units downward along y for every 1 unit rightward along x
+
+b: is called the **intercept** (i.e. "where does the line cross the y-axis?")
+
+```{r}
+library(tidyverse)
+
+# let's write our own line function
+
+line <- function(x, a, b){
+    return (a * x + b)
+}
+
+# set up x vector and use line() to compute y values
+
+data <- tibble(
+    x = seq(-5, 5, 0.1),
+    y = line(x, a = 1, b = 0)
+)
+
+data %>% 
+    ggplot(aes(x, y)) +
+    geom_line(col = "red") +
+    geom_vline(xintercept = 0) +
+    geom_hline(yintercept = 0)
+```
+
+## Fitting a line to data
+
+Let's go back to our sunny beach day example:
+    - independent variable : temperature
+    - dependent variable: ice cream sales
+    
+    Can temperature predict ice cream sales?
+    
+Why do we want to fit a function to our data?
+1) Data is complicated - if we can represent it with a single mathematical function, that makes it much easier to understand (e.g. 1 degree in temp increase relates to an increase of 5 in ice cream sales)
+
+```{r}
+noisy_line <- read_csv("data/noisy_line.csv")
+
+noisy_line_plot <- noisy_line %>% 
+    ggplot(aes(x, y)) +
+    geom_point()
+
+noisy_line_plot
+```
+
+Now let's calculate the centroid position (mean x, mean y) and add it to the plot:
+
+```{r}
+centroid <- noisy_line %>% 
+    summarise(
+        x = mean(x),
+        y = mean(y)
+    )
+
+centroid
+```
+
+```{r}
+noisy_line_plot <- noisy_line_plot +
+    geom_point(aes(x = centroid$x, y = centroid$y), col = "red", size = 5)
+
+noisy_line_plot
+```
+
+So our best fit line has to pass through the centroid. You can think of it as finding the answer to the question
+    "which line passing through the red dot (centroid) lies 'closest' to all the data points?"
+    
+equation of a line is y = (a * x) + b
+we want to find the intercept b:
+    b = y - (a * x)
+    
+Let's do this manually:
+
+```{r}
+get_intercept <- function(shape, centroid_x, centroid_y){
+    return(centroid_y - slope * centroid_x)
+}
+```
+
+```{r}
+slope = 2.3
+noisy_line_plot +
+    geom_abline(slope = slope, intercept = get_intercept(slope, centroid$x, centroid$y))
+```
+
+```{r}
+noisy_line_plot +
+    # lm = linear model
+    geom_smooth(method = "lm", se = FALSE)
+```
+
+## The principle of parsimony
+
+AKA Occam's razor
+
+In a general sense, it says that:
+
+*Given two or more 'explanations' of comparable quality, the simplest explanation is the best one*
+
+In terms of statistics, it tells us that:
+    - fitting models should have minimal parameters (i.e. a straight line over a wiggly line)
+    - experiments should have as few assumptions as possible
+    - linear models should be tried prior to non-linear models
+    
+Remember, however:      *Everything should be made as simple as possible, but not simpler*
+

@@ -1,0 +1,116 @@
+---
+title: "Correlation"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+mtcars %>% 
+    select(wt, mpg) %>% 
+    glimpse()
+```
+
+```{r}
+mtcars %>% 
+    ggplot(aes(x = wt, y = mpg)) +
+    geom_point()
+```
+
+## Pearson correlation coefficient - denoted by `r`
+
+- r has no units (it's just a number)
+- it takes bounded values (betweem -1 and 1)
+    - approaching r = 1 when variables are strongly positively correlated
+    - approaching r = -1 when strongly negatively correlated
+    - near r = 0 when not correlated
+    
+We can calculate r using the `cor()` function (Pearson r is the default)
+
+```{r}
+noisy_bivariate <- function(noise = 1, gradient = 1){
+  x <- runif(n = 200, min = 0, max = 10)
+  y <- gradient * x + 10
+  y_scatter <- noise * 4 * rnorm(n = 200)
+  y <- y + y_scatter
+  data = tibble(x, y)
+
+  r <- round(cor(x, y), 4)
+  title <- paste(
+    "noise = ", noise,
+    ", gradient = ", gradient,
+    ", r = ", r
+  )
+  
+  data %>%
+    ggplot(aes(x = x, y = y)) +
+    geom_point() +
+    xlim(0, 10) +
+    ylim(min(c(min(y), 0)), max(c(max(y), 10))) +
+    ggtitle(title)
+  
+}
+
+
+noisy_bivariate(noise = 0, gradient = 2)
+```
+
+The magnitude of r: 
+
+0 - no correlation
+0.01 - 0.19 - very weak
+0.2 - 0.39 - weak
+0.4 - 0.59 moderate
+0.6 - 0.79 - strong
+0.8 - 0.99 - very strong
+1 - perfect
+
+Let's calculate the correlation coefficient for `wt` and `mpg` in mtcars
+
+```{r}
+mtcars %>% 
+    summarise(cor(wt, mpg))
+```
+
+Order of variables doesn't matter
+
+##word of warning
+
+The correlation coefficient is a blunt instrument - we can run `cor()` on any bivariate dataset and get a number out - regardless of any real trend in the data (if any)
+
+## The most famous phrase in statistics!
+
+**Correlation is not causation**
+
+Just because two variables are **correlated** does not mean that one of them **causes** the change in the other
+
+Consider `sunglasses_sold` and the amount of `ice_cream_sold` at a beach store in one week
+
+- there's a good chance these will be correlated
+- but does this mean that the amount of sunglasses sold **causes** the amount of ice cream sold to increase?? No! We don't have a strong enough basis to make this conclusion
+
+## The 'third variable' problem
+
+The simplest realistic model might be that **both** these variables are themselves casually related with a third **hidden variable**
+
+What possible third variable could cause an increase in ice cream sold and sunglasses sold?
+
+AKA **confounding variable**
+
+## The 'directionality' problem
+
+Even if two variables **are** causally related, there is nothing in the statistics to indicate **directionality** of causation
+
+e.g. we measure `amount_of_exercise` in a given week and `happiness` in a given week
+
+and we discover positive correlation between these
+
+we might be tempted to say that more exercise leads to happier people - but maybe happier people exercise more!
+
+## How do we prove causation?
+
+Ideally, with a randomised controlled experiment
+
+These give us the basis to say whether or not our 'intervention' variable **causes** any change we find in the 'outcome' variables.

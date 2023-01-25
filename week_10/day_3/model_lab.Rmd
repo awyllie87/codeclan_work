@@ -1,0 +1,201 @@
+---
+title: "Manual Model Development - Lab"
+output: html_notebook
+---
+
+```{r}
+library(car)
+library(tidyverse)
+library(modelr)
+library(GGally)
+library(ggfortify)
+```
+
+```{r}
+prestige <- Prestige
+```
+
+```{r}
+glimpse(prestige)
+
+colSums(is.na(prestige))
+```
+
+```{r}
+prestige_trim <- prestige %>% 
+    drop_na() %>% 
+    select(-census)
+```
+
+```{r message=FALSE}
+ggpairs(prestige_trim, aes(colour = type, alpha = 0.5), progress = FALSE)
+```
+
+High correlation, high significance with Education.
+High correlation, high significance with Income
+low negative correlation with women, not marked as significant
+there seems to be a visible correlation between type and prestige: bc almost exclusively bottom half, prof top, wc sort of middle but skews bottom
+
+```{r}
+mod1a <- lm(prestige ~ education,
+            data = prestige_trim)
+
+summary(mod1a)
+autoplot(mod1a)
+```
+
+```{r}
+mod1b <- lm(prestige ~ type,
+            data = prestige_trim)
+
+summary(mod1b)
+autoplot(mod1b)
+```
+
+prestige ~ education (mod1a):
+r² = 0.7508
+std error = 8.578 
+predictor is statistically significant: p < 0.001 
+
+paired plots mostly ok, bit of a u-shape in RvF
+
+prestige ~ type (mod1b):
+r² = 0.6976
+std error = 9.499 
+predictor is statistically significant across all levels: - p < 0.001
+                                                            p < 0.001
+                                                            p < 0.01
+
+paired plots mostly ok, Q-Q maybe a little erratic towards the top?
+
+education is a larger contributor, so makes more sense as the place to start.
+
+model:
+
+prestige = b0 + b1 * education
+prestige = -10.8409 + 5.3884 * education
+
+jobs start at negative prestige, but score increases by 5.38 per year of education
+
+```{r}
+prestige_remaining_resid <- prestige_trim %>% 
+    add_residuals(model = mod1a) %>% 
+    select(-c(prestige, education))
+```
+
+```{r message=FALSE}
+prestige_remaining_resid %>% 
+    ggpairs(aes(colour = type, alpha = 0.5))
+```
+
+significant strong positive correlation between residuals and income
+significant strong negative correlation between women and income
+
+```{r}
+mod2a <- lm(prestige ~ education + income,
+            data = prestige_trim)
+
+summary(mod2a)
+autoplot(mod2a)
+```
+
+```{r}
+mod2b <- lm(prestige ~ education + type,
+            data = prestige_trim)
+
+summary(mod2b)
+autoplot(mod2b)
+```
+
+again type is competitive, but not as much as its rival. 
+
+prestige ~ education + income (mod2a):
+r² = 0.814
+std error = 7.45  
+predictors are statistically significant: p < 0.001 for both
+
+paired plots mostly ok, bit of a negative trend in the second half of RvF
+
+prestige ~ education + type (mod1b):
+r² = 0.7975
+std error = 7.814  
+predictors have issues in significance: education remains p < 0.001, but the only significant level of job type is now wc
+
+paired plots mostly ok, little hump in RvF
+
+income by far a better addition to the model.
+
+model formula:
+
+
+prestige = b0 + (b1 * education) + (b2 * income)
+prestige = -7.621 + (4.292 * education) + (0.001 * income)
+
+base prestige of -7.6, increases by 4.292 per year of education and by 0.001 per dollar of income
+
+```{r}
+prestige_remaining_resid <- prestige_trim %>% 
+    add_residuals(mod2a) %>% 
+    select(-c(education, income, prestige))
+```
+
+```{r}
+ggpairs(prestige_remaining_resid, aes(colour = type, alpha = 0.5))
+```
+
+small negative correlation between women and the remaining residuals
+
+```{r}
+mod3a <- lm(prestige ~ education + income + women,
+            data = prestige_trim)
+
+summary(mod3a)
+autoplot(mod3a)
+```
+
+```{r}
+mod3b <- lm(prestige ~ education + income + type,
+            data = prestige_trim)
+
+summary(mod3b)
+autoplot(mod3b)
+```
+
+Type might actually win!
+
+prestige ~ education + income + women (mod3a):
+r² = 0.8144 (effectively no change)
+std error = 7.482   
+women is not a statistically significant addition to the predictors (p = 0.6679)
+
+paired plots mostly ok, bit of a wiggle in RvF
+
+prestige ~ education + income + type (mod3b):
+r² = 0.8349 (+0.02)
+std error = 7.095   
+predictors have issues in significance: now of the individual levels are significant, in fact bc (intercept) is p > 0.9!
+
+paired plots mostly ok, bit of a curve in RvF
+
+```{r}
+summary(mod3b)
+anova(mod2a, mod3b)
+```
+Analysis of Variance telling me that type is in fact significant (p < 0.01), so can justify being included in the model
+
+New model formula:
+
+bc is the reference class, which is now the intercept (b0)
+
+prestige = -0.6229292 + (3.6731661 * education) + (0.0010132 * income) + (6.0389707 * (type == prof)) + (-2.7372307 * (type == wc))
+
+```{r}
+prestige_resid <- prestige_trim %>% 
+    add_residuals(mod3b) %>% 
+    select(-prestige)
+```
+
+```{r message=FALSE}
+coplot("education":"income", data = prestige_resid)
+```
+

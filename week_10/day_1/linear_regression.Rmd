@@ -1,0 +1,254 @@
+---
+title: "Simple linear regresssion"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+- understand regression by carrying out simple linear regression
+- explore the topic of "least squares"
+- understand how formulas are written in R
+- use `lm()`
+
+Regression - a process that lets us fit a line (or line-type shape) to a cloud of data points
+
+An example using one dependent variable and one independent variable. One variable we want to explain, and one we are using to explain (response / predictor)
+
+## Height and Weight
+
+Our goal is to understand the relationship between height and weight so that we can:
+
+- describe the data, and understand the association between our variables
+- predict an individual's height given their weight (if there is a significant association)
+
+after taking a sample of individuals heights and weights, we could perform SLR (simple linear regression) taking:
+
+weight as our explanatory variable (x-axis)
+height as our outcome variable (y-axis)
+
+```{r}
+height <- c(176, 164, 181, 168, 195, 185, 166, 180, 188, 174)
+weight <- c(82, 65, 85, 76, 90, 92, 68, 83, 94, 74 )
+sample <- tibble(
+  weight,
+  height
+)
+
+sample %>%
+  ggplot(aes(x = weight, y = height)) +
+  geom_point()
+```
+
+```{r}
+sample %>% 
+    summarise(cor = cor(weight, height))
+```
+
+y = gradient * x + intercept
+
+y_fit = b0 + b1 * x
+
+fit_height = b0 + b1 * weight
+
+What is the best equation of a line fitting this data? How will we define "best"?
+
+## A line of best fit
+
+```{r}
+line <- function(x, b0, b1){
+    
+    b0 + b1 * x
+}
+```
+
+Let's pick some arbitrary values of b0 = 95, b1 = 1 just to see an example fitted line:
+
+```{r}
+sample %>% 
+    mutate(fit_height = line(weight, 95, 1)) %>% 
+    ggplot(aes(x = weight, y = height)) +
+    geom_point() +
+    geom_line(aes(y = fit_height), colour = "red") +
+    geom_segment(aes(xend = weight, yend = fit_height))
+```
+
+How wrong are we?
+
+How far away is each measurement from our fitted line? - A `residual`
+
+residual = observed_height - fit_height
+A definition of "best" is the "least worst". So our line of best fit, will minimise the overall residual value.
+
+Lets add our residuals
+
+```{r}
+sample %>% 
+    mutate(fit_height = line(weight, b0 = 95, b1 = 1)) %>% 
+    mutate(resid = height - fit_height) %>% 
+    summarise(sum_resid = sum(resid^2)) # take the square to remove "cancellation effect" of large but opposite residuals
+```
+
+```{r}
+b0 = 96.8
+b1 = 1
+
+sample %>% 
+    mutate(fit_height = line(weight, b0, b1)) %>% 
+    mutate(resid = height - fit_height) %>% 
+    ggplot(aes(x = weight, y = height)) +
+    geom_point() +
+    geom_line(aes(y = fit_height), colour = "red") +
+    geom_segment(aes(xend = weight, yend = fit_height))
+
+sample %>% 
+    mutate(fit_height = line(weight, b0 = b0, b1 = b1)) %>% 
+    mutate(resid = height - fit_height) %>% 
+    summarise(sum_resid = sum(resid^2))
+```
+
+```{r}
+b0 = 57
+b1 = 1.5
+
+sample %>% 
+    mutate(fit_height = line(weight, b0, b1)) %>% 
+    mutate(resid = height - fit_height) %>% 
+    ggplot(aes(x = weight, y = height)) +
+    geom_point() +
+    geom_line(aes(y = fit_height), colour = "red") +
+    geom_segment(aes(xend = weight, yend = fit_height))
+
+sample %>% 
+    mutate(fit_height = line(weight, b0 = b0, b1 = b1)) %>% 
+    mutate(resid = height - fit_height) %>% 
+    summarise(sum_resid = sum(resid^2))
+```
+
+```{r}
+b0 = 77
+b1 = 1.25
+
+sample %>% 
+    mutate(fit_height = line(weight, b0 = b0, b1 = b1)) %>% 
+    mutate(resid = height - fit_height) %>% 
+    summarise(sum_resid = sum(resid^2))
+
+sample %>% 
+    mutate(fit_height = line(weight, b0, b1)) %>% 
+    mutate(resid = height - fit_height) %>% 
+    ggplot(aes(x = weight, y = height)) +
+    geom_point() +
+    geom_line(aes(y = fit_height), colour = "red") +
+    geom_segment(aes(xend = weight, yend = fit_height))
+
+
+```
+
+```{r}
+b0 = 105
+b1 = 0.9
+
+sample %>% 
+    mutate(fit_height = line(weight, b0 = b0, b1 = b1)) %>% 
+    mutate(resid = height - fit_height) %>% 
+    summarise(sum_resid = sum(resid^2))
+
+sample %>% 
+    mutate(fit_height = line(weight, b0, b1)) %>% 
+    mutate(resid = height - fit_height) %>% 
+    ggplot(aes(x = weight, y = height)) +
+    geom_point() +
+    geom_line(aes(y = fit_height), colour = "red") +
+    geom_segment(aes(xend = weight, yend = fit_height))
+
+
+```
+## Performing Linear Regression
+
+```{r}
+lm(formula = height ~ weight,
+   data = sample)
+```
+
+b0 = 102.17
+b1 = 0.93
+
+If I change weight by +1, how does height change?
+
+-> 0.9336
+
+height = 102 + (0.9336 * weight)
+diff_height = 0.9336 * diff_weight
+
+What would be the height of someone weighs 60kg?
+
+```{r}
+102 + (0.9336 * 60)
+```
+## The Patsy Notation (to be continued!)
+
+y ~ x
+
+~: "varies with"
+
+## Better ways of using the model
+
+```{r}
+model <- lm(formula = height ~ weight,
+   data = sample)
+
+# produces a model object; a list we can access by name
+```
+
+```{r}
+model$coefficients
+```
+```{r}
+# fit heights (for observed weights)
+# effectively -- given a specific weight, what value would fit exactly on the line?
+fitted(model)
+```
+using the `predict()` function
+
+```{r}
+predict_at <- data.frame(weight = c(60, 70, 78))
+
+predict(model, newdata = predict_at)
+```
+
+Based on our current model of height, we expect a person weighing 60kg will measure around 160cm.
+
+```{r}
+library(modelr)
+```
+
+`{modelr}`
+
+`add_residuals()`
+`add_predictions()`
+
+```{r}
+sample %>% 
+    add_predictions(model, var = "pred_height") %>% 
+    add_residuals(model, var = "resid_height") %>% 
+  #  summarise(resid_sum_sq = sum(resid_height^2))
+    ggplot(aes(x = weight)) +
+    geom_point(aes(y = height)) +
+    geom_line(aes(y = pred_height), col = "blue")
+```
+
+What about predicting values not in our data (unobserved weights)
+
+```{r}
+predict_at %>% 
+    add_predictions(model)
+
+tibble (
+    weight = 40:120
+) %>% 
+    add_predictions(model)
+```
+

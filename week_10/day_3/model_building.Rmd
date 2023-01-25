@@ -1,0 +1,107 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(ggfortify)
+library(GGally)
+library(fastDummies)
+```
+
+```{r}
+house <- read_csv("data/housing_prices.csv")
+```
+
+
+
+```{r}
+house <- house %>%
+    mutate(rooms_per_house = total_rooms / households,
+           people_per_house = population / households,
+           bedrooms_per_house = total_bedrooms / households,
+           bedrooms_per_person = total_bedrooms / population,
+           rooms_per_person = total_rooms / population,
+           # non_bedrooms = total_rooms - total_bedrooms,
+           prop_bedrooms = total_bedrooms / total_rooms
+    )
+```
+
+```{r}
+house %>% skimr::skim() %>% View()
+```
+
+Observation: lots of the "count" data - non-zero, integer stuff - is highly positively skewed - we should consider log transformations if we're doing linear regression
+
+```{r}
+house_log <- house %>%
+    select(-c(latitude, longitude, ocean_proximity)) %>%
+    mutate(across(everything(), log)) %>%
+    rename_with(~ paste0("log_", .x)) %>%
+    bind_cols(house)
+```
+
+We now have a dataset with a richer feature set.
+Lets start looking for relationships between variables, especially between our response variable and the potential predictors.
+
+We can use ggpairs for this.
+
+```{r}
+house_log <- house_log %>%
+    mutate(ocean_prox_sarah = if_else(
+        ocean_proximity %in% c("ISLAND","NEAR BAY","NEAR OCEAN"), "NEAR WATER",
+        ocean_proximity),
+        ocean_prox_jamie = if_else(
+            ocean_proximity %in% c("<1H OCEAN","NEAR BAY","NEAR OCEAN"), "NEAR WATER",
+            ocean_proximity))
+```
+
+ggpiars might give more ideas for variable engineering!
+it's a loop, not a straight road.
+
+```{r message=FALSE}
+house_log %>%
+    select(median_house_value, housing_median_age, median_income, 
+           ocean_prox_sarah, ocean_prox_jamie) %>%
+    ggpairs(aes(fill = ocean_prox_sarah, alpha = 0.5))
+
+# ggsave("ggpairs1.png")
+```
+we can use ggpairs to understand the relationships better and start making candidates for what might be the best predictors
+
+early candidates: income, ocean_prox group, ..., ?age
+
+```{r message=FALSE, warning=FALSE}
+house_log %>% 
+    select(median_house_value,
+           log_bedrooms_per_house,
+           log_households,
+           log_total_bedrooms,
+           log_prop_bedrooms,
+           log_bedrooms_per_person,
+           log_population,
+           ocean_prox_sarah) %>% 
+    ggpairs(aes(fill = ocean_prox_sarah,
+                colour = ocean_prox_sarah,
+                alpha = 0.5))
+```
+
+Let's start by finding the best single-predictor model for log(median_house_price)
+Candidates: log(_)median_income, ocean_prox(_group)
+
+```{r}
+model1a <- lm(log(1 + median_house_value) ~ log(1 + median_income),
+data = house_log)
+
+summary(model1a)
+```
+
+```{r}
+mod1b <- lm(median_house_value ~ ocean_proximity,
+            data = house_log)
+
+summary(mod1b)
+```
+
+
