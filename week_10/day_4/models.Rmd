@@ -1,0 +1,284 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(ggfortify)
+library(modelr)
+library(caret)
+library(leaps)
+```
+
+
+```{r}
+savings <- CodeClanData::savings
+```
+
+All models are wrong, but some are useful -- George Box
+
+Models should be as simple as possible, but no simpler
+
+Another word for making a model simple is _bias_
+The opposite -- inserting too many variable -- is called _variance_
+
+This leads us to the `bias - variance trade-off`
+
+> Fit the data, not the noise
+
+The more we "fit the data" the more bias we have
+The more we "fit the noise" the more variance we have
+
+```{r}
+savings
+
+lm_overfit <- lm(savings ~ ., data = savings)
+lm_wellfit <- lm(savings ~ salary + age + retired, data = savings)
+lm_underfit <- lm(savings ~ salary, data = savings)
+```
+
+```{r}
+par(mfrow = c(2,2))
+
+plot(lm_overfit)
+plot(lm_wellfit)
+plot(lm_underfit)
+```
+
+Find the R-squared, adjusted R-squared, AIC and BIC score for:
+    The well-fitted model
+model_wellfit <- lm(savings ~ salary + age + retired, data = savings)
+    The over-fitted model
+model_overfit <- lm(savings ~ ., data = savings)
+    The under-fitted model
+model_underfit <- lm(savings ~ salary, data = savings)
+Do the results you found match with your expectations?
+
+```{r}
+summary(lm_wellfit)$r.squared
+AIC(lm_wellfit)
+BIC(lm_wellfit)
+```
+
+```{r}
+summary(lm_overfit)$r.squared
+AIC(lm_overfit)
+BIC(lm_overfit)
+```
+
+```{r}
+summary(lm_underfit)$r.squared
+AIC(lm_underfit)
+BIC(lm_underfit)
+```
+R2
+```{r}
+summary(lm_wellfit)$r.squared
+summary(lm_overfit)$r.squared
+summary(lm_underfit)$r.squared
+```
+
+Adjusted R2
+```{r}
+summary(lm_wellfit)$adj.r.squared
+summary(lm_overfit)$adj.r.squared
+summary(lm_underfit)$adj.r.squared
+```
+
+AIC
+```{r}
+AIC(lm_wellfit)
+AIC(lm_overfit)
+AIC(lm_underfit)
+```
+
+BIC
+```{r}
+BIC(lm_wellfit)
+BIC(lm_overfit)
+BIC(lm_underfit)
+```
+
+## Test and train sets
+
+One dataset
+
+Let's say we have 1,000,000 rows. 
+
+Split the data into two separate datasets.
+
+Training set
+Test set
+
+What are each of these for?
+How much data should we apportion to each?
+
+- We want to use as much as possible for the training. 
+    - 70 / 30
+    - 80 / 20
+- Use the rest for testing (or validation)
+- If the model performs well on the test set:
+    - we expect it to also perform well on the training set
+    - if it performs poorly, model is likely over- or under-fit
+
+How do we combat overfitting?
+    - Theory. 
+        - Sometimes this is easy: salary probably affects savings
+        - Sometimes less clear: location affects savings???
+        
+```{r}
+set.seed(9)     # dont do this in real life
+
+n_data <- nrow(savings)
+
+test_index <- sample(1:n_data, size = n_data * .2)
+
+test <- slice(savings, test_index)
+train <- slice(savings, -test_index)
+```
+
+```{r}
+#train the model
+lm1 <- lm(savings ~ salary + age + retired, data = train) # model using the training set only
+
+#create predictions for the test set
+pred_test <- test %>% 
+    add_predictions(lm1) %>% 
+    select(savings, pred)
+```
+
+```{r}
+mse_test <- mean((pred_test$pred - test$savings)^2)
+```
+
+```{r}
+pred_train <- train %>% 
+    add_predictions(lm1) %>% 
+    select(savings, pred)
+
+mse_train <- mean((pred_train$pred - train$savings)^2)
+```
+
+## K-fold cross validation
+
+K = 5       5 partitions
+K = 10      10 partitions
+
+uses `caret` library
+
+```{r}
+cv_10_fold <- trainControl(method = "cv",
+                           number = 10,
+                           savePredictions = TRUE)
+
+model <- train(savings ~ salary + age + retired,
+               data = savings,
+               trControl = cv_10_fold,
+               method = "lm")
+
+model
+```
+
+```{r}
+model$resample
+
+mean(model$resample$RMSE)
+mean(model$resample$Rsquared)
+```
+
+```{r}
+model_allvariables <- train(savings ~ .,
+               data = savings,
+               trControl = cv_10_fold,
+               method = "lm")
+```
+
+```{r}
+model_allvariables$resample
+
+mean(model_allvariables$resample$RMSE)
+mean(model_allvariables$resample$Rsquared)
+```
+
+## Automated model development
+
+### Learning objectives
+
+- Understand _forward_ selection, _backwards_ selection and _best subset_ selection
+- Know how to use the `{leaps}` package.
+- Understand the _limitations_ of _automated_ model selection
+
+- Start with the model containing only the intercept (the so-called _'null' model_)
+- At each step, check all predictors not currently in the model, and find the one that raises r2(or adjusted r2) the most when it is included
+- Add this predictor to the model
+- Keep note of the number of predictors in the model and the current model formula
+- Go on to include another predictor, to 
+
+### Backward selection
+
+Start with the model containing all possible predictors (the so-called __'full' model__)
+
+- At each step, check all predictors in the model, and find the one that lowers r2 the _least_ when it is removed.
+- Remove this predictor from the model
+- Keep note of the number of predictors in the model and the current model formula
+- Go on to remove another predictor, or stop if all predictors in the model have been remove
+
+### Best-subsets
+
+particularly seductive
+
+Checks every possible variation of predictors
+Scales REALLY BADLY.
+Can take coicidences as real!
+
+```{r}
+insurance <- CodeClanData::insurance
+```
+
+```{r}
+regsubsets_forward <- regsubsets(charges ~ ., data = insurance,
+                                 nvmax = 8,
+                                 method = "forward")
+
+regsubsets_forward
+sum_regsubsets_forward <- summary(regsubsets_forward)
+```
+
+```{r}
+sum_regsubsets_forward$which
+plot(regsubsets_forward, scale = 'adjr2')
+```
+
+Let's plot the _r2_ values of each of the mdoels found by _forward selection_ as a function of 
+
+```{r}
+plot(sum_regsubsets_forward$rsq, type = "o", pch = 20)
+```
+
+```{r}
+regsubsets_backward <- regsubsets(charges ~ ., data = insurance, nvmax = 8, method = "backward")
+regsubsets_exhaustive <- regsubsets(charges ~ ., data = insurance, nvmax = 8, method = "exhaustive")
+
+mod_without_region <- lm(charges ~ age + bmi + smoker, insurance)
+mod_with_region <- lm(charges ~ age + bmi + smoker + region, insurance)
+
+summary(mod_with_region)
+summary(mod_without_region)
+```
+
+```{r}
+anova(mod_with_region, mod_without_region)
+```
+
+
+```{r}
+plot(regsubsets_exhaustive, scale = "adjr2")
+```
+
+
+## Human intervention is needed...
+
+These models have not been tested for statistical significance.
+More importantly, so far, they have been subject to the ADF method
+    - choices _MUST_ reflect theory
