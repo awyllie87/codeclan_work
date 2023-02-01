@@ -1,0 +1,217 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(modelr)
+library(pROC)
+library(caret)
+```
+
+```{r}
+mortgage_data <- read_csv("data/mortgage_applications.csv") %>% 
+  clean_names()
+```
+
+```{r}
+mortgage_3pred_model <- glm(accepted ~ tu_score + employed + age,
+                                        mortgage_data , family = binomial)
+
+mortgage_data_with_3pred <- mortgage_data %>% 
+  add_predictions(mortgage_3pred_model, type = "response")
+
+mortgage_data_with_3pred
+```
+
+### 
+
+-   Be able to plot a **receiver operating characteristic** (ROC) curve
+-   and calculate the area **under the curve** (AUC) and the **Gini
+    coefficient**
+-   See **cross validation** applied to logistic regression
+-   Understand that **expected value** calculations can be used to set
+    an optimal threshold
+
+Plot the thresholds on the axes of sensitivity vs 1-specificity TPR vs
+FNR y x
+
+```{r}
+roc_obj_3pred <- mortgage_data_with_3pred %>% 
+  roc(response = accepted, predictor = pred)
+
+roc_curve <- ggroc(data = roc_obj_3pred, legacy.axes = TRUE) +
+  coord_fixed() +
+  labs(y = "Sensitivity (TPR)",
+       x = "1 - Specificity (TNR) [FNR]")
+```
+
+```{r}
+classifier_data <- tibble(
+  threshold = roc_obj_3pred$thresholds,
+  sensitivity = roc_obj_3pred$sensitivities,
+  specificity = roc_obj_3pred$specificities
+)
+
+classifier_data
+```
+
+```{r}
+ggplot(classifier_data, aes(1-specificity, sensitivity, colour = threshold)) +
+  geom_line() +
+  coord_equal() +
+  scale_colour_gradient(low = "blue", high = "red")
+```
+
+Let's fit another classifier and add its curve to the ROC plot
+
+```{r}
+mortgage_1pred_model <- glm(accepted ~ tu_score,
+                                        mortgage_data , family = binomial)
+
+mortgage_data_with_1pred <- mortgage_data %>% 
+  add_predictions(mortgage_1pred_model, type = "response")
+
+roc_obj_1pred <- mortgage_data_with_1pred %>% 
+  roc(response = accepted, predictor = pred)
+
+roc_curve1_3 <- ggroc(data = list(roc_obj_1pred, roc_obj_3pred), legacy.axes = TRUE) +
+  coord_fixed() +
+  labs(y = "Sensitivity (TPR)",
+       x = "1 - Specificity (TNR) [FNR]")
+
+mortgage_1pred_age <- glm(accepted ~ age,
+                                        mortgage_data , family = binomial)
+
+mortgage_data_with_age <- mortgage_data %>% 
+  add_predictions(mortgage_1pred_age, type = "response")
+
+roc_obj_age <- mortgage_data_with_age %>% 
+  roc(response = accepted, predictor = pred)
+
+roc_curve1_3_age <- ggroc(data = list("TU Score" = roc_obj_1pred, "Age" = roc_obj_age, "3 Preds" = roc_obj_3pred), legacy.axes = TRUE) +
+  coord_fixed() +
+  labs(y = "Sensitivity (TPR)",
+       x = "1 - Specificity (TNR) [FPR]")
+```
+
+### Area Under the Curve (AUC)
+
+```{r}
+auc(roc_obj_3pred)
+auc(roc_obj_1pred)
+```
+
+### Gini Coefficient
+
+Transformation of the AUC such that the values are constrained between
+-1 and 1
+
+$$
+Gini = 2 \times AUC - 1
+$$
+
+```{r}
+gini3 <- 2 * auc(roc_obj_3pred) - 1
+gini1 <- 2 * auc(roc_obj_1pred) - 1
+```
+
+```{r}
+mortgage_data <- mortgage_data %>% 
+  mutate(across(where(is_logical), ~as_factor(tolower(.))))
+```
+
+`trainControl()` K-fold Cross-Validation How many K? 5
+
+```{r}
+mod_form <- accepted ~ tu_score + employed + age
+
+train_control <- trainControl(method = "repeatedcv",
+                              number = 5,
+                              repeats = 100,
+                              savePredictions = TRUE,
+                              classProbs = TRUE,
+                              summaryFunction = twoClassSummary)
+
+model <- train(mod_form,
+               data = mortgage_data,
+               trControl = train_control,
+               method = "glm",
+               family = binomial(link = "logit"))
+```
+
+**expected value**
+
+Is the sum-product of `value * prob`
+
+multiply each value by its probability, then sum them up to get the
+expected value
+
+### Scenario
+
+Company referall campaign. Target mortage applicants. Focus our campaign
+on those that are most likely to be accepted
+
+Contractor gets paid every time they recommend *accept* and the bank
+*does* accept.
+
+*true postitive* (highly eligible applicant correctly identified as such)
+- profit the company a referral fee of `£25`
+- true positive profit *TPP*
+
+*true negative* (a low eligibility applicant corretly identified as such)
+- earns no profit, as no approach is made.
+- true negative profit *TNP*
+
+*false positive* (a low eligibility applicant misidentified as highly eligible)
+- "profits" the company `-£5` due to contact and administration costs
+- false positive profit *FPP*
+
+*false negative* (a highly eligible applicant misidentified as low eligibility)
+- earns no profit, as no approach is made
+- false negative profit *FNP*
+
+```{r}
+classifier_data <- classifier_data %>% 
+  rename(tpr = sensitivity,
+         tnr = specificity) %>% 
+  mutate(fpr = 1 - tnr,
+         fnr = 1 - tpr)
+```
+
+```{r}
+sum(mortgage_data$accepted == "true") / 1000
+
+```
+```{r}
+prob_pos <- mean(mortgage_data$accepted == "true")
+prob_neg <- mean(mortgage_data$accepted == "false")
+
+# profits
+tpp <- 20
+tnp <- 0
+fpp <- -5
+fnp <- 0
+
+classifier_data <- classifier_data %>% 
+  mutate(exp_profit_per_applicant = prob_pos * (tpr * tpp + fnr * fnp) +
+                                    prob_neg * (tnr * tnp + fpr * fpp))
+
+classifier_data %>% 
+  arrange(-exp_profit_per_applicant)
+
+classifier_data %>% 
+  arrange(fpr)
+```
+
+```{r}
+classifier_data %>% 
+  ggplot(aes(threshold, exp_profit_per_applicant)) +
+  geom_line()
+```
+

@@ -1,0 +1,227 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(modelr)
+library(broom)
+library(pROC)
+```
+
+```{r}
+mortgage_data <- read_csv("data/mortgage_applications.csv") %>% 
+  janitor::clean_names()
+```
+
+```{r message=FALSE}
+GGally::ggpairs(mortgage_data)
+```
+
+```{r}
+mortgage_data %>% 
+  ggplot(aes(x = tu_score, y = accepted)) +
+  geom_col()
+
+mortgage_data %>% 
+  ggplot(aes(x = tu_score, y = accepted)) +
+  geom_boxplot() +
+  geom_point(position = position_jitter(height = .1))
+
+mortgage_data %>% 
+  ggplot() +
+  geom_density(aes(x = tu_score))
+```
+
+- probability
+  - defined as success divided by all possibilities
+  - on a d6: 1/6
+  - 0-1 measure of chance of event
+  
+- odds
+  - defined as the probability of success divided by the probability of failure
+  - on a d6: (1/6) / (5/6) = 1/5 or 5 to 1
+  - the ratio of successes to fails
+  
+- odds ratio
+  - Ratio of odds
+  - odds of one event / odds of another event
+
+- ln / log
+  - natural log
+  - A multiplicative scale
+
+- log odds
+  - literally the log of the odds
+  - on a d6: log(1/5) or log(0.2)
+  - What the logistic model returns
+
+- link function
+  - In "logit space" the y axis is in *log odds* units.
+    We need a *link function* to map the logits to our units - which are probabilities. 
+
+- logit 
+  -   *log odds*
+  
+- odds factor
+
+### Logistic Regression
+
+`glm()` Generalised linear model
+
+Know how to use the `glm()` function i nR
+Carry out logistic regression in R
+
+```{r}
+mortgage_data_logreg_model <- glm(accepted ~ tu_score, mortgage_data,
+                                  family = binomial)
+```
+
+```{r}
+summary(mortgage_data_logreg_model)
+```
+
+Coefficients are in __logits__
+
+$$
+ln(odds_{success}(x)) = \beta_0 + \beta_1 x
+$$
+
+```{r}
+(-4.575035 + 0.008475 * 600) %>% 
+  exp()
+```
+
+```{r}
+predict_log <- tibble(tu_score = seq(0, 710, 1)) %>% 
+  add_predictions(mortgage_data_logreg_model, type = 'response')
+```
+
+```{r}
+ggplot(mortgage_data) +
+  geom_jitter(aes(x = tu_score, y = as.integer(accepted)),
+              shape = 1,
+              height = 0.05) +
+  geom_line(aes(x = tu_score, y = pred), data = predict_log, col = "red", linewidth = 2) +
+  labs(y = "Probability")
+```
+
+```{r}
+odds_at_594 <- predict_log %>% 
+  filter(tu_score == 594) %>% 
+  mutate(odds_factor = pred / (1 - pred)) %>% 
+  select(odds_factor)
+```
+
+odds of being accepted with a TU score of 594 = 1.58
+How would those odds change if you score was 50 higher: 644
+
+```{r}
+b_tu_score <- tidy(mortgage_data_logreg_model) %>% 
+  filter(term == "tu_score") %>% 
+  select(estimate)
+
+odds_factor <- exp(b_tu_score * 50)
+
+odds_at_594
+
+odds_at_644 <- odds_factor * odds_at_594
+
+odds_at_644
+
+predict_log %>% 
+  filter(tu_score == 594 | tu_score == 644) %>% 
+  mutate(odds = pred / (1 - pred)) 
+```
+
+```{r}
+2.417739	- 1.582625
+```
+
+
+### Multiple predictors
+
+$$
+\alpha + (\beta_{score} \times {score}) + (\beta_{job} \times {jobstatus})
+$$
+```{r}
+mortgage_data_multi_logreg_model <- glm(accepted ~ tu_score + employed,
+                                        mortgage_data , family = binomial)
+
+summary(mortgage_data_multi_logreg_model)
+
+janitor::clean_names(tidy(mortgage_data_multi_logreg_model))
+```
+
+log odds of being accepted for a mortgage when employed are 1.48 higher
+1.48 *logits* higher
+to convert to odds we `exp()` it
+
+```{r}
+exp(1.484537909)
+```
+to convert from odds to probability:
+
+1 / (1 - e^-lm)
+
+```{r}
+1 / (1 + exp(-(-4.686827492	+ 0.006723941 * 500))) # 500 score, no job
+1 / (1 + exp(-(-4.686827492	+ 0.006723941 * 500 + 1.484537909))) # 500 score, job
+```
+
+```{r}
+# odds of acceptance when employed
+
+b_employed_true <- tidy(mortgage_data_multi_logreg_model) %>% 
+  filter(term == "employedTRUE") %>% 
+  select(estimate)
+
+exp(b_employed_true)
+```
+
+Be able to check for statiscal significane of fitted coefficients via their p-values.
+
+Be able to calculate a _confusion matrix_ to calculate accuracy, and true and false positive rates.
+
+```{r}
+mortgage_3pred_model <- glm(accepted ~ tu_score + employed + age, data = mortgage_data, family = binomial(link = 'logit'))
+
+mortgage_data_with_3pred <- mortgage_data %>%
+  add_predictions(mortgage_3pred_model, type = "response")
+```
+
+```{r}
+threshold <- 0.6
+
+mortgage_data_with_3pred <- mortgage_data_with_3pred %>% 
+  mutate(pred_threshold_0.6 = pred >= threshold)
+
+
+```
+
+### Confusion Matrix
+
+```{r}
+conf_mat <- mortgage_data_with_3pred %>% 
+  tabyl(accepted, pred_threshold_0.6) %>% 
+  adorn_title()
+```
+
+## Accuracy
+
+```{r}
+conf_mat
+
+(179 + 679) / 1000
+```
+Our model was 85.5% accurate
+
+For acuracy to be at its best, we need a "balanced" data set
+
+(nTP + nTN) / n
+
+```{r}
+
+```
+
