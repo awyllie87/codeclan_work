@@ -1,0 +1,86 @@
+---
+title: "Test Mining Lab"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(tidytext)
+library(ggwordcloud)
+library(hcandersenr)
+library(harrypotter)
+library(janeaustenr)
+```
+
+```{r warning = false}
+tlm_book <- hcandersen_en %>% 
+  filter(book == "The little mermaid")
+
+tlm_tokens <- tlm_book %>% 
+  unnest_tokens(word, text) %>% 
+  select(-book)
+
+tlm_wordcount <- tlm_tokens %>% 
+  group_by(word) %>% 
+  summarise(count = n())
+
+tlm_wordcount_nostop <- tlm_wordcount %>% 
+  anti_join(stop_words)
+
+tlm_sentiment <- tlm_wordcount_nostop %>% 
+  left_join(get_sentiments("bing"))
+
+ggwordcloud(tlm_wordcount_nostop$word, tlm_wordcount_nostop$count)
+
+tlm_sentiment %>% 
+  slice_max(count, n = 10) %>% 
+  ggplot(aes(x = word, y = count, fill = sentiment)) +
+  geom_col()
+
+books <- hcandersen_en %>%
+  group_by(book) %>% 
+  group_split(.keep = FALSE) %>%
+  setNames(sort(unique(hcandersen_en$book)))
+
+books$`The little mermaid`
+```
+
+```{r}
+hp_cos <- as.tibble(harrypotter::chamber_of_secrets)
+```
+
+```{r}
+hp_cos_bigram <- hp_cos %>% 
+  unnest_tokens(bigram, value, token = "ngrams", n = 2) %>% 
+  group_by(bigram) %>% 
+  summarise(count = n())
+
+hp_cos_bigram_bing <- hp_cos_bigram %>% 
+  separate(bigram, c("word1", "word2"), sep = " ") %>% 
+  filter(str_detect(word1, "^very"), word2 %in% (get_sentiments("bing"))$word) %>% 
+  arrange(-count)
+```
+
+```{r}
+hp_books <- as.tibble(philosophers_stone) %>% 
+  rbind(as.tibble(c(chamber_of_secrets, prisoner_of_azkaban, goblet_of_fire, half_blood_prince, order_of_the_phoenix, deathly_hallows)))
+```
+
+```{r}
+megabook <- hp_books %>% 
+  rbind(as.tibble(c(hcandersen_en$text, austen_books()$text)))
+
+hcandersen_en$text
+austen_books()$text
+
+glimpse(megabook)
+
+megabook %>% 
+  unnest_tokens(word, value) %>% 
+  group_by(word) %>% 
+  anti_join(stop_words) %>% 
+  summarise(count = n()) %>% 
+  slice_max(count, n = 10)
+```
+
+

@@ -1,0 +1,74 @@
+---
+title: "Lab"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(dendextend)
+library(GGally)
+```
+
+```{r}
+students <- CodeClanData::students_big
+```
+
+```{r}
+glimpse(students)
+```
+```{r}
+students_scale <- students %>% 
+  select(importance_reducing_pollution:importance_internet_access) %>% 
+  mutate(across(everything(), scale))
+
+dis_matrix <- students_scale %>% 
+  dist(method = "euclidean")
+
+clusters <- dis_matrix %>% 
+  hclust(method = "complete")
+
+plot(clusters, hang = -1, cex = 0.7)
+rect.hclust(clusters, k = 2, border = 2:5)
+```
+
+```{r}
+fviz_nbclust(students_scale,
+             FUNcluster = kmeans,
+             method = "wss",
+             nstart = 20)
+
+fviz_nbclust(students_scale,
+             FUNcluster = kmeans,
+             method = "silhouette",
+             nstart = 20)
+
+fviz_nbclust(students_scale,
+             FUNcluster = kmeans,
+             method = "gap_stat",
+             nstart = 20,
+             k.max = 20,
+             iter.max = 20)
+
+
+```
+3 clusters!
+
+```{r}
+students_scale_4 <- students %>% 
+  select(c("importance_reducing_pollution", 
+           "importance_recycling_rubbish", 
+           "importance_conserving_water", 
+           "importance_saving_enery")) %>% 
+  mutate(across(everything(), scale))
+
+students_kmeans <- kmeans(students_scale_4, centers = 2, nstart = 20)
+
+augment(students_kmeans, students) %>% 
+  ggplot(aes(importance_reducing_pollution, importance_recycling_rubbish, colour = .cluster)) +
+  geom_point()
+```
+
+
+

@@ -1,0 +1,273 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(textdata)
+library(tidytext)
+library(janeaustenr)
+```
+
+
+```{r}
+phrases <- c(
+  "Here is some text.",
+  "Again more text",
+  "TEXT is text?"
+)
+
+example_text <- tibble(phrase = phrases,
+                       id = seq_along(phrases))
+
+example_text %>% 
+    unnest_tokens(word, phrase)
+```
+
+```{r}
+
+lines <- 
+c(
+  "Whose woods these are I think I know.",
+  "His house is in the village though;", 
+  "He will not see me stopping here",
+  "To watch his woods fill up with snow."
+)
+
+lines <- tibble(phrase = lines,
+                 id = seq_along(lines))
+
+lines_df <- lines %>% 
+  unnest_tokens(word, phrase)
+
+lines_df %>% 
+  group_by(word) %>% 
+  summarise(count = n()) %>% 
+  filter(count > 1)
+```
+```{r}
+p_p <- tibble(phrase = prideprejudice,
+                 id = seq_along(phrase))
+
+book_pride <- p_p %>% 
+  unnest_tokens(word, phrase)
+
+book_pride %>% 
+  count(word, sort = TRUE)
+```
+
+```{r}
+stop_words %>% 
+  group_by(lexicon) %>% 
+  arrange(word) %>% 
+  slice(1:10) %>% 
+  pivot_wider(names_from = word, values_from = lexicon) %>% 
+  pivot_longer(everything())
+```
+
+```{r}
+book_pride %>% 
+  anti_join(stop_words) %>% 
+  count(word, sort = TRUE)
+
+book_pride %>%
+  anti_join(stop_words %>% 
+              filter(lexicon == "snowball")) %>% 
+  count(word, sort = TRUE)
+```
+
+```{r}
+s_s <- tibble(phrase = sensesensibility,
+                 id = seq_along(phrase))
+
+book_sense <- s_s %>% 
+  unnest_tokens(word, phrase)
+
+book_sense %>% 
+  anti_join(stop_words %>% 
+              filter(lexicon == "snowball")) %>% 
+  count(word, sort = TRUE)
+```
+
+## TF-IDF and n-grams
+
+**Quantitative metrics** and **tokens**
+
+### Objectives
+
+- Understand the definition of *TF-IDF*
+- Be able to work with and calculate TF-IDF scores
+  - maths!
+- Understand the definition of an *n-gram*
+  - different tokens
+- Be able to work with n-grams
+
+```{r}
+sentences <- c(
+  "This is a sentence about cats.",
+  "This is a sentence about dogs.",
+  "This is a sentence about alligators."
+)
+
+sentences_df <- tibble(
+  sentence = sentences, 
+  id = seq_along(sentences)
+)
+
+sentences_tokens <- sentences_df %>% 
+  unnest_tokens(word, sentence)
+```
+
+```{r}
+count(sentences_tokens, word)
+```
+
+### TF-IDF
+
+A statistic that measures the importance of *a word* in a *collection of documents*
+
+```{r}
+sentences_tokens %>% 
+  count(word, id) %>% 
+  bind_tf_idf(term = word, document = id, n)
+```
+
+## TF-IDF across all of Jane Austen's works
+
+```{r}
+titles <- c("Pride and Prejudice", "Sense and Sensibility", "Emma", "Persuasion", "Mansfield Park", "Northanger Abbey")
+
+books <- list(prideprejudice, sensesensibility, emma, persuasion, mansfieldpark,  northangerabbey)
+
+books <- map_chr(books, paste, collapse = ' ')
+str(books)
+```
+
+```{r}
+all_books_df <- tibble(title = titles,
+                       book = books) %>% 
+  unnest_tokens(word, book)
+
+all_books_df
+```
+
+```{r}
+all_books_tf_idf <- all_books_df %>% 
+  count(word, title) %>% 
+  bind_tf_idf(word, title, n)
+```
+
+```{r}
+all_books_tf_idf %>% 
+  group_by(title) %>% 
+  slice_max(tf_idf, n = 5)
+```
+
+## N-grams
+
+So far wwe have discussed **tokens**, where token mean a word
+
+We can use other tokens -- *N-grams*
+
+```{r}
+phrases_df <- tibble(
+  phrase = phrases,
+  id = seq_along(phrases)
+)
+
+phrases_df %>% 
+  unnest_tokens(bigram, phrase, token = "ngrams", n = 2)
+```
+
+```{r}
+p_p %>% 
+  unnest_tokens(bigram, phrase, token = "ngrams", n = 2) %>% 
+  count(bigram, sort = TRUE)
+
+p_p %>% 
+  unnest_tokens(trigram, phrase, token = "ngrams", n = 3) %>% 
+  count(trigram, sort = TRUE)
+
+p_p %>% 
+  unnest_tokens(sentence, phrase, token = "ptb") %>% 
+  count(sentence, sort = TRUE)
+```
+
+```{r}
+emma_df <- tibble(phrase = emma,
+                 id = seq_along(phrase))
+
+emma_df %>% 
+  unnest_tokens(bigram, phrase, token = "ngrams", n = 2) %>% 
+  count(bigram, sort = TRUE) %>% 
+  na.omit() %>% 
+  separate(bigram, c("word1", "word2"), sep = " ") %>% 
+  anti_join(stop_words, c("word1" = "word")) %>% 
+  anti_join(stop_words, c("word2" = "word")) %>% 
+  unite(bigram, word1, word2, remove = TRUE, sep = " ")
+```
+
+```{r}
+bing <- get_sentiments("bing")
+afinn <- get_sentiments("afinn")
+lough <- get_sentiments("loughran")
+nrc <- get_sentiments("nrc")
+```
+
+```{r}
+count(bing, sentiment)
+count(afinn, value)
+count(lough, sentiment)
+
+afinn %>% 
+  filter(value == -5)
+```
+
+```{r}
+pride_sentiments <- p_p_df %>% 
+  inner_join(get_sentiments("bing"))
+
+pride_sentiments %>% 
+  group_by(sentiment, word) %>% 
+  summarise(count = n()) %>% 
+  slice_max(count, n = 10)
+```
+
+```{r}
+emma_df <- tibble(phrase = emma,
+                 id = seq_along(phrase))
+
+emma_df %>% 
+  unnest_tokens(word, phrase) %>% 
+  left_join(get_sentiments("lough")) %>% 
+# anti_join(stop_words) %>% 
+  group_by(sentiment, word) %>% 
+  summarise(count = n()) %>% 
+  filter(sentiment %in% c("positive", "negative") | is.na(sentiment)) %>% 
+  slice_max(count, n = 5)
+```
+
+```{r}
+p_p_afinn <- p_p_df %>% 
+  inner_join(afinn)
+
+sentence_sentiments <- p_p_afinn %>%
+  group_by(word) %>%
+  summarise(
+    mean_sentiment = mean(value)
+  )
+
+sentence_sentiments
+
+ggplot(sentence_sentiments, aes(word, mean_sentiment)) +
+  geom_point(alpha = .1) +
+  geom_smooth()
+```
+
+```{r}
+books <- austen_books() %>% 
+  group_by(book) %>% 
+  group_split()
+```
+

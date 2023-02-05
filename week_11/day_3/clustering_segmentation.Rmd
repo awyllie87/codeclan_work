@@ -1,0 +1,211 @@
+---
+title: "Clustering and Segmentation"
+output: html_notebook
+---
+
+# Clustering and Segmentation
+
+Learning Objectives
+
+- Learn what clustering and segmentation are
+- Know what the differences and similarities between segmentation and clustering
+- Become aware that there are different clustering algorithms and methods
+
+## The What
+
+The main goal fo both segmentation and clustering is to split your data into groups that are "similar"
+
+Why?
+
+- Marketing: grouping people based on spending patterns, purchase history or their details might allow us to be able to recommend them specific products they'll be interested in... to make us more money
+
+- Insurance: group users based on claims and pay patterns to determine fraudulent claims
+          : split people into different categories of plan
+          
+- geo-demographic: what are the people in a certain area like? what kind of groups are in certain areas?
+
+- education planning
+
+- finance
+
+Both segmentation and clustering share the same goal, the difference is in how they do it:
+
+## Segmentation first
+
+> You know before starting how you want to split your groups.
+
+(we define boundaries to split characteristics by)
+
+e.g. for customer data we might split by
+
+- age over and under 40
+- earning over or under 30k a year
+
+We'd end up with the following groups:
+
+1. under 40, earns under 30k
+2. under 40, earns over 30k           (core audience - young professionals)
+3. over 40, earns under 30k           (important - less young medium earners)
+4. over 40, earns over 30k
+
+We could accomplish this with a "simple" mutate
+
+```{r}
+customer_data %>% 
+  mutate(
+    customer_type = case_when(
+      age < 40 & salary < 30000 ~ "A",
+      age < 40 & salary >= 30000 ~ "B",
+      age >= 40 & salary < 30000 ~ "C",
+      age >= 40 & salary >= 30000 ~ "D",
+    )
+  )
+```
+
+For segmentation we know before splitting how we want to split our groups (usually from some business question / context)
+
+Segmentaion *can* be straightforward for a few characteristics, but can quickly become complex when dealing with a lot of dimensions (attributes/columns)
+
+## Clustering
+
+Clustering is a machine learning technique that groups data points on some measure of similarity (How close are the points)
+
+This makes clustering a good data exploration tool. When you don't know how many groups (how many colours to colour points in) clustering algoritms can help determine how many distinct groups there are in a dataset.
+
+```{r}
+library(tidyverse)
+
+ggplot(iris, aes(Sepal.Length, Sepal.Width)) +
+  geom_point()
+```
+
+It's up to us to add the meaning to clusters identified by our chosen algorithm.
+
+Some clustering algorithms:
+
+- connectivity models. every data point is connected to every other point. Some are just closer than others. (hierarchical clustering)
+
+- centroid models. for a given number of center points, each data point is closest to a center. (k-means)
+
+There are others like: distribution models (prone to overfitting), and density models that are points grouped around each other.
+
+## The How - Hierarchical Clustering
+
+```{r}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(dendextend)
+library(GGally)
+```
+```{r}
+edu_data <- read_csv("data/school_data.csv")
+```
+```{r}
+head(edu_data)
+```
+
+```{r}
+edu_clean <- edu_data %>% 
+  mutate(urban_pop = urban_pop / 100) %>% 
+  column_to_rownames("X1")
+```
+
+Our goals:
+
+1. Practice hierarchical clustering, viewing dendrograms and visualising clusters.
+2. to learn about how many groups there are with regard to education school numbers in the USA
+
+What states are similar to other states when it comes to home schooling numbers?
+
+```{r}
+ggplot(edu_clean, aes(x = home_school, y = urban_pop)) +
+  geom_point()
+```
+
+```{r}
+edu_scale <- edu_clean %>% 
+  mutate(across(everything(), scale))
+```
+
+The first thing to do was scale - done. Scaling is important for clustering as a lot of the measures are based on the physical distance between points. We don't want to bias the cluster direction based on one set of values being on a scale of 10000 to 1400000000 compared to on a scale of 0 to 100.
+
+The next thing to do is calculate/obtain the **dissimilarity matrix**. This is a distance from each point to every other point in the dataset.
+
+```{r}
+diss_matrix <- edu_scale %>% 
+  select(home_school, urban_pop) %>% 
+  dist(method = "euclidean")
+```
+
+```{r}
+diss_matrix %>% 
+  fviz_dist()
+```
+
+Looking for areas with lots of red or lots of blue -- these could represent our clusters.
+
+A better visualisation: a dendrogram.
+
+```{r}
+clusters <- diss_matrix %>% 
+  hclust(method = "complete")
+```
+
+The `complete` method takes the LARGEST dissimilarity to be the distance when measuring the distance between one point and a cluster of points. 
+
+```{r}
+plot(clusters, hang = -1, cex = 0.9)
+```
+
+Most similar? Minnesota/Wisconsin
+Next two? Alabama/Tennesee? Maybe Iowa/New Hampshire
+What states are in the first cluster of three? Idaho/Iowa/New Hampshire or Alaska/Arkansas/Kentucky OR Indiana/Kansas/Oklahoma
+
+How many clusters should we have?
+
+We can get a soft estimate from our dendrogram by looking for the horizontal line that cuts the tree such that:
+
+- the next cluster points the are the furthest distance away
+
+Cluster numbers to try:
+3 or 6 (i kinda wanna try 4...)
+
+```{r}
+plot(clusters, cex = 0.6, hang = -1)
+rect.hclust(clusters, k = 3, border = 2:5)
+```
+Visualising clusters on original plot:
+
+```{r}
+#first add column for cluster
+edu_clustered <- edu_data %>% 
+  mutate(cluster = cutree(clusters, k = 3))
+
+ggplot(edu_clustered, aes (home_school, urban_pop, colour = factor(cluster))) +
+  geom_point()
+```
+
+Task: we've found some clusters
+
+Visualise the other cluster number we wanted to check out: 6 by
+
+1. overlaying the cluster groups on the dendrogram
+2. plotting the clusters on the original scatter plot
+
+```{r}
+plot(clusters, cex = 0.6, hang = -1)
+rect.hclust(clusters, k = 6, border = 2:7)
+
+edu_clustered <- edu_data %>% 
+  mutate(cluster = cutree(clusters, k = 6))
+
+ggplot(edu_clustered, aes (home_school, urban_pop, colour = factor(cluster))) +
+  geom_point()
+```
+
+```{r}
+library(dendextend)
+heights_per_k.dendrogram(as.dendrogram(clusters))
+```
+

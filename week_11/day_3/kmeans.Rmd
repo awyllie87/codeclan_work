@@ -1,0 +1,234 @@
+---
+title: "K-means Clustering"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(dendextend)
+library(GGally)
+```
+
+```{r}
+edu_data <- read_csv("data/school_data.csv")
+```
+```{r}
+edu_clean <- edu_data %>% 
+  mutate(urban_pop = urban_pop / 100) %>% 
+  column_to_rownames("X1")
+
+edu_scale <- edu_clean %>% 
+  mutate(across(everything(), scale))
+```
+
+
+
+# K-means
+
+If we have k clusters, we'll have k midpoints
+
+so if we have two clusters, we'll have two midpoints
+
+Hierarchical clustering is very good for showing the distances between points, but one way it falls down (apart from displaying large [long] datasets), is in when it groups the points. Over time it will be correct (tending to lower number of clusters), but at higher cluster numbers, we might find points slightly "mis-clustered".
+
+K-means on the other hand:
+
+- Shows your final groupings for a given number of clusters
+- We lose some granularity, but it can be possible to tell immediately what cluster a new point belongs to.
+
+
+## K-means process
+
+`kmeans()`:
+
+repeats this until "good" clustering:
+
+- plots k centres randomly
+- assigns data points into a cluster based on the closest centre
+- relocates the centres to the centre of their cluster
+
+Implementing kmeans
+
+Our data: education data about schooling in the US
+
+Looking at home schooling and urban population again:
+
+```{r}
+edu_scale %>% 
+  pivot_longer(cols = everything(),
+               names_to = "var",
+               values_to = "value") %>% 
+  group_by(var) %>% 
+  summarise(mean = mean(value),
+            sd = sd(value)
+            )
+```
+
+mean = 0
+sd = 1
+
+Data is scaled and ready for clustering
+
+```{r}
+set.seed(123)
+
+kmeans_edu <- kmeans(edu_scale, centers = 6, nstart = 20)
+
+kmeans_edu
+```
+
+1. We get the number of points in each cluster (11, 4, 8, 10, 10, 7)
+
+```{r}
+kmeans_edu$size
+```
+
+2. We get the positions of the final clusters
+
+```{r}
+kmeans_edu$centers
+```
+
+3. The assigned cluster for each row
+
+```{r}
+kmeans_edu$cluster
+```
+
+4. Sum of squares within each cluster
+
+```{r}
+kmeans_edu$withinss
+```
+Total within cluster sum of squares:
+
+- how far is each point from its cluster centre?
+- square to remove +ve and -ve cancellation
+- get total
+
+kmeans plays nicely with {broom}
+```{r}
+library(broom)
+
+tidy(kmeans_edu)
+```
+
+```{r}
+augment(kmeans_edu, edu_clean)
+```
+
+augment nicely adds the cluster information (what cluster each point is in) to your original data.
+
+```{r}
+augment(kmeans_edu, edu_clean) %>% 
+  ggplot(aes(home_school, urban_pop, colour = .cluster)) +
+  geom_point()
+```
+Help for picking a number of clusters
+
+Performing and plotting kmeans for a chosen number of clusters
+
+## Choosing the number of clusters
+
+Method 1: Elbow Method
+method 2: Silhouette coefficient
+Method 3: Gap statistic
+
+### Elbow method (within sum of squares)
+
+```{r}
+# from `factoextra` package
+
+fviz_nbclust(edu_scale %>% select(urban_pop, home_school),
+             FUNcluster = kmeans,
+             method = "wss",
+             nstart = 20)
+```
+
+At what point do we start to see less improvement in total within sum of squares when increasing the number of clusters? (where is the elbow?)
+
+k = 3 or 4
+
+### Silhouette coefficient
+
+Looks at separation distance between the clusters. So how dissimilar are the clusters?
+
+```{r}
+# from `factoextra` package
+
+fviz_nbclust(edu_scale %>% select(urban_pop, home_school),
+             FUNcluster = kmeans,
+             method = "silhouette",
+             nstart = 20)
+```
+
+Here we're looking for high average silhouette widths (distance between clusters).
+This indicates a good number of dissimilar clusters.
+
+So here, even though it's saying 9 is optimal, 4 also looks like a good choice.
+
+### Gap statistic
+
+Compared to unclusterable data, how clusterable is our data at various 
+
+```{r}
+fviz_nbclust(edu_scale %>% select(urban_pop, home_school),
+             FUNcluster = kmeans,
+             method = "gap_stat",
+             nstart = 20)
+```
+
+Anywhere you see a decrease going from current k to k + 1 is a reasonable choice for k
+
+so here reasonable choices : 1, 2, 3, 4, 5, 6
+
+So we'll try 2 clusters and 4 clusters
+
+### K = 2
+
+```{r}
+set.seed(123)
+
+kmeans_edu2 <- kmeans(edu_scale, centers = 2, nstart = 20)
+
+augment(kmeans_edu2, edu_clean) %>% 
+  ggplot(aes(home_school, urban_pop, colour = .cluster)) +
+  geom_point()
+```
+
+### K = 4
+
+```{r}
+set.seed(123)
+
+kmeans_edu4 <- kmeans(edu_scale, centers = 4, nstart = 20)
+
+augment(kmeans_edu4, edu_clean) %>% 
+  ggplot(aes(home_school, urban_pop, colour = .cluster)) +
+  geom_point()
+```
+### K = 5
+
+```{r}
+set.seed(123)
+
+kmeans_edu5 <- kmeans(edu_scale, centers = 5, nstart = 20)
+
+augment(kmeans_edu5, edu_clean) %>% 
+  ggplot(aes(home_school, urban_pop, colour = .cluster)) +
+  geom_point()
+```
+
+## Summary
+
+K-means is sensitive to:
+
+- outliers (solution: remove, use a less sensitive clustering algorithm like `kmedoids` [`pam`])
+- unscaled data (solution : scale your data)
+- the initial centroid location (possible solution: have a higher nstart value)
+
+just a general observation: clustering isn't always suitable / produces a valuable result
+
+`kmeans()` will run on any numerical data, whether it's useful or not is context / data dependant

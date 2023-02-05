@@ -1,0 +1,130 @@
+---
+title: "Day 2 Lab"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(GGally)
+library(tidyselect)
+library(janitor)
+library(modelr)
+library(pROC)
+library(caret)
+```
+
+```{r}
+churn <- readxl::read_xlsx("data/telecomms_churn.xlsx")
+```
+
+```{r}
+churn_clean <- janitor::clean_names(churn) %>% 
+  select(-customer_id)
+```
+
+
+```{r warning=FALSE, message=FALSE}
+ggpairs(churn_clean, progress = FALSE)
+```
+
+senior_citizen?!
+dependents
+tenure
+phone service
+contract
+both charges
+
+```{r}
+churn_prepped <- churn_clean %>% 
+  mutate(across(where(is.character), as.factor),
+         senior_citizen = as.factor(if_else(senior_citizen == 1, "Yes", "No")))
+```
+
+```{r}
+churn_contract <- glm(churn ~ contract, data = churn_prepped, family = binomial)
+
+# p *** on all three
+
+churn_prepped %>% 
+  add_predictions(churn_contract, type = "response") %>% 
+  distinct(contract, pred)
+
+churn_tenure <- glm(churn ~ tenure, data = churn_prepped, family = binomial)
+
+# p ***
+
+churn_prepped %>% 
+  add_predictions(churn_tenure, type = "response")
+
+churn_t_charges <- glm(churn ~ total_charges, data = churn_prepped, family = binomial)
+
+# p ***
+
+churn_prepped %>% 
+  add_predictions(churn_t_charges, type = "response")
+```
+
+```{r message = FALSE}
+roc_contract <- churn_prepped %>% 
+  add_predictions(churn_contract, type = "response") %>% 
+  roc(response = churn, predictor = pred)
+
+roc_tenure <- churn_prepped %>% 
+  add_predictions(churn_tenure, type = "response") %>% 
+  roc(response = churn, predictor = pred)
+
+roc_t_charges <- churn_prepped %>% 
+  add_predictions(churn_t_charges, type = "response") %>% 
+  roc(response = churn, predictor = pred)
+
+ggroc(data = list(contract = roc_contract, tenure = roc_tenure, tot_charges = roc_t_charges)) +
+  coord_fixed() +
+  geom_abline(slope = 1, intercept = 1, linetype = 3) +
+  labs(y = "Sensitivity (TPR)",
+       x = "1 - Specificity (TNR) [FPR]")
+
+print(paste0("Contract: ", auc(roc_contract))) 
+print(paste0("Tenure: ", auc(roc_tenure))) 
+print(paste0("Total Charges: ", auc(roc_t_charges))) 
+```
+
+Best classifier likely to be either Contract or Tenure, with Tenure a little better
+
+```{r}
+train_control <- trainControl(method = "repeatedcv",
+                              number = 5,
+                              repeats = 100,
+                              savePredictions = TRUE,
+                              classProbs = TRUE,
+                              summaryFunction = twoClassSummary)
+
+```
+
+```{r}
+model_contract <- train(churn ~ contract,
+                        data = churn_prepped,
+                        trControl = train_control,
+                        method = "glm",
+                        family = binomial)
+```
+
+```{r}
+model_tenure <- train(churn ~ tenure,
+                        data = churn_prepped,
+                        trControl = train_control,
+                        method = "glm",
+                        family = binomial)
+```
+
+```{r}
+model_t_charges <- train(churn ~ total_charges,
+                        data = churn_prepped,
+                        trControl = train_control,
+                        method = "glm",
+                        family = binomial)
+```
+
+```{r}
+colSums(is.na(churn_prepped))
+```
+
